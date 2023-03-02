@@ -3,7 +3,7 @@
         "sourceMap": true,
         "outDir": "dist",
         "strict": false, //marks if all ts types must be defined
-        "lib": ["ESNext"],
+        "lib": ["esnext"],
         "esModuleInterop": true
     }
 }
