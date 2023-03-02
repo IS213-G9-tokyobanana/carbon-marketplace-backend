@@ -1,1 +1,4 @@
 /node_modules
+
+# prisma
+/templates/express/.env
