@@ -1,4 +1,5 @@
 /node_modules
+/templates/express/node_modules
 
 # prisma env variable - shouldn't be included in repo
 /templates/express/prisma/.env
