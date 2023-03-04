@@ -1,4 +1,12 @@
-{
+{ 
+  "name": "carbon-marketplace-express-microservice",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "npm run build && node ./dist/index.js",
+    "dev": "nodemon ./src/index.ts",
+    "build": "tsc -p ."
+  },
   "dependencies": {
     "@prisma/client": "^4.11.0",
     "@types/node": "^18.14.6",
