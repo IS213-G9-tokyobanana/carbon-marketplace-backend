@@ -1,5 +1,7 @@
 # Ignore flask __pycache__ directory
-__pycache__node_modules
+__pycache__
+.DS_Store
+node_modules
 dist
 # prisma env variable - shouldn't be included in repo
 .env
