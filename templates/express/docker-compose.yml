@@ -1,14 +1,14 @@
 version: '4.15.0'
 services:
-  postgres:
+  db:
     image: postgres:15.2
     restart: always
     environment:
       - POSTGRES_USER=tokyobanana
       - POSTGRES_PASSWORD=naganohara
     volumes:
-      - postgres:/var/lib/postgresql/data
+      - db_data:/var/lib/postgresql/data
     ports:
       - '5432:5432'
 volumes:
-  postgres:
+  db_data: {}
