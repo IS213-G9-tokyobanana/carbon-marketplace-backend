@@ -1,0 +1,33 @@
+version: '3'
+
+volumes:
+  mongo-data:
+
+networks:
+  mongo-network:
+    driver: bridge
+
+services:
+  mongo:
+    image: mongo
+    restart: always
+    networks:
+      - mongo-network
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME} # from .env file
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+    volumes:
+      - mongo-data:/data/mongodb
+    ports:
+      - "27017:27017"
+  
+  user:
+    image: user:latest
+    build: .
+    restart: always
+    networks:
+      - mongo-network
+    environment:
+      - MONGODB_URI=${MONGODB_URI}
+    ports:
+      - "3000:3000"
