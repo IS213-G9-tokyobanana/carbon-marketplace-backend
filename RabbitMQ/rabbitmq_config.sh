@@ -8,5 +8,7 @@ until wget http://${RABBITMQ_HOST}:15672/cli/rabbitmqadmin -O /tmp/rabbitmqadmin
    attempts=$((attempts + 1))
 done
 
+# Create the topic exchange
 python3 /tmp/rabbitmqadmin --host ${RABBITMQ_HOST} declare exchange name=topic_exchange type=topic
 
+# Add more exchange here

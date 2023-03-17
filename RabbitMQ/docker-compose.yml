@@ -4,8 +4,6 @@ services:
     container_name: "rabbitmq3"
     image: ${PRIVATE_REGISTRY_URI}rabbitmq:3-management
     hostname: "rabbit1"
-    env_file:
-      - .env
     ports:
       #HTTP management UI
       - "15672:15672"
