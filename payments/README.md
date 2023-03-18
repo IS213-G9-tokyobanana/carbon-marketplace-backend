@@ -1,17 +1,13 @@
-# Express + Prisma Template
+# Payment Microservice
 
-Steps:
-1. Retrieve the .env file for the database URL (or manually enter).
+A Node.js Express Application with MongoDB database.
 
-2. Create the docker container for the postgresql database.
-This is done by ```docker compose up```, in templates/dockerfiles/prisma-postgres.
+MongoDB Admin Panel can be accessed through localhost:8888, and the Express App is running on port 5008. 
 
-3. Migrate the database schema from /express/prisma/schema.prisma
-Run ```npx prisma migrate dev --name init``` from /express/prisma.
+To create a new PaymentIntent in Stripe, submit a POST request to localhost:5008/payments with params *amount* (in cents) and *currency* (string value like 'sgd' or 'usd'). 
 
-4. You may refer to postgrestest.ts in templates/express/prisma/dist for some sample code on creating the Prisma Client queries - creating an instance of an entity and also getting instances.
-To run this code, cd to the /express/prisma/dist folder, and run ```npx ts-node postgrestest.ts```. This will create a sample user in the database.
+The PaymentIntent object from Stripe will be saved in the local database with the PaymentIntent_Id as the identifier.
 
-5. You can run the Express app. 
-Locate the file in templates/express/, then run the two commands ```npm run build``` and ```npm run start```.
-The Prisma Function getAllUsers is in localhost:5000/users, and will return the user created in postgrestest.ts.
+# To run the container
+1. Load the .env file in the payments folder.
+2. Simply docker-compose up.
