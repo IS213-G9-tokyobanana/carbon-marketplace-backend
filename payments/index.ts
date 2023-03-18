@@ -1,5 +1,3 @@
-// TODO
-import { PrismaClient } from ".prisma/client"
 import { TransactionInput } from "./types"
 import Stripe from "stripe"
 import mongoDB, { MongoClient } from "mongodb"
@@ -8,7 +6,6 @@ import * as dotenv from "dotenv"
 dotenv.config()
 import express from "express"
 
-const prisma = new PrismaClient()
 const app = express()
 const port = 5000
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {

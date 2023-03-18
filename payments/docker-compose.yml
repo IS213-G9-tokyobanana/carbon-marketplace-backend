@@ -42,3 +42,10 @@ services:
       - mongo
     ports:
       - "8888:8081"
+  payments:
+    build: 
+      dockerfile: ./payments.Dockerfile
+    image: payments
+    ports:
+      - "5008:5000"
+    container_name: payments
