@@ -7,12 +7,14 @@ dotenv.config()
 import express from "express"
 
 const app = express()
+app.use(express.json())
 const port = 5000
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
 	apiVersion: "2022-11-15",
 	typescript: true,
 })
 const collections: { paymentintents?: mongoDB.Collection } = {}
+const database: { db?: mongoDB.Db } = {}
 
 // function to connect to MongoDB
 async function connectToDatabase() {
@@ -21,17 +23,22 @@ async function connectToDatabase() {
 	)
 	await client.connect()
 
-	const db: mongoDB.Db = client.db(process.env.DB_NAME)
-	const collection: mongoDB.Collection = db.collection(
+	database.db = client.db(process.env.DB_NAME)
+}
+
+connectToDatabase()
+
+async function createCollection() {
+	const collection: mongoDB.Collection = database.db.collection(
 		process.env.COLLECTION_NAME
 	)
 	collections.paymentintents = collection
 	console.log(
-		`Successfully connected to database: ${db.databaseName} and collection: ${collections.paymentintents}`
+		`Successfully connected to database: ${database.db.databaseName} and collection: ${collections.paymentintents}`
 	)
 }
 
-connectToDatabase()
+createCollection()
 
 app.get("/", (req, res) => {
 	res.send("Hello World!")
@@ -42,8 +49,8 @@ app.listen(port, () => {
 })
 
 // route to create Payment Intent in Stripe
-app.post("/payment", async (req, res) => {
-	const input: TransactionInput = req.query
+app.post("/payments", async (req, res) => {
+	const input: TransactionInput = req.body
 
 	const params: Stripe.PaymentIntentCreateParams = {
 		amount: input.amount,
@@ -55,28 +62,22 @@ app.post("/payment", async (req, res) => {
 		const paymentIntent: Stripe.PaymentIntent =
 			await stripe.paymentIntents.create(params)
 
-		const request = {
-			paymentId: paymentIntent.id,
-			paymentIntent: paymentIntent,
+		const dbTransaction = {
+			payment_id: paymentIntent.id,
+			payment_intent: paymentIntent,
+			quantity_tco2e: input.quantity_tco2e,
+			project_id: input.project_id,
+			owner_id: input.owner_id,
+			buyer_id: input.buyer_id,
+			created_at: new Date(),
+			updated_at: new Date(),
 		}
 
-		try {
-			const databaseResult = await collections.paymentintents.insertOne(
-				request
-			)
+		const databaseResult = await collections.paymentintents.insertOne(
+			dbTransaction
+		)
 
-			console.log(databaseResult)
-		} catch (e) {
-			res.status(400).send({
-				error: {
-					message: e.message,
-				},
-			})
-		}
-
-		const result = await res.send({
-			clientSecret: paymentIntent.client_secret,
-		})
+		await res.send({ clientSecret: paymentIntent.client_secret })
 	} catch (e) {
 		res.status(400).send({
 			error: {
