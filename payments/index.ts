@@ -14,7 +14,6 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
 	typescript: true,
 })
 const collections: { paymentintents?: mongoDB.Collection } = {}
-const database: { db?: mongoDB.Db } = {}
 
 // function to connect to MongoDB
 async function connectToDatabase() {
@@ -23,22 +22,18 @@ async function connectToDatabase() {
 	)
 	await client.connect()
 
-	database.db = client.db(process.env.DB_NAME)
-}
+	const db = client.db(process.env.DB_NAME)
 
-connectToDatabase()
-
-async function createCollection() {
-	const collection: mongoDB.Collection = database.db.collection(
+	const collection: mongoDB.Collection = db.collection(
 		process.env.COLLECTION_NAME
 	)
 	collections.paymentintents = collection
 	console.log(
-		`Successfully connected to database: ${database.db.databaseName} and collection: ${collections.paymentintents}`
+		`Successfully connected to database: ${db.databaseName} and collection: ${collections.paymentintents}`
 	)
 }
 
-createCollection()
+connectToDatabase()
 
 app.get("/", (req, res) => {
 	res.send("Hello World!")
