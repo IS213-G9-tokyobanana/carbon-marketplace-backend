@@ -1,12 +1,23 @@
 import json
 import pika
-from config import RMQHOSTNAME, RMQPORT, RMQUSERNAME, RMQPASSWORD, EXCHANGE_NAME, TASK_EXECUTE_ROUTING_KEY
+from config import (
+    RMQHOSTNAME,
+    RMQPORT,
+    RMQUSERNAME,
+    RMQPASSWORD,
+    EXCHANGE_NAME,
+    TASK_EXECUTE_ROUTING_KEY,
+)
 import police
 
 # Connect to RabbitMQ
 connection = pika.BlockingConnection(
     pika.ConnectionParameters(
-        host=RMQHOSTNAME, port=RMQPORT, heartbeat=3600, blocked_connection_timeout=3600, credentials=pika.PlainCredentials(RMQUSERNAME, RMQPASSWORD)
+        host=RMQHOSTNAME,
+        port=RMQPORT,
+        heartbeat=3600,
+        blocked_connection_timeout=3600,
+        credentials=pika.PlainCredentials(RMQUSERNAME, RMQPASSWORD),
     )
 )
 
@@ -16,10 +27,11 @@ channel = connection.channel()
 # Create a task_triggered_topic queue
 channel.queue_declare("task_triggered_topic", durable=True)
 channel.queue_bind(
-    exchange= EXCHANGE_NAME,
+    exchange=EXCHANGE_NAME,
     queue="task_triggered_topic",
     routing_key=TASK_EXECUTE_ROUTING_KEY,
 )
+
 
 def check_setup():
     global connection, channel, RMQHOSTNAME, RMQPORT
@@ -38,6 +50,7 @@ def check_setup():
             exchange=EXCHANGE_NAME, exchange_type="topic", durable=True
         )
 
+
 def is_connection_open(connection):
     try:
         connection.process_data_events()
@@ -46,6 +59,7 @@ def is_connection_open(connection):
         print("AMQP Error:", e)
         print("...creating a new connection.")
         return False
+
 
 def receiveError():
     check_setup()
@@ -56,8 +70,10 @@ def receiveError():
     )
     channel.start_consuming()
 
+
 def callback(channel, method, properties, body):
     processTrigger(body)
+
 
 def processTrigger(message):
     try:
@@ -67,8 +83,11 @@ def processTrigger(message):
         print("--NOT JSON:", e)
         print("--DATA:", data)
 
-if __name__ == "__main__": 
-    print(": monitoring routing key '{}' in exchange '{}' ...".format("events.*.*.task.execute", EXCHANGE_NAME))
+
+if __name__ == "__main__":
+    print(
+        ": monitoring routing key '{}' in exchange '{}' ...".format(
+            "events.*.*.task.execute", EXCHANGE_NAME
+        )
+    )
     receiveError()
-
-
