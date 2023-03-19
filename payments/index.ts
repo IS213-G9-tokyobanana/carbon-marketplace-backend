@@ -31,6 +31,8 @@ async function connectToDatabase() {
 	)
 }
 
+connectToDatabase()
+
 app.get("/", (req, res) => {
 	res.send("Hello World!")
 })
@@ -49,8 +51,6 @@ app.post("/payment", async (req, res) => {
 		automatic_payment_methods: { enabled: true }, // for the sake of this project, we just assume automatic payment options
 	}
 
-	connectToDatabase()
-
 	try {
 		const paymentIntent: Stripe.PaymentIntent =
 			await stripe.paymentIntents.create(params)
@@ -60,12 +60,19 @@ app.post("/payment", async (req, res) => {
 			paymentIntent: paymentIntent,
 		}
 
-		const databaseResult = await collections.paymentintents.insertOne(
-			request
-		)
+		try {
+			const databaseResult = await collections.paymentintents.insertOne(
+				request
+			)
 
-		// check the database result status
-		console.log(databaseResult)
+			console.log(databaseResult)
+		} catch (e) {
+			res.status(400).send({
+				error: {
+					message: e.message,
+				},
+			})
+		}
 
 		const result = await res.send({
 			clientSecret: paymentIntent.client_secret,
