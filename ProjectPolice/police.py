@@ -4,7 +4,6 @@ import json
 import requests
 from config import EXCHANGE_NAME
 
-
 def checkType(msg):
     jsonmsg = json.dumps(
         {
