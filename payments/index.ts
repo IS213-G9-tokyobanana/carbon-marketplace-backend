@@ -73,16 +73,13 @@ app.post("/payments", async (req, res) => {
 			updated_at: new Date(),
 		}
 
-		const databaseResult = await collections.paymentintents.insertOne(
-			dbTransaction
-		)
+		collections.paymentintents.insertOne(dbTransaction)
 
-		await res.send({ clientSecret: paymentIntent.client_secret })
+		res.send({ success: true, data: paymentIntent.client_secret })
 	} catch (e) {
 		res.status(400).send({
-			error: {
-				message: e.message,
-			},
+			message: e.message,
+			resource: input,
 		})
 	}
 })
