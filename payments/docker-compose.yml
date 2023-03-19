@@ -10,6 +10,11 @@ services:
       - MONGO_INITDB_DATABASE=project
     ports:
       - "27017:27017"
+    volumes: 
+      - /mongo/data:/data/db
+    networks:
+      - payment-network
+
   payments:
     build: 
       dockerfile: ./payments.Dockerfile
@@ -17,3 +22,11 @@ services:
     ports:
       - "5008:5000"
     container_name: payments
+    networks:
+      - payment-network
+    depends_on:
+      - mongo
+  
+networks:
+  payment-network:
+    driver: bridge
