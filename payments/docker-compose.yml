@@ -20,6 +20,7 @@ services:
     build: 
       dockerfile: ./payments.Dockerfile
     image: payments
+    restart: always
     ports:
       - "5008:5000"
     container_name: payments
