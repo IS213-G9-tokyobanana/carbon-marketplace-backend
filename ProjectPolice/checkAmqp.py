@@ -61,7 +61,7 @@ def is_connection_open(connection):
         return False
 
 
-def receiveError():
+def receiveMsg():
     check_setup()
     channel.basic_consume(
         queue="task_triggered_topic",
@@ -90,4 +90,4 @@ if __name__ == "__main__":
             "events.*.*.task.execute", EXCHANGE_NAME
         )
     )
-    receiveError()
+    receiveMsg()
