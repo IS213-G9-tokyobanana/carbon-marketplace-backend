@@ -22,7 +22,7 @@ services:
     image: payments
     restart: always
     ports:
-      - "5008:5000"
+      - "3000:5000"
     container_name: payments
     networks:
       - payment-network
