@@ -56,13 +56,13 @@ def receiveError():
     )
     channel.start_consuming()
 
-def callback(body):
+def callback(channel, method, properties, body):
     processTrigger(body)
 
 def processTrigger(message):
     try:
         data = json.loads(message)
-        police.checkPromise(data)
+        police.checkType(data)
     except Exception as e:
         print("--NOT JSON:", e)
         print("--DATA:", data)
