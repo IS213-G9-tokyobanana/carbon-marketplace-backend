@@ -1,0 +1,21 @@
+version: "3.8"
+services: 
+  rabbitmq3:
+    container_name: "rabbitmq3"
+    image: ${PRIVATE_REGISTRY_URI}rabbitmq:3-management
+    hostname: "rabbit1"
+    ports:
+      #HTTP management UI
+      - "15672:15672"
+      #AMQP protocol port
+      - "5672:5672"
+  rabbitmq-config:
+    container_name: rabbitmq-config
+    image: ${PRIVATE_REGISTRY_URI}mushkevych/syn-rabbitmq-config:latest
+    build:
+      dockerfile: rabbitmq_config.dockerfile
+      args:
+        private_registry_uri: ${PRIVATE_REGISTRY_URI}
+    restart: "no"
+    depends_on:
+      - rabbitmq3
