@@ -13,17 +13,17 @@ import (
 	"gorm.io/gorm"
 )
 
-// @BasePath /api/v1
+//	@BasePath	/api/v1
 
 // PingExample godoc
-// @Summary Healthcheck
-// @Schemes http https
-// @Description Pings the server to see if it's up
-// @Tags example
-// @Accept json
-// @Produce json
-// @Success 200 {object} object{success=bool,data=string} "healthcheck"
-// @Router /healthcheck [get]
+//	@Summary		Healthcheck
+//	@Schemes		http https
+//	@Description	Pings the server to see if it's up
+//	@Tags			example
+//	@Accept			json
+//	@Produce		json
+//	@Success		200	{object}	object{success=bool,data=string}	"healthcheck"
+//	@Router			/healthcheck [get]
 func Healthcheck(g *gin.Context) {
 	g.JSON(http.StatusOK, gin.H{
 		"success": true,
@@ -32,16 +32,16 @@ func Healthcheck(g *gin.Context) {
 }
 
 // GetUsers godoc
-// @Summary Get list of users
-// @Schemes http https
-// @Description fetch all Users' data based on the query parameters
-// @Tags users
-// @Accept json
-// @Produce json
-// @Param type 		 query string false "type"
-// @Param project_id query string false "project_id"
-// @Success 200 {object} object{success=bool,data=[]models.User} "list of users matching the query"
-// @Router /users [get]
+//	@Summary		Get list of users
+//	@Schemes		http https
+//	@Description	fetch all Users' data based on the query parameters
+//	@Tags			users
+//	@Accept			json
+//	@Produce		json
+//	@Param			type		query		string									false	"type"
+//	@Param			project_id	query		string									false	"project_id"
+//	@Success		200			{object}	object{success=bool,data=[]models.User}	"list of users matching the query"
+//	@Router			/users [get]
 func GetUsers(c *gin.Context) {
 	db := models.DB
 	var (
@@ -138,15 +138,15 @@ func GetUsers(c *gin.Context) {
 }
 
 // GetUsersById godoc
-// @Summary Get user by id
-// @Schemes http https
-// @Description fetch a User's data based on the id
-// @Tags users
-// @Accept json
-// @Produce json
-// @Param id path string true "id"
-// @Success 200 {object} object{success=bool,data=models.User} "user matching the id"
-// @Router /users/{id} [get]
+//	@Summary		Get user by id
+//	@Schemes		http https
+//	@Description	fetch a User's data based on the id
+//	@Tags			users
+//	@Accept			json
+//	@Produce		json
+//	@Param			id	path		string									true	"id"
+//	@Success		200	{object}	object{success=bool,data=models.User}	"user matching the id"
+//	@Router			/users/{id} [get]
 func GetUserById(c *gin.Context) {
 	db := models.DB
 	id := c.Param("id")
@@ -178,19 +178,19 @@ func GetUserById(c *gin.Context) {
 }
 
 // CreateUser godoc
-// @Summary Create a user
-// @Schemes http https
-// @Description create a new user
-// @Tags users
-// @Accept json
-// @Produce json
-// @Param name body string true "name"
-// @Param email body string true "email"
-// @Param type body string true "type"
-// @Param project_id body string false "project_id"
-// @Param footprint_in_tco2e body string false "footprint_in_tco2e"
-// @Success 200 {object} object{success=bool,data=models.User} "user created"
-// @Router /users [post]
+//	@Summary		Create a user
+//	@Schemes		http https
+//	@Description	create a new user
+//	@Tags			users
+//	@Accept			json
+//	@Produce		json
+//	@Param			name				body		string									true	"name"
+//	@Param			email				body		string									true	"email"
+//	@Param			type				body		string									true	"type"
+//	@Param			project_id			body		string									false	"project_id"
+//	@Param			footprint_in_tco2e	body		string									false	"footprint_in_tco2e"
+//	@Success		200					{object}	object{success=bool,data=models.User}	"user created"
+//	@Router			/users [post]
 func CreateUser(c *gin.Context) {
 	// Parse request body params
 	var params struct {
