@@ -44,7 +44,6 @@ func Healthcheck(g *gin.Context) {
 // @Router /users [get]
 func GetUsers(c *gin.Context) {
 	db := models.DB
-
 	var (
 		users     []interface{}
 		err       error
@@ -86,7 +85,7 @@ func GetUsers(c *gin.Context) {
 			users = append(users, verifier)
 		}
 	} else {
-		// Prepare the WHERE clause
+		// Prepare the WHERE clause for query
 		where := ""
 		args := []interface{}{}
 		if queryUserType != "" {
@@ -102,7 +101,6 @@ func GetUsers(c *gin.Context) {
 		}
 
 		// Query the database
-
 		err = db.Where(where, args...).Find(&buyers).Error
 		if err != nil {
 			rest.ServerErrorWithData("error fetching buyers", err).Send(c)
@@ -146,6 +144,7 @@ func GetUsers(c *gin.Context) {
 // @Tags users
 // @Accept json
 // @Produce json
+// @Param id path string true "id"
 // @Success 200 {object} object{success=bool,data=models.User} "user matching the id"
 // @Router /users/{id} [get]
 func GetUserById(c *gin.Context) {
