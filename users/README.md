@@ -15,7 +15,13 @@ Built with Go, this microservice is responsible for managing users.
 git clone
 ```
 
-2. Run docker compose
+2. Copy and rename the `.env.example` file to `.env`. Please remember to update the environment variables accordingly.
+
+```bash
+cp .env.example .env
+```
+
+3. Run docker compose
 
 ```bash
 docker compose up
