@@ -66,7 +66,6 @@ def receiveMsg():
     channel.basic_consume(
         queue="task_triggered_topic",
         on_message_callback=callback,
-        auto_ack=True,
     )
     channel.start_consuming()
 
