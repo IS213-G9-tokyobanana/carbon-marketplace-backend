@@ -62,5 +62,5 @@ poetry install
 6. Run the app
 
 ```
-python3 app.py
+python3 checkAmqp.py
 ```
