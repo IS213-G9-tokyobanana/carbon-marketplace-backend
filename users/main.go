@@ -45,7 +45,7 @@ func SetupRouter(mode string) *gin.Engine {
 
 	v1 := r.Group("/api/v1")
 	{
-		v1.GET("/health", controllers.Healthcheck)
+		v1.GET("/healthcheck", controllers.Healthcheck)
 		v1.GET("/users", controllers.GetUsers)
 		v1.POST("/users", controllers.CreateUser)
 		v1.GET("/users/:id", controllers.GetUserById)

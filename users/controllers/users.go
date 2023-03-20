@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"go-rest-api/models"
 	"go-rest-api/rest"
-	"net/http"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -13,25 +12,8 @@ import (
 	"gorm.io/gorm"
 )
 
-//	@BasePath	/api/v1
-
-// PingExample godoc
-//	@Summary		Healthcheck
-//	@Schemes		http https
-//	@Description	Pings the server to see if it's up
-//	@Tags			example
-//	@Accept			json
-//	@Produce		json
-//	@Success		200	{object}	object{success=bool,data=string}	"healthcheck"
-//	@Router			/healthcheck [get]
-func Healthcheck(g *gin.Context) {
-	g.JSON(http.StatusOK, gin.H{
-		"success": true,
-		"data":    gin.H{"message": "healthy"},
-	})
-}
-
 // GetUsers godoc
+//
 //	@Summary		Get list of users
 //	@Schemes		http https
 //	@Description	fetch all Users' data based on the query parameters
@@ -59,30 +41,24 @@ func GetUsers(c *gin.Context) {
 	// If no query parameters are provided, return all users
 	if queryUserType == "" && queryProjectId == "" {
 		err = db.Find(&buyers).Error
-		if err != nil {
-			rest.ServerErrorWithData("error fetching buyers", err).Send(c)
-			return
-		}
-		for _, buyer := range buyers {
-			users = append(users, buyer)
+		if err == nil {
+			for _, buyer := range buyers {
+				users = append(users, buyer)
+			}
 		}
 
 		err = db.Find(&sellers).Error
-		if err != nil {
-			rest.ServerErrorWithData("error fetching sellers", err).Send(c)
-			return
-		}
-		for _, seller := range sellers {
-			users = append(users, seller)
+		if err == nil {
+			for _, seller := range sellers {
+				users = append(users, seller)
+			}
 		}
 
 		err = db.Find(&verifiers).Error
-		if err != nil {
-			rest.ServerErrorWithData("error fetching verifiers", err).Send(c)
-			return
-		}
-		for _, verifier := range verifiers {
-			users = append(users, verifier)
+		if err == nil {
+			for _, verifier := range verifiers {
+				users = append(users, verifier)
+			}
 		}
 	} else {
 		// Prepare the WHERE clause for query
@@ -102,30 +78,24 @@ func GetUsers(c *gin.Context) {
 
 		// Query the database
 		err = db.Where(where, args...).Find(&buyers).Error
-		if err != nil {
-			rest.ServerErrorWithData("error fetching buyers", err).Send(c)
-			return
-		}
-		for _, buyer := range buyers {
-			users = append(users, buyer)
+		if err == nil {
+			for _, buyer := range buyers {
+				users = append(users, buyer)
+			}
 		}
 
 		err = db.Where(where, args...).Find(&sellers).Error
-		if err != nil {
-			rest.ServerErrorWithData("error fetching sellers", err).Send(c)
-			return
-		}
-		for _, seller := range sellers {
-			users = append(users, seller)
+		if err == nil {
+			for _, seller := range sellers {
+				users = append(users, seller)
+			}
 		}
 
 		err = db.Where(where, args...).Find(&verifiers).Error
-		if err != nil {
-			rest.ServerErrorWithData("error fetching verifiers", err).Send(c)
-			return
-		}
-		for _, verifier := range verifiers {
-			users = append(users, verifier)
+		if err == nil {
+			for _, verifier := range verifiers {
+				users = append(users, verifier)
+			}
 		}
 	}
 
@@ -138,6 +108,7 @@ func GetUsers(c *gin.Context) {
 }
 
 // GetUsersById godoc
+//
 //	@Summary		Get user by id
 //	@Schemes		http https
 //	@Description	fetch a User's data based on the id
@@ -178,6 +149,7 @@ func GetUserById(c *gin.Context) {
 }
 
 // CreateUser godoc
+//
 //	@Summary		Create a user
 //	@Schemes		http https
 //	@Description	create a new user
