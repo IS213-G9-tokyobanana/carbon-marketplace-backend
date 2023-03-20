@@ -29,13 +29,13 @@ docker compose up
 docker stop go-rest-api
 ```
 
-3. Run the gin app with hot reload
+2. Run the gin app with hot reload
 
 ```bash
 go run main.go
 ```
 
-1. Make necessary code changes & test with Postman. Restart the go-rest-api container once satisfied.
+3. Make necessary code changes & test with Postman. Restart the go-rest-api container once satisfied.
 
 ```bash
 docker start go-rest-api
@@ -105,8 +105,8 @@ func (c *Controller) ShowAccount(ctx *gin.Context) {
 
 ## Built With
 
-- [Go](https://golang.org/) - The programming language used
-- [GORM](https://gorm.io/) - ORM
+- [Go](https://golang.org/) - Programming Language
 - [Gin-gonic](https://gin-gonic.com/) - Web framework
-- [Swagger](https://swagger.io/) - API documentation
+- [GORM](https://gorm.io/) - ORM
 - [PostgreSQL](https://www.postgresql.org/) - Database
+- [Swagger](https://swagger.io/) - API documentation
