@@ -11,10 +11,27 @@ This is the Project Police complex microservice. It is a Flask microservice that
 
 1. Python 3.11 - https://www.python.org/downloads/
 2. Poetry 1.4.0 - https://python-poetry.org/docs/#installation
+3. Docker 20.10.8 - https://docs.docker.com/get-docker/
 
-### Installation
+### Initial Setup
 
-Follow these steps to install and set up this flask template.
+ 1. Clone the repository
+
+ ```bash
+ git clone
+ ```
+
+ 2. Copy and rename the `.env.example` file to `.env`. Please remember to update the environment variables accordingly.
+
+ ```bash
+ cp .env.example .env
+ ```
+
+ 3. Change configuration in `config.py` file based on whether it is production or development environment.
+
+### Running the app
+
+Follow these steps to set up this complex microservice.
 
 1. Ensure docker server is running
 
