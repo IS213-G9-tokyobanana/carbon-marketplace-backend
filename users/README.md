@@ -2,14 +2,12 @@
 
 Built with Go, this microservice is responsible for managing users.
 
-## Getting Started
-
-### Prerequisites
+## Prerequisites
 
 - [Docker](https://www.docker.com/)
 - [Go 1.20+](https://go.dev/dl/)
 
-### Installing
+## Initial Setup
 
 1. Clone the repository
 
@@ -25,13 +23,7 @@ docker compose up
 
 ## Local Development
 
-1. Run docker compose
-
-```bash
-docker compose up
-```
-
-2. Stop the go-rest-api container
+1. Stop the go-rest-api container
 
 ```bash
 docker stop go-rest-api
