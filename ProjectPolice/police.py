@@ -4,20 +4,31 @@ import json
 import requests
 from config import EXCHANGE_NAME
 
+
 def checkType(msg):
-    jsonmsg = json.dumps(
-        {
-            "resource_id": msg["data"]["milestoneid"],
-            "type": "milestone.upcoming",
-            "data": {
-                "project_id": msg["data"]["projectid"],
-                "milestone_id": msg["data"]["milestoneid"],
-            },
-        }
-    )
     if msg["type"] == "upcoming":
+        jsonmsg = json.dumps(
+            {
+                "resource_id": msg["data"]["milestoneid"],
+                "type": "milestone.upcoming",
+                "data": {
+                    "project_id": msg["data"]["projectid"],
+                    "milestone_id": msg["data"]["milestoneid"],
+                },
+            }
+        )
         publishMsgNotify(jsonmsg)
     elif msg["type"] == "penalise":
+        jsonmsg = json.dumps(
+            {
+                "resource_id": msg["data"]["milestoneid"],
+                "type": "milestone.penalise",
+                "data": {
+                    "project_id": msg["data"]["projectid"],
+                    "milestone_id": msg["data"]["milestoneid"],
+                },
+            }
+        )
         sendRequestProject(jsonmsg)
     elif msg["type"] == "overdue":
         # Trigger Temporal.io workflow
