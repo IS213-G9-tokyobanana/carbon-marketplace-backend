@@ -1,4 +1,4 @@
-import { TransactionInput } from "./types"
+import { DbTransactionOutput, TransactionInput } from "./types"
 import Stripe from "stripe"
 import mongoDB, { MongoClient } from "mongodb"
 
@@ -46,6 +46,8 @@ app.listen(port, () => {
 // route to create Payment Intent in Stripe
 app.post("/payments", async (req, res) => {
 	const input: TransactionInput = req.body
+	let paymentIntent: Stripe.PaymentIntent
+	let dbTransaction: DbTransactionOutput
 
 	const params: Stripe.PaymentIntentCreateParams = {
 		amount: input.amount,
@@ -54,10 +56,22 @@ app.post("/payments", async (req, res) => {
 	}
 
 	try {
-		const paymentIntent: Stripe.PaymentIntent =
-			await stripe.paymentIntents.create(params)
+		paymentIntent = await stripe.paymentIntents.create(params)
+	} catch (e) {
+		res.status(400).send({
+			success: false,
+			data: {
+				message: e.message,
+				resource: {
+					amount: input.amount,
+					currency: input.currency,
+				},
+			},
+		})
+	}
 
-		const dbTransaction = {
+	try {
+		dbTransaction = {
 			payment_id: paymentIntent.id,
 			payment_intent: paymentIntent,
 			quantity_tco2e: input.quantity_tco2e,
@@ -73,8 +87,11 @@ app.post("/payments", async (req, res) => {
 		res.send({ success: true, data: paymentIntent.client_secret })
 	} catch (e) {
 		res.status(400).send({
-			message: e.message,
-			resource: input,
+			success: false,
+			data: {
+				message: e.message,
+				resource: dbTransaction,
+			},
 		})
 	}
 })
