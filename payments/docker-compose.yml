@@ -1,0 +1,34 @@
+version: '3'
+
+services:
+  mongo:
+    container_name: mongo
+    image: mongo
+    restart: always
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USER}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD}
+      - MONGO_INITDB_DATABASE=project
+    ports:
+      - "27017:27017"
+    volumes: 
+      - /mongo/data:/data/db
+    networks:
+      - payment-network
+
+  payments:
+    build: 
+      dockerfile: ./payments.Dockerfile
+    image: payments
+    restart: always
+    ports:
+      - "3000:5000"
+    container_name: payments
+    networks:
+      - payment-network
+    depends_on:
+      - mongo
+  
+networks:
+  payment-network:
+    driver: bridge
