@@ -10,5 +10,6 @@ done
 
 # Create the topic exchange
 python3 /tmp/rabbitmqadmin --host ${RABBITMQ_HOST} declare exchange name=topic_exchange type=topic
+python3 /tmp/rabbitmqadmin --host ${RABBITMQ_HOST} declare exchange name=scheduler_exchange type=topic
 
 # Add more exchange here
