@@ -9,7 +9,7 @@ BINDING_KEYS = {
     "PROJECT_VERIFY":"events.projects.*.project.verify",
     "TASK_ADD":"events.*.scheduler.task.add",
     "OFFSET_RESERVE":"events.projects.*.offsets.reserve",
-    "OFFSET_COMMIT":"events.projects.*.offsets.committed",
+    "OFFSET_COMMIT":"events.projects.*.offsets.commit",
     "RATINGS_REWARD":"events.projects.*.ratings.reward",
     "PAYMENT_FAIL":"events.buyprojects.*.payment.failed",
 }
