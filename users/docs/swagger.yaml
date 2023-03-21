@@ -1,0 +1,153 @@
+definitions:
+  models.User:
+    properties:
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      type:
+        type: string
+      updated_at:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /healthcheck:
+    get:
+      consumes:
+      - application/json
+      description: Pings the server to see if it's up
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: healthcheck
+          schema:
+            allOf:
+            - type: object
+            - properties:
+                data:
+                  type: string
+                success:
+                  type: boolean
+              type: object
+      summary: Healthcheck
+      tags:
+      - example
+  /users:
+    get:
+      consumes:
+      - application/json
+      description: fetch all Users' data based on the query parameters
+      parameters:
+      - description: type
+        in: query
+        name: type
+        type: string
+      - description: project_id
+        in: query
+        name: project_id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: list of users matching the query
+          schema:
+            allOf:
+            - type: object
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/models.User'
+                  type: array
+                success:
+                  type: boolean
+              type: object
+      summary: Get list of users
+      tags:
+      - users
+    post:
+      consumes:
+      - application/json
+      description: create a new user
+      parameters:
+      - description: name
+        in: body
+        name: name
+        required: true
+        schema:
+          type: string
+      - description: email
+        in: body
+        name: email
+        required: true
+        schema:
+          type: string
+      - description: type
+        in: body
+        name: type
+        required: true
+        schema:
+          type: string
+      - description: project_id
+        in: body
+        name: project_id
+        schema:
+          type: string
+      - description: footprint_in_tco2e
+        in: body
+        name: footprint_in_tco2e
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: user created
+          schema:
+            allOf:
+            - type: object
+            - properties:
+                data:
+                  $ref: '#/definitions/models.User'
+                success:
+                  type: boolean
+              type: object
+      summary: Create a user
+      tags:
+      - users
+  /users/{id}:
+    get:
+      consumes:
+      - application/json
+      description: fetch a User's data based on the id
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: user matching the id
+          schema:
+            allOf:
+            - type: object
+            - properties:
+                data:
+                  $ref: '#/definitions/models.User'
+                success:
+                  type: boolean
+              type: object
+      summary: Get user by id
+      tags:
+      - users
+swagger: "2.0"
