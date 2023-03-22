@@ -1,11 +1,5 @@
-from config import (
-    RMQHOSTNAME,
-    RMQPORT,
-    RMQUSERNAME,
-    RMQPASSWORD,
-    SCHEDULER_EXCHANGE_NAME,
-    PUBLISHED_TASK_EXECUTE_ROUTING_KEY,
-)
+from publisher import publishTask
+from crontab import CronTab
 
 # TODO:
 # [x] 1. CheckType of each message and call the appropriate function
@@ -21,7 +15,7 @@ from config import (
 #   [] 4.1. newOffsetTrack()
 #   [] 4.2. removeOffsetTrack()
 # [] 5. Re-Publish scheduler task Funct
-#   [] 5.1. republishTask()
+#   [] 5.1. publishTask()
 
 
 def checkType(msg):
@@ -44,11 +38,8 @@ def checkType(msg):
         milestoneRewarded()
     elif msg['type'] == 'task.add':
         # Re-publish the task to the exchange
-        republishTask()
+        publishTask()
 
-# Function that republishes tasks that failed
-def republishTask():
-    pass
 
 # Function that looks for the Offset tracking and removes it from Cron
 def removeOffsetTrack():
@@ -67,13 +58,28 @@ def milestoneRewarded():
 
 # Function that is called when there is a new project. Will call addMilestoneJob() to add all milestones
 def addProject():
-    for milestone in milestones:
-        addMilestoneJob()
+    # for milestone in milestones:
+    #     addMilestoneJob()
+    pass
 
 # Function that will be called repeatedly to add a new milestone job
 # Cron job needs to track Upcoming milestone and Overdue milestone (1day after due)
-def addMilestoneJob():
+def addMilestoneJob(milestone, project_id):
+    due_date = milestone['due_date']
     pass
+
+def test_cron():
+    print('in scheduler test cron')
+    cron = CronTab(user=True)
+    job  = cron.new(command='echo hello_world', comment='test1')
+    job.minute.every(3)
+    cron.write()
+    job  = cron.new(command='echo hello_world2', comment='test2')
+    job.minute.every(5)
+    cron.write()
+    cron.remove_all(comment='test1')
+    cron.write()
+    print('in scheduler after cron')
 
 if __name__ == "__main__":
     pass
