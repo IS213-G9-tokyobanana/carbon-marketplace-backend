@@ -1,6 +1,8 @@
 FROM python:3.11-buster
 WORKDIR /usr/src/app
 
+RUN apt-get update && apt-get -y install cron vim
+
 ARG YOUR_ENV
 
 ENV YOUR_ENV=${YOUR_ENV} \
