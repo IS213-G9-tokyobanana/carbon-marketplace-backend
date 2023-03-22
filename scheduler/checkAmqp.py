@@ -8,7 +8,7 @@ from config import (
     TOPIC_EXCHANGE_NAME,
     BINDING_KEYS,
 )
-import scheduler
+import scheduler, publisher
 
 # Connect to RabbitMQ
 print(RMQHOSTNAME,RMQPORT)
@@ -82,12 +82,19 @@ def callback(channel, method, properties, body):
 def processTrigger(message):
     # call the scheduler
     try:
-        data = json.loads(message)
-        scheduler.checkType(data)
+        # data = json.loads(message)
+        # scheduler.checkType(data)
+        print('testing cron')
+        scheduler.test_cron()
+        print('after test cron')
     except Exception as e:
         print("--NOT JSON:", e)
-        print("--DATA:", data)
+        print("--DATA:", message)
 
+def test():
+    print('testing cron')
+    scheduler.test_cron()
+    print('after test cron')
 
 
 if __name__ == "__main__":
