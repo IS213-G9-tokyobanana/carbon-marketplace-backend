@@ -14,6 +14,7 @@ flask-cors = "^3.0.10"
 flask-sqlalchemy = "^3.0.3"
 psycopg2-binary = "^2.9.5"
 load-dotenv = "^0.1.0"
+pika = "^1.3.1"
 
 
 [build-system]

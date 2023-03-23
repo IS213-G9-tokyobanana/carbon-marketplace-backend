@@ -1,4 +1,4 @@
-from config.config import app
+from config.flask_config import app
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Column, ForeignKey
 from sqlalchemy.orm import relationship
@@ -25,7 +25,7 @@ class Project(db.Model):
 
     def json(self) -> dict:
         return {
-            "id": self.id, 
+            "id": str(self.id), 
             "name": self.name,
             "owner_id": self.owner_id,
             "description": self.description,
@@ -58,7 +58,7 @@ class Milestone(db.Model):
 
     def json(self) -> dict:
         return {
-            "id": self.id,
+            "id": str(self.id),
             "name": self.name,
             "description": self.description,
             "type": self.type,
@@ -68,7 +68,7 @@ class Milestone(db.Model):
             "created_at": self.created_at.isoformat(),
             "updated_at": self.updated_at.isoformat(),
             "due_date": self.due_date.isoformat(),
-            "project_id": self.project_id
+            "project_id": str(self.project_id)
         }
 
     def __repr__(self) -> str:
@@ -86,7 +86,7 @@ class ReservedOffset(db.Model):
     def json(self) -> dict:
         return {
             "payment_id": self.payment_id,
-            "milestone_id": self.milestone_id,
+            "milestone_id": str(self.milestone_id),
             "buyer_id": self.buyer_id,
             "amount": self.amount,
             "created_at": self.created_at.isoformat()
