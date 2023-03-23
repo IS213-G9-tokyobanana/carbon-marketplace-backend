@@ -1,7 +1,7 @@
 import requests
 import pika
 import json
-from config.config import EXCHANGE_NAME
+from config.config import EXCHANGE_NAME, POLICE_NOTIFY_ROUTING_KEY
 
 # Function to format message before sending to Notifier / Project Microservice
 def format_message(resource_id, type, data):
@@ -20,7 +20,7 @@ def publish_to_notifier(message, channel):
     payload = format_message(milestoneid, type, message["data"])
     channel.basic_publish(
         exchange=EXCHANGE_NAME,
-        routing_key="events.police.notify.milestone.upcoming",
+        routing_key=POLICE_NOTIFY_ROUTING_KEY,
         body=payload,
         properties=pika.BasicProperties(delivery_mode=2),
     )
