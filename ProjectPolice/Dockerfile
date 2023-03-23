@@ -1,5 +1,5 @@
 FROM python:3.11-buster
-WORKDIR /usr/src/app
+WORKDIR /app
 
 ARG YOUR_ENV
 
