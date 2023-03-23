@@ -1,70 +1,57 @@
-import checkAmqp
+import requests
 import pika
 import json
-import requests
-from config import EXCHANGE_NAME
+from config.config import EXCHANGE_NAME
+
+# Function to format message before sending to Notifier / Project Microservice
+def format_message(resource_id, type, data):
+    if data is None:
+        new_data = {}
+    else:
+        keys = ["projectid", "milestoneid"]
+        new_data = {x: data[x] for x in keys}
+    return json.dumps({"resource_id": resource_id, "type": type, "data": new_data})
 
 
-def checkType(msg):
-    if msg["type"] == "upcoming":
-        jsonmsg = json.dumps(
-            {
-                "resource_id": msg["data"]["milestoneid"],
-                "type": "milestone.upcoming",
-                "data": {
-                    "project_id": msg["data"]["projectid"],
-                    "milestone_id": msg["data"]["milestoneid"],
-                },
-            }
-        )
-        publishMsgNotify(jsonmsg)
-    elif msg["type"] == "penalise":
-        jsonmsg = json.dumps(
-            {
-                "resource_id": msg["data"]["milestoneid"],
-                "type": "milestone.penalise",
-                "data": {
-                    "project_id": msg["data"]["projectid"],
-                    "milestone_id": msg["data"]["milestoneid"],
-                },
-            }
-        )
-        sendRequestProject(jsonmsg)
-    elif msg["type"] == "overdue":
-        # Trigger Temporal.io workflow
-        return
-
-
-def publishMsgNotify(jsonmsg):
-    checkAmqp.channel.basic_publish(
+# Function to send message to Notifier
+def publish_to_notifier(message, channel):
+    milestoneid = message["data"]["milestoneid"]
+    type = "milestone.upcoming"
+    payload = format_message(milestoneid, type, message["data"])
+    channel.basic_publish(
         exchange=EXCHANGE_NAME,
         routing_key="events.police.notify.milestone.upcoming",
-        body=jsonmsg,
+        body=payload,
         properties=pika.BasicProperties(delivery_mode=2),
     )
 
 
-# Project Microservice URL = http://localhost:5000/api/v1/project
-def sendRequestProject(jsonmsg):
+# Function to send message to Project Microservice
+def send_to_projectms(message):
+    milestoneid = message["data"]["milestoneid"]
+    projectid = message["data"]["projectid"]
+    payload = format_message(milestoneid, projectid, message["data"])
+    URL = f"http://localhost:5000/project/{projectid}/milestone/{milestoneid}/penalise"
+
+    # Send request to Project Microservice
     try:
-        url = "http://localhost:5000/api/v1/project"
-        res = requests.request("POST", url, json=jsonmsg)
-    except Exception as e:
-        code = 500
+        res = requests.post(URL, json=payload)
+    except requests.exceptions.HTTPError as err:
         result = {
-            "code": code,
-            "message": "invocation of service fails: " + url + ". " + str(e),
+            "code": 500,
+            "message": "invocation of service fails: " + URL + ". " + str(err),
         }
+
+    # Check if request is successful
     if code not in range(200, 300):
         return result
     if res.status_code != requests.codes.ok:
         code = res.status_code
     try:
-        result = res.json() if len(res.content) > 0 else ""
-    except Exception as e:
-        code = 500
+        response = requests.post(URL, json=payload)
+        response.raise_for_status()
+    except Exception as err:
         result = {
-            "code": code,
-            "message": "Invalid JSON output from service: " + url + ". " + str(e),
+            "code": 500,
+            "message": "Invalid JSON output from service: " + URL + ". " + str(err),
         }
-    return result
