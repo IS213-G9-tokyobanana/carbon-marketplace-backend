@@ -75,21 +75,14 @@ def receiveMsg():
 
 
 def callback(channel, method, properties, body):
-    print(" [x] Received %r" % body)
+    # print(" [x] Received %r" % body)
     # after receiving a message, call the scheduler
-    processTrigger(body)
-
-def processTrigger(message):
-    # call the scheduler
     try:
-        # data = json.loads(message)
-        # scheduler.checkType(data)
-        print('testing cron')
-        scheduler.test_cron()
-        print('after test cron')
-    except Exception as e:
+        data = json.loads(body)
+        scheduler.checkType(data)
+    except json.decoder.JSONDecodeError as e:
         print("--NOT JSON:", e)
-        print("--DATA:", message)
+        print("--DATA:", body)
 
 def test():
     print('testing cron')
