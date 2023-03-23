@@ -19,54 +19,65 @@ from crontab import CronTab
 
 
 def checkType(msg):
+    print(msg)
     if msg['type'] == 'milestone.add':
         # Creation of a new milestone for a specific project
-        addMilestoneJob()
+        projId = msg['data']['project_id']
+        milestoneId = msg['resource_id']
+        milestone = msg['data']['milestones'][0]
+        addMilestoneJob(milestoneId, projId, milestone)
     elif msg['type'] == 'project.verify':
         # New project has been created and all milestones need to be added
-        addProject()
+        projId = msg['data']['project_id']
+        milestoneId = msg['resource_id']
+        milestone = msg['data']['milestones']
+        addProject(milestoneId, projId, milestone)
     elif msg['type'] == 'offsets.reserve':
         # Start tracking the TTL for the offset (1hr)
-        newOffsetTrack()
+        payment_id = msg['resource_id']
+        newOffsetTrack(payment_id, msg['data']['created_at'])
     elif msg['type'] == 'offsets.commit' or msg['type'] == 'payment.failed':
         # Offset has been purchased, stop tracking the TTL OR
         # For when Stripe payment fails, need to remove the offset from cron as it will no longer be needed
         # Check if in Cron to see if need to remove.
-        removeOffsetTrack()
+        payment_id = msg['resource_id']
+        removeOffsetTrack(payment_id)
     elif msg['type'] == 'milestone.rewarded':
         # Milestone has been rewarded, need to remove from cron
-        milestoneRewarded()
+        milestone_id = msg['resource_id']
+        milestoneRewarded(milestone_id)
     elif msg['type'] == 'task.add':
         # Re-publish the task to the exchange
         publishTask()
 
 
 # Function that looks for the Offset tracking and removes it from Cron
-def removeOffsetTrack():
+def removeOffsetTrack(payment_id):
     pass
 
 # Function that creates a new job to track TTL
-def newOffsetTrack():
+def newOffsetTrack(payment_id, created_at):
     pass
 
 # Function that is called when milestone have been rewarded
-def milestoneRewarded():
+def milestoneRewarded(milestone_id):
     # Need to check 2 conditions
     # 1. If upcoming and overdue both still in Cron
     # 2. If only overdue in Cron
     pass
 
 # Function that is called when there is a new project. Will call addMilestoneJob() to add all milestones
-def addProject():
+def addProject(milestone_id, project_id, milestone):
     # for milestone in milestones:
     #     addMilestoneJob()
-    pass
+    print('in scheduler addProject')
 
 # Function that will be called repeatedly to add a new milestone job
 # Cron job needs to track Upcoming milestone and Overdue milestone (1day after due)
-def addMilestoneJob(milestone, project_id):
+def addMilestoneJob(milestone_id, project_id, milestone):
+    print('in scheduler addMilestoneJob')
     due_date = milestone['due_date']
-    pass
+    
 
 def test_cron():
     print('in scheduler test cron')
