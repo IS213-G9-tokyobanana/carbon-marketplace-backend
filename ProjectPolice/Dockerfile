@@ -1,5 +1,5 @@
 FROM python:3.11-buster
-WORKDIR /usr/src/app
+WORKDIR /app
 
 ENV PYTHONFAULTHANDLER=1 \
   PYTHONUNBUFFERED=1 \
@@ -15,6 +15,4 @@ COPY . ./
 RUN poetry config virtualenvs.create false \
   && poetry install --no-interaction --no-ansi
 
-EXPOSE 5000
-
-CMD [ "python", "./app.py" ]
+CMD [ "python", "./checkAmqp.py" ]
