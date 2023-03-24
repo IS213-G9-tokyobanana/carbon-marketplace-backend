@@ -53,15 +53,18 @@ def callback(channel, method, properties, body):
 
 # Function is called when message is received, and message type is checked
 def check_message(data: dict):
-    if data["type"] == "upcoming":
-        police.publish_to_notifier(data, channel)
-    elif data["type"] == "penalise":
-        police.send_to_projectms(data)
-    elif data["type"] == "overdue":
-        # Trigger Temporal.io workflow
-        return
-    else:
-        print("Invalid message type")
+    try:
+        if data["type"] == "upcoming":
+            police.publish_to_notifier(data, channel)
+        elif data["type"] == "penalise":
+            police.send_to_projectms(data)
+        elif data["type"] == "overdue":
+            # Trigger Temporal.io workflow
+            return
+        else:
+            print("Invalid message type")
+    except Exception as err:
+        logging.exception("Error processing message: %s", err)
 
 
 if __name__ == "__main__":

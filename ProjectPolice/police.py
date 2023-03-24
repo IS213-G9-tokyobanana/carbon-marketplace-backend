@@ -1,21 +1,21 @@
 import requests
 import pika
 import json
-from config.config import EXCHANGE_NAME, POLICE_NOTIFY_ROUTING_KEY
+from config.config import EXCHANGE_NAME, POLICE_NOTIFY_ROUTING_KEY, PROJECT_MS_URL
+
+def format_url(pid, mid):
+    return PROJECT_MS_URL.format(project_id=pid, milestone_id=mid)
 
 # Function to format message before sending to Notifier / Project Microservice
 def format_message(resource_id, type, data):
-    if data is None:
-        new_data = {}
-    else:
-        keys = ["projectid", "milestoneid"]
-        new_data = {x: data[x] for x in keys}
+    new_data = {}
+    new_data = {k:v for k,v in data.items() if k != "task_id"}
     return json.dumps({"resource_id": resource_id, "type": type, "data": new_data})
 
 
 # Function to send message to Notifier
 def publish_to_notifier(message, channel):
-    milestoneid = message["data"]["milestoneid"]
+    milestoneid = message["data"]["milestone_id"]
     type = "milestone.upcoming"
     payload = format_message(milestoneid, type, message["data"])
     channel.basic_publish(
@@ -28,30 +28,18 @@ def publish_to_notifier(message, channel):
 
 # Function to send message to Project Microservice
 def send_to_projectms(message):
-    milestoneid = message["data"]["milestoneid"]
-    projectid = message["data"]["projectid"]
-    payload = format_message(milestoneid, projectid, message["data"])
-    URL = f"http://localhost:5000/project/{projectid}/milestone/{milestoneid}/penalise"
+    milestone_id = message["data"]["milestone_id"]
+    project_id = message["data"]["project_id"]
+    payload = format_message(milestone_id, project_id, message["data"])
+    url = format_url(project_id, milestone_id)
 
     # Send request to Project Microservice
     try:
-        res = requests.post(URL, json=payload)
+        res = requests.patch(url, json=payload)
+        res.raise_for_status()
     except requests.exceptions.HTTPError as err:
         result = {
             "code": 500,
-            "message": "invocation of service fails: " + URL + ". " + str(err),
+            "message": "invocation of service fails: " + url + ". " + str(err),
         }
-
-    # Check if request is successful
-    if code not in range(200, 300):
-        return result
-    if res.status_code != requests.codes.ok:
-        code = res.status_code
-    try:
-        response = requests.post(URL, json=payload)
-        response.raise_for_status()
-    except Exception as err:
-        result = {
-            "code": 500,
-            "message": "Invalid JSON output from service: " + URL + ". " + str(err),
-        }
+    return result
