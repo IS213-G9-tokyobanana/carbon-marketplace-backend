@@ -8,7 +8,6 @@ def format_url(pid, mid):
 
 # Function to format message before sending to Notifier / Project Microservice
 def format_message(resource_id, type, data):
-    new_data = {}
     new_data = {k:v for k,v in data.items() if k != "task_id"}
     return json.dumps({"resource_id": resource_id, "type": type, "data": new_data})
 
