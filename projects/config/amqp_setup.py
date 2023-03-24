@@ -1,7 +1,13 @@
 import pika
 
-hostname = 'localhost' # "54.169.50.166"
-port = 5672 # default port
+from dotenv import load_dotenv
+from os import getenv
+
+load_dotenv()
+RABBITMQ_HOSTNAME = getenv('RABBITMQ_HOSTNAME')
+RABBITMQ_USERNAME = getenv('RABBITMQ_USERNAME')
+RABBITMQ_PASSWORD = getenv('RABBITMQ_PASSWORD')
+RABBITMQ_PORT = getenv('RABBITMQ_PORT')
 
 ROUTING_KEY = 'routing_key'
 BINDING_KEY = 'binding_key'
@@ -48,15 +54,13 @@ QUEUES = { # {queue_name: {"binding_key": binding_key, "routing_key": routing_ke
         ROUTING_KEY: 'events.projects.public.ratings.penalise',
         BINDING_KEY: 'events.projects.*.ratings.penalise',
     },
-    
-    
 }
 
 connection = pika.BlockingConnection(
     pika.ConnectionParameters(
-        host=hostname, port=port,
+        host=RABBITMQ_HOSTNAME, port=RABBITMQ_PORT,
         heartbeat=3600, blocked_connection_timeout=3600,
-        credentials=pika.PlainCredentials('myuser', 'mypass')
+        credentials=pika.PlainCredentials(RABBITMQ_USERNAME, RABBITMQ_PASSWORD)
 ))
 
 channel = connection.channel()
@@ -70,9 +74,10 @@ for queue_name, queue_info in QUEUES.items():
     channel.queue_declare(queue=queue_name, durable=True) 
     channel.queue_bind(exchange=exchangename, queue=queue_name, routing_key=queue_info[BINDING_KEY])
 
-def publish_message(channel, exchangename, routing_key, message):
-    """This function in this module publishes a message to the exchange with a routing key.
+def publish_message(connection, channel, hostname, port, exchangename, exchangetype, routing_key, message):
+    """This function in this module publishes a message (persistent) to the exchange with a routing key.
     """
+    check_setup(connection, channel, hostname, port, exchangename, exchangetype)
     channel.basic_publish(exchange=exchangename, routing_key=routing_key, body=message, properties=pika.BasicProperties(delivery_mode=2)) # make message persistent
 
 def check_setup(connection, channel, hostname, port, exchangename, exchangetype):

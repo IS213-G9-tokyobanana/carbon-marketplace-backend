@@ -8,6 +8,7 @@ from sqlalchemy.dialects.postgresql import ARRAY, VARCHAR, TEXT, TIMESTAMP, FLOA
 
 db = SQLAlchemy(app)
 
+time_format = "%Y-%m-%dT%H:%M:%SZ"
 class Project(db.Model):
     __tablename__ = 'project'
 
@@ -31,8 +32,8 @@ class Project(db.Model):
             "description": self.description,
             "types": self.types,
             "status": self.status,
-            "created_at": self.created_at.replace(microsecond=0).isoformat(),
-            "updated_at": self.updated_at.replace(microsecond=0).isoformat(),
+            "created_at": self.created_at.strftime(time_format),
+            "updated_at": self.updated_at.strftime(time_format),
             "rating": self.rating,
             "milestones": None if self.milestones is None else [m.json() for m in self.milestones]
             }
@@ -65,8 +66,8 @@ class Milestone(db.Model):
             "offsets_available": self.offsets_available,
             "offsets_total": self.offsets_total,
             "status": self.status,
-            "created_at": self.created_at.isoformat(),
-            "updated_at": self.updated_at.isoformat(),
+            "created_at": self.created_at.strftime(time_format), 
+            "updated_at": self.updated_at.strftime(time_format), 
             "due_date": self.due_date.isoformat(),
             "project_id": str(self.project_id)
         }
@@ -89,7 +90,7 @@ class ReservedOffset(db.Model):
             "milestone_id": str(self.milestone_id),
             "buyer_id": self.buyer_id,
             "amount": self.amount,
-            "created_at": self.created_at.isoformat()
+            "created_at": self.created_at.strftime(time_format)
         }
 
     def __repr__(self) -> str:

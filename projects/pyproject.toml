@@ -6,7 +6,7 @@ authors = ["Jaylin0312 <68802506+Jaylin0312@users.noreply.github.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.11"
 sqlalchemy = "^2.0.5.post1"
 requests = "^2.28.2"
 Flask = "^2.0.2"

@@ -1,10 +1,10 @@
 version: '3.8'
 
 volumes:
-  db_data: {}
+  db_data_test: {}
 
 networks:
-  flask_postgres:
+  flask_postgres_test:
     driver: bridge
 
 services:
@@ -19,9 +19,24 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - db_data:/var/lib/postgresql/data
+      - db_data_test:/var/lib/postgresql/data
     networks:
-      - flask_postgres
+      - flask_postgres_test
+
+  message_broker:
+    image: rabbitmq:3-management
+    container_name: ${RABBITMQ_HOSTNAME}
+    hostname: ${RABBITMQ_HOSTNAME}
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_USERNAME}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASSWORD}
+    ports:
+      #HTTP management UI
+      - "15672:15672"
+      #AMQP protocol port
+      - "5672:5672"
+    networks:
+      - flask_postgres_test
 
   projects_ms_flask:
     build:
@@ -43,6 +58,7 @@ services:
       - "5000:5000"
     depends_on:
       - db
+      - message_broker
     networks:
-      - flask_postgres
+      - flask_postgres_test
   
