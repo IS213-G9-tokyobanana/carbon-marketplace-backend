@@ -1,10 +1,10 @@
 import requests
 import pika
 import json
-from config.config import EXCHANGE_NAME, POLICE_NOTIFY_ROUTING_KEY, PROJECT_MS_URL
+from config.config import EXCHANGE_NAME, POLICE_NOTIFY_ROUTING_KEY, PROJECT_STATUS_URL
 
 def format_url(pid, mid):
-    return PROJECT_MS_URL.format(project_id=pid, milestone_id=mid)
+    return PROJECT_STATUS_URL.format(project_id=pid, milestone_id=mid)
 
 # Function to format message before sending to Notifier / Project Microservice
 def format_message(resource_id, type, data):
@@ -34,8 +34,8 @@ def send_to_projectms(message):
 
     # Send request to Project Microservice
     try:
-        res = requests.patch(url, json=payload)
-        res.raise_for_status()
+        result = requests.patch(url, json=payload)
+        result.raise_for_status()
     except requests.exceptions.HTTPError as err:
         result = {
             "code": 500,
