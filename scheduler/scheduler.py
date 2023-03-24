@@ -1,15 +1,16 @@
 from publisher import publishTask
 from crontab import CronTab
+from datetime import datetime, timedelta
 
 # TODO:
 # [x] 1. CheckType of each message and call the appropriate function
 # [] 2. Upcoming Milestone Funct
-#   [] 2.1. addMilestoneJob()
-#   [] 2.2. addProject()
+#   [x] 2.1. addMilestoneJob()
+#   [x] 2.2. addProject()
 #   [] 2.3. milestoneRewarded()
 # [] 3. Overdue Milestone Funct
-#   [] 3.1. addMilestoneJob()
-#   [] 3.2. addProject()
+#   [x] 3.1. addMilestoneJob()
+#   [x] 3.2. addProject()
 #   [] 3.3. milestoneRewarded()
 # [] 4. Reserve Offset Funct
 #   [] 4.1. newOffsetTrack()
@@ -67,17 +68,28 @@ def milestoneRewarded(milestone_id):
     pass
 
 # Function that is called when there is a new project. Will call addMilestoneJob() to add all milestones
-def addProject(milestone_id, project_id, milestone):
-    # for milestone in milestones:
-    #     addMilestoneJob()
+def addProject(milestone_id, project_id, milestones):
     print('in scheduler addProject')
+    for milestone in milestones:
+        milestone_id = milestone['milestone_id']
+        addMilestoneJob(milestone_id, project_id, milestone)
 
 # Function that will be called repeatedly to add a new milestone job
 # Cron job needs to track Upcoming milestone and Overdue milestone (1day after due)
 def addMilestoneJob(milestone_id, project_id, milestone):
     print('in scheduler addMilestoneJob')
     due_date = milestone['due_date']
-    
+    date, time = due_date.split(' ')
+    year, month, day = date.split('-')
+    hour, minute, second = time.split(':')
+    cron = CronTab(user=True)
+    job  = cron.new(command='python publisher', comment=f'upcoming_{project_id}_{milestone_id}')
+    job.setall(datetime(int(year), int(month), int(day), int(hour), int(minute), int(second)) - timedelta(30))
+    cron.write()
+
+    job  = cron.new(command='python publisher', comment=f'overdue_{project_id}_{milestone_id}')
+    job.setall(datetime(int(year), int(month), int(day), int(hour), int(minute), int(second)) + timedelta(1))
+    cron.write()    
 
 def test_cron():
     print('in scheduler test cron')
