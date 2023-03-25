@@ -26,9 +26,9 @@ connection = pika.BlockingConnection(
 channel = connection.channel()
 
 # Loops through all the binding keys and creates a queue for each
-for key, value in BINDING_KEYS.items():
-    channel.queue_declare(key, durable=True)
-    channel.queue_bind(exchange=TOPIC_EXCHANGE_NAME, queue=key, routing_key=value)
+for queue_name, binding_key in BINDING_KEYS.items():
+    channel.queue_declare(binding_key, durable=True)
+    channel.queue_bind(exchange=TOPIC_EXCHANGE_NAME, queue=queue_name, routing_key=binding_key)
 
 def check_setup():
     global connection, channel, RMQHOSTNAME, RMQPORT
