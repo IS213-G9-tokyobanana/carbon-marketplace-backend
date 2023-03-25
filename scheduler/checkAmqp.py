@@ -8,10 +8,9 @@ from config import (
     TOPIC_EXCHANGE_NAME,
     BINDING_KEYS,
 )
-import scheduler, publisher
+import scheduler
 
 # Connect to RabbitMQ
-print(RMQHOSTNAME,RMQPORT)
 connection = pika.BlockingConnection(
     pika.ConnectionParameters(
         host=RMQHOSTNAME,
