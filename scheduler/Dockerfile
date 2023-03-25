@@ -1,5 +1,5 @@
 FROM python:3.11-buster
-WORKDIR /usr/src/app
+WORKDIR /app
 
 RUN apt-get update && apt-get -y install cron vim
 
@@ -17,7 +17,8 @@ ENV YOUR_ENV=${YOUR_ENV} \
 RUN pip install "poetry==$POETRY_VERSION"
 
 COPY . ./
+RUN chmod +x start.sh
 RUN poetry config virtualenvs.create false \
   && poetry install --no-interaction --no-ansi
 
-CMD [ "python", "./checkAmqp.py" ]
+ENTRYPOINT ["./start.sh"]
