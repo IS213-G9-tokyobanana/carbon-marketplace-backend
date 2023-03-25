@@ -51,6 +51,8 @@ def newOffsetTrack(payment_id, created_at, project_id, milestone_id):
     cron = CronTab(user=True)
     job  = cron.new(command=f'/usr/local/bin/python /app/publisher.py --type offset --proj {project_id} --mile {milestone_id}', comment=f'offset_{payment_id}')
     job.setall(datetime.fromisoformat(created_at) + timedelta(hours=1))
+    # Can be used for testing, will schedule the job to run in 1 minute
+    # job.setall(datetime.fromisoformat(due_date) + timedelta(minutes=1))
     cron.write()
 
 # Function that is called when milestone have been rewarded
