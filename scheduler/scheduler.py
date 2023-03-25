@@ -2,23 +2,6 @@ from publisher import publishTask
 from crontab import CronTab
 from datetime import datetime, timedelta
 
-# TODO:
-# [x] 1. CheckType of each message and call the appropriate function
-# [x] 2. Upcoming Milestone Funct
-#   [x] 2.1. addMilestoneJob()
-#   [x] 2.2. addProject()
-#   [x] 2.3. milestoneRewarded()
-# [x] 3. Overdue Milestone Funct
-#   [x] 3.1. addMilestoneJob()
-#   [x] 3.2. addProject()
-#   [x] 3.3. milestoneRewarded()
-# [x] 4. Reserve Offset Funct
-#   [x] 4.1. newOffsetTrack()
-#   [x] 4.2. removeOffsetTrack()
-# [] 5. Re-Publish scheduler task Funct
-#   [] 5.1. publishTask()
-
-
 def checkType(msg):
     print(msg)
     if msg['type'] == 'milestone.add':
