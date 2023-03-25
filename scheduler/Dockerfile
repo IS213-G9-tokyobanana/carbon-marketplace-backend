@@ -3,10 +3,8 @@ WORKDIR /app
 
 RUN apt-get update && apt-get -y install cron vim
 
-ARG YOUR_ENV
 
-ENV YOUR_ENV=${YOUR_ENV} \
-  PYTHONFAULTHANDLER=1 \
+ENV PYTHONFAULTHANDLER=1 \
   PYTHONUNBUFFERED=1 \
   PYTHONHASHSEED=random \
   PIP_NO_CACHE_DIR=off \
