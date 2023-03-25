@@ -35,7 +35,9 @@ def checkType(msg):
     elif msg['type'] == 'offsets.reserve':
         # Start tracking the TTL for the offset (1hr)
         payment_id = msg['resource_id']
-        newOffsetTrack(payment_id, msg['data']['created_at'])
+        projId = msg['data']['project_id']
+        milestone_id = msg['data']['milestone_id']
+        newOffsetTrack(payment_id, msg['data']['created_at'], projId, milestone_id)
     elif msg['type'] == 'offsets.commit' or msg['type'] == 'payment.failed':
         # Offset has been purchased, stop tracking the TTL OR
         # For when Stripe payment fails, need to remove the offset from cron as it will no longer be needed
@@ -49,8 +51,8 @@ def checkType(msg):
         milestoneRewarded(milestone_id, projId)
     elif msg['type'] == 'task.add':
         # Re-publish the task to the exchange
-        # publishTask()
-        print(msg)
+        publishTask('task.add')
+        # print(msg)
 
 
 # Function that looks for the Offset tracking and removes it from Cron
@@ -61,10 +63,10 @@ def removeOffsetTrack(payment_id):
     cron.write()
 
 # Function that creates a new job to track TTL
-def newOffsetTrack(payment_id, created_at):
+def newOffsetTrack(payment_id, created_at, project_id, milestone_id):
     print('in scheduler newOffsetTrack')
     cron = CronTab(user=True)
-    job  = cron.new(command='python ./publisher.py', comment=f'offset_{payment_id}')
+    job  = cron.new(command=f'/usr/local/bin/python /app/publisher.py --type offset --proj {project_id} --mile {milestone_id}', comment=f'offset_{payment_id}')
     job.setall(datetime.fromisoformat(created_at) + timedelta(hours=1))
     cron.write()
 
@@ -92,16 +94,15 @@ def addProject(project_id, milestones):
 def addMilestoneJob(milestone_id, project_id, milestone):
     print('in scheduler addMilestoneJob')
     due_date = milestone['due_date']
-    date, time = due_date.split(' ')
-    year, month, day = date.split('-')
-    hour, minute, second = time.split(':')
     cron = CronTab(user=True)
-    job  = cron.new(command='python ./publisher.py', comment=f'upcoming_{project_id}_{milestone_id}')
-    job.setall(datetime(int(year), int(month), int(day), int(hour), int(minute), int(second)) - timedelta(30))
+    job  = cron.new(command=f'/usr/local/bin/python /app/publisher.py --type upcoming --proj {project_id} --mile {milestone_id}', comment=f'upcoming_{project_id}_{milestone_id}')
+    # job.setall(datetime.fromisoformat(due_date) - timedelta(30))
+    job.setall(datetime.fromisoformat(due_date) + timedelta(minutes=1))
     cron.write()
 
-    job  = cron.new(command='python ./publisher.py', comment=f'overdue_{project_id}_{milestone_id}')
-    job.setall(datetime(int(year), int(month), int(day), int(hour), int(minute), int(second)) + timedelta(1))
+    job  = cron.new(command=f'/usr/local/bin/python /app/publisher.py --type overdue --proj {project_id} --mile {milestone_id}', comment=f'overdue_{project_id}_{milestone_id}')
+    # job.setall(datetime.fromisoformat(due_date) + timedelta(1))
+    job.setall(datetime.fromisoformat(due_date) + timedelta(minutes=1))
     cron.write()    
 
 if __name__ == "__main__":
