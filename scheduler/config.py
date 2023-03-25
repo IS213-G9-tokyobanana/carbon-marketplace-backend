@@ -1,7 +1,7 @@
 import os
 from dotenv import load_dotenv
 
-env = "development"
+env = "production"
 TOPIC_EXCHANGE_NAME = "topic_exchange"
 # Binding Keys that scheduler has to listen to
 BINDING_KEYS = {
@@ -13,7 +13,6 @@ BINDING_KEYS = {
     "RATINGS_REWARD":"events.projects.*.ratings.reward",
     "PAYMENT_FAIL":"events.buyprojects.*.payment.failed",
 }
-SCHEDULER_EXCHANGE_NAME = "scheduler_exchange"
 # Routing Keys that scheduler has to publish to
 PUBLISHED_TASK_EXECUTE_ROUTING_KEY = "events.scheduler.public.task.execute"
 
