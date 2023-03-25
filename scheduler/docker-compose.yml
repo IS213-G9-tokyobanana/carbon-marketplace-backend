@@ -1,8 +1,5 @@
 version: "3.8"
 
-volumes:
-  postgres_data: {}
-
 networks:
   scheduler_network:
     driver: bridge
@@ -14,26 +11,3 @@ services:
     restart: always
     networks:
       - scheduler_network
-    depends_on:
-      - db
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_HOST: postgres # this should be the container name of the db service
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_PORT: 5432
-
-  db:
-    image: postgres:latest
-    restart: always
-    container_name: postgres
-    volumes:
-      - postgres_data:/var/lib/postgres
-    networks:
-      - scheduler_network
-    ports:
-      - 5432:5432
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
