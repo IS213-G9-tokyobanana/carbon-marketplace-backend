@@ -96,13 +96,15 @@ def addMilestoneJob(milestone_id, project_id, milestone):
     due_date = milestone['due_date']
     cron = CronTab(user=True)
     job  = cron.new(command=f'/usr/local/bin/python /app/publisher.py --type upcoming --proj {project_id} --mile {milestone_id}', comment=f'upcoming_{project_id}_{milestone_id}')
-    # job.setall(datetime.fromisoformat(due_date) - timedelta(30))
-    job.setall(datetime.fromisoformat(due_date) + timedelta(minutes=1))
+    job.setall(datetime.fromisoformat(due_date) - timedelta(30))
+    # Can be used for testing, will schedule the job to run in 1 minute
+    # job.setall(datetime.fromisoformat(due_date) + timedelta(minutes=1))
     cron.write()
 
     job  = cron.new(command=f'/usr/local/bin/python /app/publisher.py --type overdue --proj {project_id} --mile {milestone_id}', comment=f'overdue_{project_id}_{milestone_id}')
-    # job.setall(datetime.fromisoformat(due_date) + timedelta(1))
-    job.setall(datetime.fromisoformat(due_date) + timedelta(minutes=1))
+    job.setall(datetime.fromisoformat(due_date) + timedelta(1))
+    # Can be used for testing, will schedule the job to run in 1 minute
+    # job.setall(datetime.fromisoformat(due_date) + timedelta(minutes=1))
     cron.write()    
 
 if __name__ == "__main__":
