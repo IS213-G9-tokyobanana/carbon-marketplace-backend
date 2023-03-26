@@ -9,20 +9,20 @@ from ProjectPolice.config.config import PAYMENT_MS_URL, RMQHOSTNAME, RMQPORT, RM
 # Request to Project Microservice to remove reserved offset
 @activity.defn
 async def remove_reserved_offset(data) -> dict:
-    milestone_id = data["data"]["milestone_id"]
-    project_id = data["data"]["project_id"]
-    payload = format_message(milestone_id, project_id, data["data"])
-    url = format_url(project_id, milestone_id, "offset")
+    # milestone_id = data["data"]["milestone_id"]
+    # project_id = data["data"]["project_id"]
+    # payload = format_message(milestone_id, project_id, data["data"])
+    # url = format_url(project_id, milestone_id, "offset")
 
-    # Send request to Project Microservice
-    try:
-        result = requests.delete(url, json=payload)
-        result.raise_for_status()
-    except requests.exceptions.HTTPError as err:
-        result = {
-            "code": 500,
-            "message": "invocation of service fails: " + url + ". " + str(err),
-        }
+    # # Send request to Project Microservice
+    # try:
+    #     result = requests.delete(url, json=payload)
+    #     result.raise_for_status()
+    # except requests.exceptions.HTTPError as err:
+    #     result = {
+    #         "code": 500,
+    #         "message": "invocation of service fails: " + url + ". " + str(err),
+    #     }
     # return result
     return {"code": 200, "message": "reserved offset removed"}
 
@@ -30,17 +30,17 @@ async def remove_reserved_offset(data) -> dict:
 # Request to Payment Microservice to retrieve relevant payment intent
 @activity.defn
 async def get_payment_intent() -> dict:
-    try:
-        result = requests.get(PAYMENT_MS_URL)
-        result.raise_for_status()
-    except requests.exceptions.HTTPError as err:
-        result = {
-            "code": 500,
-            "message": "invocation of service fails: "
-            + PAYMENT_MS_URL
-            + ". "
-            + str(err),
-        }
+    # try:
+    #     result = requests.get(PAYMENT_MS_URL)
+    #     result.raise_for_status()
+    # except requests.exceptions.HTTPError as err:
+    #     result = {
+    #         "code": 500,
+    #         "message": "invocation of service fails: "
+    #         + PAYMENT_MS_URL
+    #         + ". "
+    #         + str(err),
+    #     }
     # return result
     return {"code": 200, "message": "payment intent retrieved"}
 
@@ -58,5 +58,4 @@ async def send_to_notifier(data) -> dict:
     connection = pika.BlockingConnection(parameters=parameters)
     channel = connection.channel()
     result = publish_to_notifier(data, channel)
-    # return result
-    return {"code": 200, "message": "message sent to notifier"}
+    return result
