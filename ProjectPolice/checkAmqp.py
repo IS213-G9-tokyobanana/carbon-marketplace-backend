@@ -1,7 +1,13 @@
 import json
 import pika
 import logging
-from config.config import (
+import sys
+import os
+import asyncio
+
+# add the path to the main directory of your project to the system path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+from ProjectPolice.config.config import (
     EXCHANGE_NAME,
     TASK_EXECUTE_BINDING_KEY,
     QUEUE_NAME,
@@ -10,10 +16,32 @@ from config.config import (
     RMQUSERNAME,
     RMQPASSWORD,
 )
-import police
+import ProjectPolice.police
+from ProjectPolice.temporal.run_workflow import main
 
 # Global variable
 channel = None
+
+
+def create_connection(type: str):
+    # Define connection parameters
+    parameters = pika.ConnectionParameters(
+        host=RMQHOSTNAME,
+        port=RMQPORT,
+        heartbeat=3600,
+        credentials=pika.PlainCredentials(RMQUSERNAME, RMQPASSWORD),
+        blocked_connection_timeout=3600,
+    )
+    # Connect to RabbitMQ
+    if type == "selection":
+        connection = pika.SelectConnection(
+            parameters=parameters, on_open_callback=on_open
+        )
+    elif type == "blocking":
+        connection = pika.BlockingConnection(parameters=parameters)
+    else:
+        return "Invalid connection type"
+    return connection
 
 
 # Function is called when connection is open, and channel is open
@@ -55,12 +83,11 @@ def callback(channel, method, properties, body):
 def check_message(data: dict):
     try:
         if data["type"] == "upcoming":
-            police.publish_to_notifier(data, channel)
+            ProjectPolice.police.publish_to_notifier(data, channel)
         elif data["type"] == "penalise":
-            police.send_to_projectms(data)
+            ProjectPolice.police.send_to_projectms(data)
         elif data["type"] == "overdue":
-            # Trigger Temporal.io workflow
-            return
+            asyncio.run(main(data))
         else:
             print("Invalid message type")
     except Exception as err:
@@ -71,17 +98,7 @@ if __name__ == "__main__":
     print(
         f"monitoring the exchange {EXCHANGE_NAME} on binding key {TASK_EXECUTE_BINDING_KEY} ..."
     )
-    # Define connection parameters
-    parameters = pika.ConnectionParameters(
-        host=RMQHOSTNAME,
-        port=RMQPORT,
-        heartbeat=3600,
-        credentials=pika.PlainCredentials(RMQUSERNAME, RMQPASSWORD),
-        blocked_connection_timeout=3600,
-    )
-    # Connect to RabbitMQ
-    connection = pika.SelectConnection(parameters=parameters, on_open_callback=on_open)
-    # Start the IOLoop to allow the SelectConnection to operate
+    connection = create_connection("selection")
     try:
         connection.ioloop.start()
     except KeyboardInterrupt:
