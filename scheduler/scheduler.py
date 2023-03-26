@@ -90,7 +90,4 @@ def addMilestoneJob(milestone_id, project_id, milestone):
     job.setall(datetime.fromisoformat(due_date) + timedelta(1))
     # Can be used for testing, will schedule the job to run in 1 minute
     # job.setall(datetime.fromisoformat(due_date) + timedelta(minutes=1))
-    cron.write()    
-
-if __name__ == "__main__":
-    pass
+    cron.write()
