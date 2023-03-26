@@ -7,14 +7,15 @@ from classes.exception import CustomException
 from classes.amqp_payload import Payload
 from classes.enums import MilestoneStatus, ProjectStatus
 from sqlalchemy.exc import IntegrityError
-from config.amqp_setup import \
-    RABBITMQ_HOSTNAME, RABBITMQ_PORT, exchangename, exchangetype, connection, channel, \
-    ROUTING_KEY, QUEUES, \
-    PROJECTS_CREATED_QUEUE, PROJECTS_VERIFIED_QUEUE, PROJECTS_MILESTONES_OFFSETS_RESERVE_QUEUE, PROJECTS_MILESTONES_OFFSETS_COMMIT_QUEUE, \
-    PROJECTS_MILESTONES_OFFSETS_ROLLBACK_QUEUE, PROJECTS_MILESTONES_REWARD_QUEUE, PROJECTS_MILESTONES_PENALISE_QUEUE,\
-    publish_message
+from config.amqp_setup import (
+    RABBITMQ_HOSTNAME, RABBITMQ_PORT, exchangename, exchangetype, connection, channel, ROUTING_KEY, QUEUES, 
+    PROJECTS_CREATED_QUEUE, PROJECTS_MILESTONES_ADD_QUEUE, PROJECTS_VERIFIED_QUEUE, PROJECTS_MILESTONES_OFFSETS_RESERVE_QUEUE,
+    PROJECTS_MILESTONES_OFFSETS_COMMIT_QUEUE, PROJECTS_MILESTONES_OFFSETS_ROLLBACK_QUEUE, PROJECTS_MILESTONES_REWARD_QUEUE, 
+    PROJECTS_MILESTONES_PENALISE_QUEUE,
+    publish_message)
 import json
 
+request_time_format = '%Y-%m-%dT%H:%M:%S.%fZ'
 
 @app.errorhandler(404)
 def handle_resource_not_found(e):
@@ -89,7 +90,7 @@ def create_project():
     db.session.flush() # for sqlalchemy to populate null fields in project
     
     for milestone in milestones:
-        milestone['due_date'] = datetime.strptime(milestone['due_date'], '%Y-%m-%dT%H:%M:%S.%fZ') # parse iso format string in request body to datetime
+        milestone['due_date'] = datetime.strptime(milestone['due_date'], request_time_format) # parse iso format string in request body to datetime
         m = Milestone(**milestone, project=project, offsets_total=milestone['offsets_available'])
         db.session.add(m)
 
@@ -132,6 +133,39 @@ def update_project_status(id):
     res = ResponseBodyJSON(True, project.json()).json()
     return jsonify(res), 200
 
+@app.route("/projects/<uuid:id>/milestones", methods=['POST'])
+def create_project_milestone(id):
+    """ Creates milestones for a project in db and publishes created milestone to milestone_add queue.
+    """
+    body = request.get_json()
+
+    milestones = body.pop('milestones')
+
+    # Get project by id
+    project = db.session.execute(db.select(Project).where(Project.id == id)).scalars().first()
+    if project is None:
+        abort(404, description=f"Project {str(id)} not found.")
+    
+    milestone_objects = []
+    for milestone in milestones:
+        milestone['due_date'] = datetime.strptime(milestone['due_date'], request_time_format) # parse iso format string in request body to datetime
+        m = Milestone(**milestone, project=project, offsets_total=milestone['offsets_available'])
+        db.session.add(m)
+        milestone_objects.append(m)
+
+    db.session.commit()
+    
+    res_data = []
+    # publish each milestone to queue
+    for milestone in milestone_objects:
+        payload =  Payload(resource_id=str(milestone.id), type='milestone.add', data=milestone.json())
+        res_data.append(milestone.json())
+        payload_serialised = json.dumps(payload.json())
+        publish_message(connection=connection, channel=channel, hostname=RABBITMQ_HOSTNAME, exchangename=exchangename, port=RABBITMQ_PORT, exchangetype=exchangetype, routing_key=QUEUES[PROJECTS_MILESTONES_ADD_QUEUE][ROUTING_KEY], message=payload_serialised)
+
+    res = ResponseBodyJSON(True, res_data).json()
+    return jsonify(res), 201
+
     
 @app.route("/projects/<uuid:id>/milestones/<uuid:mid>/status", methods=['PATCH'])
 def update_project_milestone_status(id, mid):
@@ -160,17 +194,19 @@ def update_project_milestone_status(id, mid):
     milestone.status = body['status']
     db.session.commit()
     
+    data = project.json()
+    data['milestones'] = milestone.json() # only publish the milestone that was met
     # increase project rating + publish to project_verified queue if status is "Met"
     if body['status'] == MilestoneStatus.MET.value:
         project.rating += 10
-        payload =  Payload(resource_id=str(milestone.id), type='milestone.reward', data=project.json())
+        payload =  Payload(resource_id=str(milestone.id), type='milestone.reward', data=data)
         payload_serialised = json.dumps(payload.json()) 
         publish_message(connection=connection, channel=channel, hostname=RABBITMQ_HOSTNAME, exchangename=exchangename, port=RABBITMQ_PORT, exchangetype=exchangetype, routing_key=QUEUES[PROJECTS_MILESTONES_REWARD_QUEUE][ROUTING_KEY], message=payload_serialised)
         
     # decrease project rating + publish to project_penalised queue if status is "Rejected"
     elif body['status'] == MilestoneStatus.REJECTED.value:
         project.rating -= 10
-        payload =  Payload(resource_id=str(milestone.id), type='milestone.penalise', data=project.json())
+        payload =  Payload(resource_id=str(milestone.id), type='milestone.penalise', data=data)
         payload_serialised = json.dumps(payload.json()) 
         publish_message(connection=connection, channel=channel, hostname=RABBITMQ_HOSTNAME, exchangename=exchangename, port=RABBITMQ_PORT, exchangetype=exchangetype, routing_key=QUEUES[PROJECTS_MILESTONES_PENALISE_QUEUE][ROUTING_KEY], message=payload_serialised)
 
@@ -233,7 +269,8 @@ def create_reserved_offset(id, mid):
     data = reserved_offset.json()
     db.session.commit()
 
-    # publish to project_milestone_offsets_reserve queue
+    # publish to queue
+    data['project_id'] = str(project.id) # add project_id to the payload
     payload =  Payload(resource_id=reserved_offset.payment_id, type='offset.reserved', data=data)
     payload_serialised = json.dumps(payload.json())
     publish_message(connection=connection, channel=channel, hostname=RABBITMQ_HOSTNAME, exchangename=exchangename, port=RABBITMQ_PORT, exchangetype=exchangetype, routing_key=QUEUES[PROJECTS_MILESTONES_OFFSETS_RESERVE_QUEUE][ROUTING_KEY], message=payload_serialised)
@@ -274,7 +311,8 @@ def commit_reserved_offset():
     payload_serialised = json.dumps(payload.json())
     publish_message(connection=connection, channel=channel, hostname=RABBITMQ_HOSTNAME, exchangename=exchangename, port=RABBITMQ_PORT, exchangetype=exchangetype, routing_key=QUEUES[PROJECTS_MILESTONES_OFFSETS_COMMIT_QUEUE][ROUTING_KEY], message=payload_serialised)
 
-    return jsonify(), 204
+    res = ResponseBodyJSON(True, data).json()
+    return jsonify(res), 200
     
     
 @app.route("/projects/milestones/offset", methods=['DELETE'])

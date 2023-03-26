@@ -11,14 +11,14 @@ RABBITMQ_PORT = getenv('RABBITMQ_PORT')
 
 ROUTING_KEY = 'routing_key'
 BINDING_KEY = 'binding_key'
-PROJECTS_CREATED_QUEUE = 'projects_created'
-PROJECTS_VERIFIED_QUEUE = 'projects_verified'
-PROJECTS_MILESTONES_ADD_QUEUE = 'projects_milestone_added'
-PROJECTS_MILESTONES_OFFSETS_RESERVE_QUEUE = 'projects_milestones_offsets_reserve'
-PROJECTS_MILESTONES_OFFSETS_COMMIT_QUEUE = 'projects_milestones_offsets_commit'
-PROJECTS_MILESTONES_OFFSETS_ROLLBACK_QUEUE = 'projects_milestones_offsets_rollback'
-PROJECTS_MILESTONES_REWARD_QUEUE = 'projects_milestones_reward'
-PROJECTS_MILESTONES_PENALISE_QUEUE = 'projects_milestones_penalise'
+PROJECTS_CREATED_QUEUE = 'project_create'
+PROJECTS_VERIFIED_QUEUE = 'project_verify'
+PROJECTS_MILESTONES_ADD_QUEUE = 'milestone_add'
+PROJECTS_MILESTONES_OFFSETS_RESERVE_QUEUE = 'offsets_reserve'
+PROJECTS_MILESTONES_OFFSETS_COMMIT_QUEUE = 'offsets_commit'
+PROJECTS_MILESTONES_OFFSETS_ROLLBACK_QUEUE = 'offsets_rollback'
+PROJECTS_MILESTONES_REWARD_QUEUE = 'ratings_reward'
+PROJECTS_MILESTONES_PENALISE_QUEUE = 'ratings_penalise'
 
 
 QUEUES = { # {queue_name: {"binding_key": binding_key, "routing_key": routing_key}, ...}
@@ -69,10 +69,10 @@ exchangetype="topic"
 channel.exchange_declare(exchange=exchangename, exchange_type=exchangetype, durable=True)
 
 
-# Bind all queues to the exchange with their respective binding keys
-for queue_name, queue_info in QUEUES.items():
-    channel.queue_declare(queue=queue_name, durable=True) 
-    channel.queue_bind(exchange=exchangename, queue=queue_name, routing_key=queue_info[BINDING_KEY])
+# Bind all queues to the exchange with their respective binding keys (done by consumer microservices)
+# for queue_name, queue_info in QUEUES.items():
+#     channel.queue_declare(queue=queue_name, durable=True) 
+#     channel.queue_bind(exchange=exchangename, queue=queue_name, routing_key=queue_info[BINDING_KEY])
 
 def publish_message(connection, channel, hostname, port, exchangename, exchangetype, routing_key, message):
     """This function in this module publishes a message (persistent) to the exchange with a routing key.

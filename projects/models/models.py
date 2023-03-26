@@ -68,7 +68,7 @@ class Milestone(db.Model):
             "status": self.status,
             "created_at": self.created_at.strftime(time_format), 
             "updated_at": self.updated_at.strftime(time_format), 
-            "due_date": self.due_date.isoformat(),
+            "due_date": self.due_date.strftime(time_format),
             "project_id": str(self.project_id)
         }
 

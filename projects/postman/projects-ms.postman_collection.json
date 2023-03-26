@@ -92,7 +92,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"name\": \"100.5MW Wind Power Project in Madhya Pradesh, India\",\r\n    \"owner_id\": \"3b08a327-42b2-4694-bbeb-f61ad526ec47\",\r\n    \"description\": \"desc1\",\r\n    \"types\": [\r\n        \"carbon capture\",\r\n        \"local green initiative (small project)\"\r\n    ],\r\n    \"milestones\": [{\r\n      \"name\": \"0.5 million tCO2e saved by year 3\",\r\n      \"description\": \"0.5 million tCO2e saved in 3 years after the launch of the windmill\",\r\n      \"type\": \"Temporal\",\r\n      \"offsets_available\": 50,\r\n      \"due_date\": \"2026-03-21T09:30:00.000Z\"\r\n    },\r\n    {\r\n      \"name\": \"1 million tCO2e saved by year 6\",\r\n      \"description\": \"1 million tCO2e saved by year 6 after the launch of the windmill\",\r\n      \"type\": \"Temporal\",\r\n      \"offsets_available\": 50,\r\n      \"due_date\": \"2029-03-21T09:30:00.000Z\"\r\n    },\r\n    {\r\n      \"name\": \"Generation of 180 GWh of clean electricity annually\",\r\n      \"description\": \"Generation of 180 GWh of clean electricity annually after the project has been implemented.\",\r\n      \"type\": \"Temporal\",\r\n      \"offsets_available\": 50,\r\n      \"due_date\": \"2024-03-21T09:30:00.000Z\"\r\n    },\r\n    {\r\n      \"name\": \"1.23 million tCO2e saved by year 7\",\r\n      \"description\": \"1.23 million tCO2e saved by year 7 after the launch of the windmill\",\r\n      \"type\": \"Temporal\",\r\n      \"offsets_available\": 50,\r\n      \"due_date\": \"2030-03-21T09:30:00.000Z\"\r\n    }\r\n  ]\r\n}",
+							"raw": "{\r\n    \"name\": \"100.5MW Wind Power Project in Madhya Pradesh, India\",\r\n    \"owner_id\": \"3b08a327-42b2-4694-bbeb-f61ad526ec47\",\r\n    \"description\": \"desc3\",\r\n    \"types\": [\r\n        \"carbon capture\",   \r\n        \"local green initiative (small project)\"\r\n    ],\r\n    \"milestones\": [{\r\n      \"name\": \"0.5 million tCO2e saved by year 3\",\r\n      \"description\": \"0.5 million tCO2e saved in 3 years after the launch of the windmill\",\r\n      \"type\": \"Temporal\",\r\n      \"offsets_available\": 50,\r\n      \"due_date\": \"2026-03-21T09:30:00.000Z\"\r\n    },\r\n    {\r\n      \"name\": \"1 million tCO2e saved by year 6\",\r\n      \"description\": \"1 million tCO2e saved by year 6 after the launch of the windmill\",\r\n      \"type\": \"Temporal\",\r\n      \"offsets_available\": 50,\r\n      \"due_date\": \"2029-03-21T09:30:00.000Z\"\r\n    },\r\n    {\r\n      \"name\": \"Generation of 180 GWh of clean electricity annually\",\r\n      \"description\": \"Generation of 180 GWh of clean electricity annually after the project has been implemented.\",\r\n      \"type\": \"Temporal\",\r\n      \"offsets_available\": 50,\r\n      \"due_date\": \"2024-03-21T09:30:00.000Z\"\r\n    },\r\n    {\r\n      \"name\": \"1.23 million tCO2e saved by year 7\",\r\n      \"description\": \"1.23 million tCO2e saved by year 7 after the launch of the windmill\",\r\n      \"type\": \"Temporal\",\r\n      \"offsets_available\": 50,\r\n      \"due_date\": \"2030-03-21T09:30:00.000Z\"\r\n    }\r\n  ]\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -236,7 +236,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:5000/projects/eff318ef-a43f-48de-8091-03310958361b",
+							"raw": "http://localhost:5000/projects/3bd77619-06a5-42e7-bdf9-3a4cd5236329",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -244,7 +244,7 @@
 							"port": "5000",
 							"path": [
 								"projects",
-								"eff318ef-a43f-48de-8091-03310958361b"
+								"3bd77619-06a5-42e7-bdf9-3a4cd5236329"
 							]
 						}
 					},
@@ -408,7 +408,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"status\": \"123\"\r\n}",
+							"raw": "{\r\n    \"status\": \"verified\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -416,7 +416,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:5000/projects/e10589c6-abc9-4d1b-8766-a95f8b353b1b/status",
+							"raw": "http://localhost:5000/projects/3a99ba93-6494-44fc-a3de-19bc5b9fbf6e/status",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -424,7 +424,7 @@
 							"port": "5000",
 							"path": [
 								"projects",
-								"e10589c6-abc9-4d1b-8766-a95f8b353b1b",
+								"3a99ba93-6494-44fc-a3de-19bc5b9fbf6e",
 								"status"
 							]
 						}
@@ -613,13 +613,13 @@
 					]
 				},
 				{
-					"name": "Milestone - verify status",
+					"name": "Milestone - create all",
 					"request": {
-						"method": "PATCH",
+						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"status\": \"Met\"\r\n}",
+							"raw": "{\r\n    \"milestones\": [{\r\n      \"name\": \"0.5 million tCO2e saved by year 3\",\r\n      \"description\": \"0.5 million tCO2e saved in 3 years after the launch of the windmill\",\r\n      \"type\": \"Temporal\",\r\n      \"offsets_available\": 50,\r\n      \"due_date\": \"2026-03-21T09:30:00.567Z\"\r\n    },\r\n    {\r\n      \"name\": \"1 million tCO2e saved by year 6\",\r\n      \"description\": \"1 million tCO2e saved by year 6 after the launch of the windmill\",\r\n      \"type\": \"Temporal\",\r\n      \"offsets_available\": 50,\r\n      \"due_date\": \"2029-03-21T09:30:00.000Z\"\r\n    },\r\n    {\r\n      \"name\": \"Generation of 180 GWh of clean electricity annually\",\r\n      \"description\": \"Generation of 180 GWh of clean electricity annually after the project has been implemented.\",\r\n      \"type\": \"Temporal\",\r\n      \"offsets_available\": 50,\r\n      \"due_date\": \"2024-03-21T09:30:00.000Z\"\r\n    },\r\n    {\r\n      \"name\": \"1.23 million tCO2e saved by year 7\",\r\n      \"description\": \"1.23 million tCO2e saved by year 7 after the launch of the windmill\",\r\n      \"type\": \"Temporal\",\r\n      \"offsets_available\": 50,\r\n      \"due_date\": \"2030-03-21T09:30:00.000Z\"\r\n    }\r\n  ]\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -627,7 +627,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:5000/projects/dc588f81-0ea0-45ce-96df-96c95e7c3cef/milestones/620ad928-f7c8-4985-830d-f0e91fa8fe41/status",
+							"raw": "http://localhost:5000/projects/3a99ba93-6494-44fc-a3de-19bc5b9fbf6e/milestones",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -635,9 +635,160 @@
 							"port": "5000",
 							"path": [
 								"projects",
-								"dc588f81-0ea0-45ce-96df-96c95e7c3cef",
+								"3a99ba93-6494-44fc-a3de-19bc5b9fbf6e",
+								"milestones"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "200 - Success",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"milestones\": [{\r\n      \"name\": \"0.5 million tCO2e saved by year 3\",\r\n      \"description\": \"0.5 million tCO2e saved in 3 years after the launch of the windmill\",\r\n      \"type\": \"Temporal\",\r\n      \"offsets_available\": 50,\r\n      \"due_date\": \"2026-03-21T09:30:00.567Z\"\r\n    },\r\n    {\r\n      \"name\": \"1 million tCO2e saved by year 6\",\r\n      \"description\": \"1 million tCO2e saved by year 6 after the launch of the windmill\",\r\n      \"type\": \"Temporal\",\r\n      \"offsets_available\": 50,\r\n      \"due_date\": \"2029-03-21T09:30:00.000Z\"\r\n    },\r\n    {\r\n      \"name\": \"Generation of 180 GWh of clean electricity annually\",\r\n      \"description\": \"Generation of 180 GWh of clean electricity annually after the project has been implemented.\",\r\n      \"type\": \"Temporal\",\r\n      \"offsets_available\": 50,\r\n      \"due_date\": \"2024-03-21T09:30:00.000Z\"\r\n    },\r\n    {\r\n      \"name\": \"1.23 million tCO2e saved by year 7\",\r\n      \"description\": \"1.23 million tCO2e saved by year 7 after the launch of the windmill\",\r\n      \"type\": \"Temporal\",\r\n      \"offsets_available\": 50,\r\n      \"due_date\": \"2030-03-21T09:30:00.000Z\"\r\n    }\r\n  ]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:5000/projects/7528fa58-6ae3-4382-88a5-49650e102727/milestones",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5000",
+									"path": [
+										"projects",
+										"7528fa58-6ae3-4382-88a5-49650e102727",
+										"milestones"
+									]
+								}
+							},
+							"status": "CREATED",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/2.2.3 Python/3.11.0"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 26 Mar 2023 18:42:51 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "2124"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": [\n        {\n            \"created_at\": \"2023-03-26T18:42:51Z\",\n            \"description\": \"0.5 million tCO2e saved in 3 years after the launch of the windmill\",\n            \"due_date\": \"2026-03-21T09:30:00Z\",\n            \"id\": \"6cf57af5-0869-420f-8ebd-78be95543f98\",\n            \"name\": \"0.5 million tCO2e saved by year 3\",\n            \"offsets_available\": 50,\n            \"offsets_total\": 50,\n            \"project_id\": \"7528fa58-6ae3-4382-88a5-49650e102727\",\n            \"status\": \"Pending\",\n            \"type\": \"Temporal\",\n            \"updated_at\": \"2023-03-26T18:42:51Z\"\n        },\n        {\n            \"created_at\": \"2023-03-26T18:42:51Z\",\n            \"description\": \"1 million tCO2e saved by year 6 after the launch of the windmill\",\n            \"due_date\": \"2029-03-21T09:30:00Z\",\n            \"id\": \"1ebd7055-ce0f-4bbd-a33c-ce9ba0f79989\",\n            \"name\": \"1 million tCO2e saved by year 6\",\n            \"offsets_available\": 50,\n            \"offsets_total\": 50,\n            \"project_id\": \"7528fa58-6ae3-4382-88a5-49650e102727\",\n            \"status\": \"Pending\",\n            \"type\": \"Temporal\",\n            \"updated_at\": \"2023-03-26T18:42:51Z\"\n        },\n        {\n            \"created_at\": \"2023-03-26T18:42:51Z\",\n            \"description\": \"Generation of 180 GWh of clean electricity annually after the project has been implemented.\",\n            \"due_date\": \"2024-03-21T09:30:00Z\",\n            \"id\": \"01665dda-8510-4893-aad1-1625ac02ab17\",\n            \"name\": \"Generation of 180 GWh of clean electricity annually\",\n            \"offsets_available\": 50,\n            \"offsets_total\": 50,\n            \"project_id\": \"7528fa58-6ae3-4382-88a5-49650e102727\",\n            \"status\": \"Pending\",\n            \"type\": \"Temporal\",\n            \"updated_at\": \"2023-03-26T18:42:51Z\"\n        },\n        {\n            \"created_at\": \"2023-03-26T18:42:51Z\",\n            \"description\": \"1.23 million tCO2e saved by year 7 after the launch of the windmill\",\n            \"due_date\": \"2030-03-21T09:30:00Z\",\n            \"id\": \"28c4877e-3285-4955-94df-c2afff7eb8e8\",\n            \"name\": \"1.23 million tCO2e saved by year 7\",\n            \"offsets_available\": 50,\n            \"offsets_total\": 50,\n            \"project_id\": \"7528fa58-6ae3-4382-88a5-49650e102727\",\n            \"status\": \"Pending\",\n            \"type\": \"Temporal\",\n            \"updated_at\": \"2023-03-26T18:42:51Z\"\n        }\n    ],\n    \"success\": true\n}"
+						},
+						{
+							"name": "404 - Project not found",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"milestones\": [{\r\n      \"name\": \"0.5 million tCO2e saved by year 3\",\r\n      \"description\": \"0.5 million tCO2e saved in 3 years after the launch of the windmill\",\r\n      \"type\": \"Temporal\",\r\n      \"offsets_available\": 50,\r\n      \"due_date\": \"2026-03-21T09:30:00.567Z\"\r\n    },\r\n    {\r\n      \"name\": \"1 million tCO2e saved by year 6\",\r\n      \"description\": \"1 million tCO2e saved by year 6 after the launch of the windmill\",\r\n      \"type\": \"Temporal\",\r\n      \"offsets_available\": 50,\r\n      \"due_date\": \"2029-03-21T09:30:00.000Z\"\r\n    },\r\n    {\r\n      \"name\": \"Generation of 180 GWh of clean electricity annually\",\r\n      \"description\": \"Generation of 180 GWh of clean electricity annually after the project has been implemented.\",\r\n      \"type\": \"Temporal\",\r\n      \"offsets_available\": 50,\r\n      \"due_date\": \"2024-03-21T09:30:00.000Z\"\r\n    },\r\n    {\r\n      \"name\": \"1.23 million tCO2e saved by year 7\",\r\n      \"description\": \"1.23 million tCO2e saved by year 7 after the launch of the windmill\",\r\n      \"type\": \"Temporal\",\r\n      \"offsets_available\": 50,\r\n      \"due_date\": \"2030-03-21T09:30:00.000Z\"\r\n    }\r\n  ]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:5000/projects/3bd77619-06a5-42e6-bdf9-3a4cd5236329/milestones",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5000",
+									"path": [
+										"projects",
+										"3bd77619-06a5-42e6-bdf9-3a4cd5236329",
+										"milestones"
+									]
+								}
+							},
+							"status": "NOT FOUND",
+							"code": 404,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/2.2.3 Python/3.11.2"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 26 Mar 2023 19:05:40 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "150"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": {\n        \"message\": \"404 Not Found: Project 3bd77619-06a5-42e6-bdf9-3a4cd5236329 not found.\",\n        \"resource\": null\n    },\n    \"success\": false\n}"
+						}
+					]
+				},
+				{
+					"name": "Milestone - verify status",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"status\": \"rejected\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5000/projects/3a99ba93-6494-44fc-a3de-19bc5b9fbf6e/milestones/60af22a8-e44f-4300-95db-b776ae703848/status",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"projects",
+								"3a99ba93-6494-44fc-a3de-19bc5b9fbf6e",
 								"milestones",
-								"620ad928-f7c8-4985-830d-f0e91fa8fe41",
+								"60af22a8-e44f-4300-95db-b776ae703848",
 								"status"
 							]
 						}
@@ -961,7 +1112,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:5000/projects/milestones/620ad928-f7c8-4985-830d-f0e91fa8fe41",
+							"raw": "http://localhost:5000/projects/milestones/60af22a8-e44f-4300-95db-b776ae703848",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -970,7 +1121,7 @@
 							"path": [
 								"projects",
 								"milestones",
-								"620ad928-f7c8-4985-830d-f0e91fa8fe41"
+								"60af22a8-e44f-4300-95db-b776ae703848"
 							]
 						}
 					},
@@ -1086,7 +1237,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"payment_id\": \"pi_3MndyuGehkGRMk671qmpwqVS_secret_Wa99pZSYbfF09X2sVM8s3dzLy\",\r\n    \"amount\": 10.0,\r\n    \"buyer_id\": \"31db76d6-34dc-4687-8ce1-c96195916e05\"\r\n}",
+							"raw": "{\r\n    \"payment_id\": \"pi_3MndyuGehkGRMk671qmpwqVS_secret_Wa99pZSYbfF09X2sVM8s3dzLb\",\r\n    \"amount\": 10.3,\r\n    \"buyer_id\": \"31db76d6-34dc-4687-8ce1-c96195916e05\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1094,7 +1245,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:5000/projects/dc588f81-0ea0-45ce-96df-96c95e7c3cef/milestones/620ad928-f7c8-4985-830d-f0e91fa8fe41/offset",
+							"raw": "http://localhost:5000/projects/3a99ba93-6494-44fc-a3de-19bc5b9fbf6e/milestones/60af22a8-e44f-4300-95db-b776ae703848/offset",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -1102,9 +1253,9 @@
 							"port": "5000",
 							"path": [
 								"projects",
-								"dc588f81-0ea0-45ce-96df-96c95e7c3cef",
+								"3a99ba93-6494-44fc-a3de-19bc5b9fbf6e",
 								"milestones",
-								"620ad928-f7c8-4985-830d-f0e91fa8fe41",
+								"60af22a8-e44f-4300-95db-b776ae703848",
 								"offset"
 							]
 						}
@@ -1490,7 +1641,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:5000/projects/milestones/offset/805a76c8-abd8-4dac-b90f-98a4d5537c8d",
+							"raw": "http://localhost:5000/projects/milestones/offset/pi_3MndyuGehkGRMk671qmpwqVS_secret_Wa99pZSYbfF09X2sVM8s3dzLa",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -1500,7 +1651,7 @@
 								"projects",
 								"milestones",
 								"offset",
-								"805a76c8-abd8-4dac-b90f-98a4d5537c8d"
+								"pi_3MndyuGehkGRMk671qmpwqVS_secret_Wa99pZSYbfF09X2sVM8s3dzLa"
 							]
 						}
 					},
@@ -1511,7 +1662,7 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "http://localhost:5000/projects/milestones/offset/805a76c8-abd8-4dac-b90f-98a4d5537c87",
+									"raw": "http://localhost:5000/projects/milestones/offset/pi_3MndyuGehkGRMk671qmpwqVS_secret_Wa99pZSYbfF09X2sVM8s3dzLa",
 									"protocol": "http",
 									"host": [
 										"localhost"
@@ -1521,7 +1672,7 @@
 										"projects",
 										"milestones",
 										"offset",
-										"805a76c8-abd8-4dac-b90f-98a4d5537c87"
+										"pi_3MndyuGehkGRMk671qmpwqVS_secret_Wa99pZSYbfF09X2sVM8s3dzLa"
 									]
 								}
 							},
@@ -1531,11 +1682,11 @@
 							"header": [
 								{
 									"key": "Server",
-									"value": "Werkzeug/2.2.3 Python/3.9.13"
+									"value": "Werkzeug/2.2.3 Python/3.11.2"
 								},
 								{
 									"key": "Date",
-									"value": "Wed, 22 Mar 2023 06:33:52 GMT"
+									"value": "Sun, 26 Mar 2023 17:03:24 GMT"
 								},
 								{
 									"key": "Content-Type",
@@ -1543,7 +1694,7 @@
 								},
 								{
 									"key": "Content-Length",
-									"value": "249"
+									"value": "298"
 								},
 								{
 									"key": "Access-Control-Allow-Origin",
@@ -1555,7 +1706,7 @@
 								}
 							],
 							"cookie": [],
-							"body": "{\n    \"data\": {\n        \"amount\": 30,\n        \"buyer_id\": \"uuid2\",\n        \"created_at\": \"2023-03-22T06:29:53.850842\",\n        \"milestone_id\": \"7439fbb5-12c1-4467-906e-7ebce5a1018f\",\n        \"payment_id\": \"805a76c8-abd8-4dac-b90f-98a4d5537c87\"\n    },\n    \"success\": true\n}"
+							"body": "{\n    \"data\": {\n        \"amount\": 10.3,\n        \"buyer_id\": \"31db76d6-34dc-4687-8ce1-c96195916e05\",\n        \"created_at\": \"2023-03-26T17:02:48Z\",\n        \"milestone_id\": \"7a685ec7-92d3-4a48-90ae-40a8d07ca9da\",\n        \"payment_id\": \"pi_3MndyuGehkGRMk671qmpwqVS_secret_Wa99pZSYbfF09X2sVM8s3dzLa\"\n    },\n    \"success\": true\n}"
 						},
 						{
 							"name": "404 - Not found",
@@ -1691,7 +1842,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"payment_id\": \"pi_3MndyuGehkGRMk671qmpwqVS_secret_Wa99pZSYbfF09X2sVM8s3dzLy\"\r\n}",
+							"raw": "{\r\n    \"payment_id\": \"pi_3MndyuGehkGRMk671qmpwqVS_secret_Wa99pZSYbfF09X2sVM8s3dzLa\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1774,13 +1925,13 @@
 							"body": "{\n    \"data\": {\n        \"message\": \"Fields missing from request body ('payment_id',)\",\n        \"resource\": null\n    },\n    \"success\": false\n}"
 						},
 						{
-							"name": "204 - Success",
+							"name": "200 - Success",
 							"originalRequest": {
 								"method": "PATCH",
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"payment_id\": \"805a76c8-abd8-4dac-b90f-98a4d5537c87\"\r\n}",
+									"raw": "{\r\n    \"payment_id\": \"pi_3MndyuGehkGRMk671qmpwqVS_secret_Wa99pZSYbfF09X2sVM8s3dzLa\"\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -1801,21 +1952,25 @@
 									]
 								}
 							},
-							"status": "NO CONTENT",
-							"code": 204,
+							"status": "OK",
+							"code": 200,
 							"_postman_previewlanguage": "json",
 							"header": [
 								{
 									"key": "Server",
-									"value": "Werkzeug/2.2.3 Python/3.9.13"
+									"value": "Werkzeug/2.2.3 Python/3.11.2"
 								},
 								{
 									"key": "Date",
-									"value": "Wed, 22 Mar 2023 06:35:08 GMT"
+									"value": "Sun, 26 Mar 2023 17:01:03 GMT"
 								},
 								{
 									"key": "Content-Type",
 									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "298"
 								},
 								{
 									"key": "Access-Control-Allow-Origin",
@@ -1827,7 +1982,7 @@
 								}
 							],
 							"cookie": [],
-							"body": ""
+							"body": "{\n    \"data\": {\n        \"amount\": 10.3,\n        \"buyer_id\": \"31db76d6-34dc-4687-8ce1-c96195916e05\",\n        \"created_at\": \"2023-03-26T17:01:01Z\",\n        \"milestone_id\": \"7a685ec7-92d3-4a48-90ae-40a8d07ca9da\",\n        \"payment_id\": \"pi_3MndyuGehkGRMk671qmpwqVS_secret_Wa99pZSYbfF09X2sVM8s3dzLa\"\n    },\n    \"success\": true\n}"
 						}
 					]
 				},
@@ -1838,7 +1993,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"payment_id\": \"pi_3MndyuGehkGRMk671qmpwqVS_secret_Wa99pZSYbfF09X2sVM8s3dzLy\"\r\n}",
+							"raw": "{\r\n    \"payment_id\": \"pi_3MndyuGehkGRMk671qmpwqVS_secret_Wa99pZSYbfF09X2sVM8s3dzLb\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
