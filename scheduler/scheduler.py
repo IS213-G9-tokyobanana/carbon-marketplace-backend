@@ -1,4 +1,4 @@
-from publisher import publishTask
+from publisher import republishTask
 from crontab import CronTab
 from datetime import datetime, timedelta
 
@@ -32,9 +32,9 @@ def checkType(msg):
         milestone_id = msg['resource_id']
         projId = msg['data']['project_id']
         milestoneRemove(milestone_id, projId)
-    elif msg['type'] == 'task.add':
+    elif msg['resource_id'] == 'task.add':
         # Re-publish the task to the exchange
-        publishTask('task.add')
+        republishTask(msg)
         # print(msg)
 
 
