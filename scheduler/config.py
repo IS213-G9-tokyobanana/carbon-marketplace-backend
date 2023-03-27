@@ -5,13 +5,14 @@ env = "production"
 TOPIC_EXCHANGE_NAME = "topic_exchange"
 # Binding Keys that scheduler has to listen to
 BINDING_KEYS = {
-    "MILESTONE_ADD":"events.projects.*.milestone.add",
-    "PROJECT_VERIFY":"events.projects.*.project.verify",
-    "TASK_ADD":"events.*.scheduler.task.add",
-    "OFFSET_RESERVE":"events.projects.*.offsets.reserve",
-    "OFFSET_COMMIT":"events.projects.*.offsets.commit",
-    "RATINGS_REWARD":"events.projects.*.ratings.reward",
-    "PAYMENT_FAIL":"events.buyprojects.*.payment.failed",
+    "milestone_add":"events.projects.*.milestone.add",
+    "project_verify":"events.projects.*.project.verify",
+    "task_add":"events.*.scheduler.task.add",
+    "offsets_reserve":"events.projects.*.offsets.reserve",
+    "offsets_commit":"events.projects.*.offsets.commit",
+    "ratings_reward":"events.projects.*.ratings.reward",
+    "ratings_penalise":"events.projects.*.ratings.penalise",
+    "payment_fail":"events.buyprojects.*.payment.failed",
 }
 # Routing Keys that scheduler has to publish to
 PUBLISHED_TASK_EXECUTE_ROUTING_KEY = "events.scheduler.public.task.execute"
