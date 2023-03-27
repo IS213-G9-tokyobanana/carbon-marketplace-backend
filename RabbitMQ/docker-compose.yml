@@ -11,6 +11,7 @@ services:
       - "5672:5672"
   rabbitmq-config:
     container_name: rabbitmq-config
+    image: ${PRIVATE_REGISTRY_URI}mushkevych/syn-rabbitmq-config:latest
     build:
       dockerfile: rabbitmq_config.dockerfile
       args:
