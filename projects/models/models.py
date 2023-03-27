@@ -17,7 +17,7 @@ class Project(db.Model):
     owner_id = Column(TEXT, nullable=False)
     description = Column(TEXT, nullable=False)
     types = Column(ARRAY(TEXT))
-    status = Column(VARCHAR(20), nullable=False, default="Pending")
+    status = Column(VARCHAR(20), nullable=False, default="pending")
     created_at = Column(TIMESTAMP, nullable=False, default=datetime.utcnow)
     updated_at = Column(TIMESTAMP, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
     rating = Column(FLOAT, nullable=False, default=100.00)
@@ -50,7 +50,7 @@ class Milestone(db.Model):
     type = Column(VARCHAR(20), nullable=False) # -- 'Temporal' | 'Qualitative' | 'Quantitative'
     offsets_available = Column(FLOAT, nullable=False)
     offsets_total = Column(FLOAT, nullable=False)
-    status = Column(VARCHAR(20), nullable=False, default="Pending") # -- "Pending" | "Verified" | "Met" | "Rejected"
+    status = Column(VARCHAR(20), nullable=False, default="pending") # -- "pending" | "verified" | "met" | "rejected"
     created_at = Column(TIMESTAMP, nullable=False, default=datetime.utcnow) 
     updated_at = Column(TIMESTAMP, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
     due_date = Column(TIMESTAMP, nullable=False)
