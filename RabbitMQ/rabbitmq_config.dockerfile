@@ -2,7 +2,7 @@
 ARG private_registry_uri= 
 
 # list of alpine packages: https://pkgs.alpinelinux.org/packages
-FROM ${private_registry_uri}alpine:3.10
+FROM ${private_registry_uri}alpine:3.14
 
 RUN apk add --no-cache bash curl wget
 
