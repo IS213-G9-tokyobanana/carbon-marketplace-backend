@@ -8,11 +8,11 @@ volumes:
   search_data: {}
 
 services:
-  flask:
+  flask_app:
     build:
         context: .
         dockerfile: Dockerfile
-    container_name: flask
+    container_name: flask_app
     restart: always
     networks:
       - flask_search
