@@ -64,7 +64,16 @@ def publishTask(event, project_id, milestone_id):
     check_setup(connection, channel, RMQHOSTNAME, RMQPORT)
     channel.basic_publish(exchange=TOPIC_EXCHANGE_NAME, routing_key=PUBLISHED_TASK_EXECUTE_ROUTING_KEY, body=payload, properties=pika.BasicProperties(delivery_mode=2))
     
-
+def republishTask(msg):
+    connection = pika.BlockingConnection(
+    pika.ConnectionParameters(
+        host=RMQHOSTNAME, port=RMQPORT,
+        heartbeat=3600, blocked_connection_timeout=3600,
+        credentials=pika.PlainCredentials(RMQUSERNAME, RMQPASSWORD)
+    ))
+    channel = connection.channel()
+    check_setup(connection, channel, RMQHOSTNAME, RMQPORT)
+    channel.basic_publish(exchange=TOPIC_EXCHANGE_NAME, routing_key=PUBLISHED_TASK_EXECUTE_ROUTING_KEY, body=msg, properties=pika.BasicProperties(delivery_mode=2))
 
 
 if __name__ == "__main__":
