@@ -1,6 +1,7 @@
 import json
 import pika
 import logging
+import asyncio
 from config.config import (
     EXCHANGE_NAME,
     TASK_EXECUTE_BINDING_KEY,
@@ -11,9 +12,31 @@ from config.config import (
     RMQPASSWORD,
 )
 import police
+from temporal.run_workflow import main
 
 # Global variable
 channel = None
+
+
+def create_connection(type: str):
+    # Define connection parameters
+    parameters = pika.ConnectionParameters(
+        host=RMQHOSTNAME,
+        port=RMQPORT,
+        heartbeat=3600,
+        credentials=pika.PlainCredentials(RMQUSERNAME, RMQPASSWORD),
+        blocked_connection_timeout=3600,
+    )
+    # Connect to RabbitMQ
+    if type == "selection":
+        connection = pika.SelectConnection(
+            parameters=parameters, on_open_callback=on_open
+        )
+    elif type == "blocking":
+        connection = pika.BlockingConnection(parameters=parameters)
+    else:
+        return "Invalid connection type"
+    return connection
 
 
 # Function is called when connection is open, and channel is open
@@ -55,33 +78,38 @@ def callback(channel, method, properties, body):
 def check_message(data: dict):
     try:
         if data["type"] == "upcoming":
-            police.publish_to_notifier(data, channel)
+            result = police.publish_to_notifier(data, channel)
         elif data["type"] == "penalise":
-            police.send_to_projectms(data)
+            result = police.send_to_projectms(data)
         elif data["type"] == "overdue":
-            # Trigger Temporal.io workflow
-            return
+            result = asyncio.run(main(data))
         else:
-            print("Invalid message type")
+            result = {
+                "success": False,
+                "data": {
+                    "message": "Invalid message type",
+                },
+            }
+        print("Result:", result)
+        publish_status(result)
     except Exception as err:
         logging.exception("Error processing message: %s", err)
 
+
+def publish_status(result: dict):
+    # Publish result to supoervisor ms
+    channel.basic_publish(
+        exchange=EXCHANGE_NAME,
+        routing_key="events.police.public.task.status",
+        body=json.dumps(result),
+        properties=pika.BasicProperties(delivery_mode=2),
+    )
 
 if __name__ == "__main__":
     print(
         f"monitoring the exchange {EXCHANGE_NAME} on binding key {TASK_EXECUTE_BINDING_KEY} ..."
     )
-    # Define connection parameters
-    parameters = pika.ConnectionParameters(
-        host=RMQHOSTNAME,
-        port=RMQPORT,
-        heartbeat=3600,
-        credentials=pika.PlainCredentials(RMQUSERNAME, RMQPASSWORD),
-        blocked_connection_timeout=3600,
-    )
-    # Connect to RabbitMQ
-    connection = pika.SelectConnection(parameters=parameters, on_open_callback=on_open)
-    # Start the IOLoop to allow the SelectConnection to operate
+    connection = create_connection("selection")
     try:
         connection.ioloop.start()
     except KeyboardInterrupt:
