@@ -1,0 +1,13 @@
+version: "3.8"
+
+networks:
+  scheduler_network:
+    driver: bridge
+
+services:   
+  scheduler:
+    container_name: scheduler
+    build: .
+    restart: always
+    networks:
+      - scheduler_network
