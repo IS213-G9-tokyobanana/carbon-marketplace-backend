@@ -27,11 +27,11 @@ def checkType(msg):
         # Check if in Cron to see if need to remove.
         payment_id = msg['resource_id']
         removeOffsetTrack(payment_id)
-    elif msg['type'] == 'milestone.reward':
+    elif msg['type'] == 'milestone.reward' or msg['type'] == 'milestone.penalise':
         # Milestone has been rewarded, need to remove from cron
         milestone_id = msg['resource_id']
         projId = msg['data']['project_id']
-        milestoneRewarded(milestone_id, projId)
+        milestoneRemove(milestone_id, projId)
     elif msg['type'] == 'task.add':
         # Re-publish the task to the exchange
         publishTask('task.add')
@@ -56,11 +56,11 @@ def newOffsetTrack(payment_id, created_at, project_id, milestone_id):
     cron.write()
 
 # Function that is called when milestone have been rewarded
-def milestoneRewarded(milestone_id, project_id):
+def milestoneRemove(milestone_id, project_id):
     # Need to check 2 conditions
     # 1. If upcoming and overdue both still in Cron
     # 2. If only overdue in Cron
-    print('in scheduler milestoneRewarded')
+    print('in scheduler milestoneRemove')
     cron = CronTab(user=True)
     cron.remove_all(comment=f'upcoming_{project_id}_{milestone_id}')
     cron.write()
