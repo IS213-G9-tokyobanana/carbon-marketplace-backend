@@ -3,8 +3,14 @@ import pika
 import requests
 
 # add the path to the main directory of your project to the system path
-from ProjectPolice.police import format_message, format_url, publish_to_notifier
-from ProjectPolice.config.config import PAYMENT_MS_URL, RMQHOSTNAME, RMQPORT, RMQUSERNAME, RMQPASSWORD
+from police import format_message, format_url, publish_to_notifier
+from config.config import (
+    PAYMENT_MS_URL,
+    RMQHOSTNAME,
+    RMQPORT,
+    RMQUSERNAME,
+    RMQPASSWORD,
+)
 
 # Request to Project Microservice to remove reserved offset
 @activity.defn
@@ -20,11 +26,18 @@ async def remove_reserved_offset(data) -> dict:
     #     result.raise_for_status()
     # except requests.exceptions.HTTPError as err:
     #     result = {
-    #         "code": 500,
-    #         "message": "invocation of service fails: " + url + ". " + str(err),
+    #         "success": False,
+    #         "data": {
+    #             "message": "invocation of service fails: " + url + ". " + str(err),
+    #         },
     #     }
     # return result
-    return {"code": 200, "message": "reserved offset removed"}
+    return {
+        "success": True,
+        "data": {
+            "message": "invocation of service fails" 
+        },
+    }
 
 
 # Request to Payment Microservice to retrieve relevant payment intent
@@ -35,14 +48,21 @@ async def get_payment_intent() -> dict:
     #     result.raise_for_status()
     # except requests.exceptions.HTTPError as err:
     #     result = {
-    #         "code": 500,
-    #         "message": "invocation of service fails: "
-    #         + PAYMENT_MS_URL
-    #         + ". "
-    #         + str(err),
+    #         "success": False,
+    #         "data": {
+    #             "message": "invocation of service fails: "
+    #             + PAYMENT_MS_URL
+    #             + ". "
+    #             + str(err),
+    #         },
     #     }
     # return result
-    return {"code": 200, "message": "payment intent retrieved"}
+    return {
+        "success": True,
+        "data": {
+            "message": "invocation of service fails"
+        },
+    }
 
 
 # Request to Messgae Broker to send message to Notifier

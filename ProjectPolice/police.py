@@ -1,7 +1,7 @@
 import requests
 import pika
 import json
-from ProjectPolice.config.config import (
+from config.config import (
     EXCHANGE_NAME,
     POLICE_NOTIFY_ROUTING_KEY,
     PROJECT_STATUS_URL,
@@ -29,7 +29,7 @@ def publish_to_notifier(message, channel):
         body=payload,
         properties=pika.BasicProperties(delivery_mode=2),
     )
-    return {"code": 200, "message": "message sent to Notifier"}
+    return {"success": True, "data": {"message": "message sent to Notifier"}}
 
 
 # Function to send message to Project Microservice
@@ -45,7 +45,9 @@ def send_to_projectms(message):
         result.raise_for_status()
     except requests.exceptions.HTTPError as err:
         result = {
-            "code": 500,
-            "message": "invocation of service fails: " + url + ". " + str(err),
+            "success": False,
+            "data": {
+                "message": "invocation of service fails: " + url + ". " + str(err),
+            },
         }
     return result

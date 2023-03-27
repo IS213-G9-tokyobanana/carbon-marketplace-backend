@@ -1,24 +1,38 @@
-import asyncio
 from temporalio.client import Client
 
 # Import the workflow
-from ProjectPolice.temporal.workflow import ProjectPoliceTemporalWorkflow
+from temporal.workflow import ProjectPoliceTemporalWorkflow
+from config.config import TEMPORAL_SERVICE_URL
 
 
 async def main(data):
     # Create client connected to server at the given address
-    client = await Client.connect("localhost:7233")
+    client = await Client.connect(TEMPORAL_SERVICE_URL)
 
     # Execute a workflow
-    result = await client.execute_workflow(
+    workflow_result = await client.execute_workflow(
         ProjectPoliceTemporalWorkflow.run,
         data,
         id="project-workflow8",
         task_queue="my-task-queue",
     )
 
-    print("Workflow result:", result)
+    if workflow_result["success"] == True:
+        result = {
+            "success": True,
+            "data": {
+                "message": "Workflow executed successfully",
+                "resources": workflow_result,
+            },
+        }
+    else:
+        result = {
+            "success": False,
+            "data": {
+                "message": "Workflow execution failed",
+                "resources": workflow_result,
+            },
+        }
 
-
-if __name__ == "__main__":
-    asyncio.run(main())
+    print("Workflow result:", workflow_result)
+    return result

@@ -13,5 +13,6 @@ QUEUE_NAME="task_triggered_topic_queue"
 PROJECT_MS_URL = os.getenv('projectms')
 PROJECT_STATUS_URL = PROJECT_MS_URL + "/project/{project_id}/milestone/{milestone_id}/{task}"
 PAYMENT_MS_URL = os.getenv('paymentms')
+TEMPORAL_SERVICE_URL = os.getenv('temporalservice')
 
 

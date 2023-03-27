@@ -1,13 +1,8 @@
 import json
 import pika
 import logging
-import sys
-import os
 import asyncio
-
-# add the path to the main directory of your project to the system path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from ProjectPolice.config.config import (
+from config.config import (
     EXCHANGE_NAME,
     TASK_EXECUTE_BINDING_KEY,
     QUEUE_NAME,
@@ -16,8 +11,8 @@ from ProjectPolice.config.config import (
     RMQUSERNAME,
     RMQPASSWORD,
 )
-import ProjectPolice.police
-from ProjectPolice.temporal.run_workflow import main
+import police
+from temporal.run_workflow import main
 
 # Global variable
 channel = None
@@ -83,16 +78,32 @@ def callback(channel, method, properties, body):
 def check_message(data: dict):
     try:
         if data["type"] == "upcoming":
-            ProjectPolice.police.publish_to_notifier(data, channel)
+            result = police.publish_to_notifier(data, channel)
         elif data["type"] == "penalise":
-            ProjectPolice.police.send_to_projectms(data)
+            result = police.send_to_projectms(data)
         elif data["type"] == "overdue":
-            asyncio.run(main(data))
+            result = asyncio.run(main(data))
         else:
-            print("Invalid message type")
+            result = {
+                "success": False,
+                "data": {
+                    "message": "Invalid message type",
+                },
+            }
+        print("Result:", result)
+        publish_status(result)
     except Exception as err:
         logging.exception("Error processing message: %s", err)
 
+
+def publish_status(result: dict):
+    # Publish result to supoervisor ms
+    channel.basic_publish(
+        exchange=EXCHANGE_NAME,
+        routing_key="events.police.public.task.status",
+        body=json.dumps(result),
+        properties=pika.BasicProperties(delivery_mode=2),
+    )
 
 if __name__ == "__main__":
     print(
