@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "search"
+version = "0.1.0"
+description = ""
+authors = ["Zong Wei Eng <engzongwei@hotmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+meilisearch = "^0.25.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
