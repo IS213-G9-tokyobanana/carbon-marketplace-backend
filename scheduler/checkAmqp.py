@@ -26,7 +26,7 @@ channel = connection.channel()
 
 # Loops through all the binding keys and creates a queue for each
 for queue_name, binding_key in BINDING_KEYS.items():
-    channel.queue_declare(binding_key, durable=True)
+    channel.queue_declare(queue_name, durable=True)
     channel.queue_bind(exchange=TOPIC_EXCHANGE_NAME, queue=queue_name, routing_key=binding_key)
 
 def check_setup():
