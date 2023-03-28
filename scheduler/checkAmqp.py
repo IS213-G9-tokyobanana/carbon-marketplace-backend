@@ -83,12 +83,6 @@ def callback(channel, method, properties, body):
         print("--NOT JSON:", e)
         print("--DATA:", body)
 
-def test():
-    print('testing cron')
-    scheduler.test_cron()
-    print('after test cron')
-
-
 if __name__ == "__main__":
     check_setup()
     receiveMsg()
