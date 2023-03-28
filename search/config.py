@@ -8,7 +8,7 @@ BINDING_KEYS = {
     "milestone_add":"events.projects.*.milestone.add",
     "project_verify":"events.projects.*.project.verify",
     "offsets_reserve":"events.projects.*.offsets.reserve",
-    "offsets_commit":"events.projects.*.offsets.rollback",
+    "offsets_rollback":"events.projects.*.offsets.rollback",
 }
 
 
