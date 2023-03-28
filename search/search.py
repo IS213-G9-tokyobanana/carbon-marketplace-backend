@@ -77,16 +77,31 @@ def callback(channel, method, properties, body):
     try:
         client = meilisearch.Client('http://search:7700')
         data = json.loads(body)
-        # if data['type'] == 'project.verify' or data['type'] == 'offset.rollback' or data['type'] == 'offset.reserve':
-        client.index('projects').add_documents(data)
-        # else:
-        #     # for milestone add
-        #     response = client.index('projects').get_document(data['data']['project_id'])
-        #     document = response.data
-        #     document['milestones'].append(data['data']['milestones'][0])
-        #     # new = json.dumps(document)
-        #     # print(json.loads(new))
-        #     client.index('projects').add_documents(document)
+        if data['type'] == 'project.verify' or data['type'] == 'offset.rollback':
+            client.index('projects').add_documents([data['data']], primary_key='id')
+        elif data['type'] == 'milestone.add':
+            # for milestone add
+            response = client.index('projects').get_document(document_id = data['data']['project_id'])
+            old = response.milestones
+            new = data['data']['milestones']
+            new.extend(old)
+            client.index('projects').update_documents(
+                [{
+                    "id": data['data']['project_id'],
+                    "milestones": new
+                }],
+                primary_key="id"
+            )
+        elif data['type'] == 'offset.reserve':
+            response = client.index('projects').get_document(document_id = data['resource_id'])
+            new = data['data']['milestones']
+            client.index('projects').update_documents(
+                [{
+                    "id": data['resource_id'],
+                    "milestones": new
+                }],
+                primary_key="id"
+            )
 
     except json.decoder.JSONDecodeError as e:
         print("--NOT JSON:", e)
