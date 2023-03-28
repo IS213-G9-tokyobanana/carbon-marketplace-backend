@@ -10,6 +10,7 @@ from config.config import (
     RMQPORT,
     RMQUSERNAME,
     RMQPASSWORD,
+    POLICE_SCHEDULER_MANAGER_ROUTING_KEY
 )
 import police
 from temporal.run_workflow import main
@@ -100,7 +101,7 @@ def publish_status(result: dict):
     # Publish result to supoervisor ms
     channel.basic_publish(
         exchange=EXCHANGE_NAME,
-        routing_key="events.police.public.task.status",
+        routing_key=POLICE_SCHEDULER_MANAGER_ROUTING_KEY,
         body=json.dumps(result),
         properties=pika.BasicProperties(delivery_mode=2),
     )
