@@ -1,4 +1,5 @@
 import pika
+
 from config.config import (
     EXCHANGE_NAME,
     RMQHOSTNAME,
@@ -41,14 +42,7 @@ def create_connection():
 
 def check_setup(connection, channel):
     if not is_connection_open(connection):
-        parameters = pika.ConnectionParameters(
-            host=RMQHOSTNAME,
-            port=RMQPORT,
-            heartbeat=3600,
-            blocked_connection_timeout=3600,
-            credentials=pika.PlainCredentials(RMQUSERNAME, RMQPASSWORD),
-        )
-        connection = pika.BlockingConnection(parameters=parameters)
+        connection = create_connection()
     if channel.is_closed:
         channel = connection.channel()
         channel.exchange_declare(
