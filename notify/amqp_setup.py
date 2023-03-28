@@ -53,7 +53,6 @@ QUEUES = {
 
     QUEUE_PROJECT_RATINGS_PENALISE: 
     {
-        ROUTING_KEY: "events.projects.public.ratings.penalise",
         BINDING_KEY: "events.projects.*.ratings.penalise" ,
         SUBJECT: "Project has been penalised", 
         message: "Project {project_id} with milestone {milestone_id} has been penalised"
@@ -61,7 +60,6 @@ QUEUES = {
 
     QUEUE_PROJECT_VERIFY:  
     {
-        ROUTING_KEY: "events.projects.public.project.verify",
         BINDING_KEY: "events.projects.*.project.verify" ,
         SUBJECT: "Project has been verified",
         message: "Project {project_id} has been verified"
@@ -69,7 +67,6 @@ QUEUES = {
     
     QUEUE_PROJECT_MILESTONES_ADD:  
     {
-        ROUTING_KEY: "events.projects.public.milestone.add",
         BINDING_KEY: "events.projects.*.milestone.add" ,
         SUBJECT: "Project Milestone has been added",
         message: "Project {project_id} with milestone {milestone_id} has been added"
@@ -77,7 +74,6 @@ QUEUES = {
     
     QUEUE_BUYPROJECTS_PAYMENT_SUCCESS:  
     {
-        ROUTING_KEY: "events.buyprojects.notify.payment.success",
         BINDING_KEY: "events.buyprojects.notify.payment.success" ,
         SUBJECT: "Payment has been successful",
         message_buyer: "Hi Buyer {buyer_id} has successfully paid for the project",
@@ -99,7 +95,6 @@ QUEUES = {
     },
     QUEUE_PROJECTPOLICE_MILESTONE_UPCOMING: 
     {
-        ROUTING_KEY: "events.police.notify.milestone.upcoming",
         BINDING_KEY: "events.police.notify.milestone.upcoming" ,
         SUBJECT: "Upcoming Milestone",
         message: "Project {project_id} with milestone {milestone_id} is upcoming"
