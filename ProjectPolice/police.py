@@ -29,7 +29,13 @@ def publish_to_notifier(message, channel):
         body=payload,
         properties=pika.BasicProperties(delivery_mode=2),
     )
-    return {"success": True, "data": {"message": "message sent to Notifier"}}
+    return {
+        "success": True,
+        "data": {
+            "message": "message sent to Notifier",
+            "resources": payload,
+        },
+    }
 
 
 # Function to send message to Project Microservice
@@ -48,6 +54,7 @@ def send_to_projectms(message):
             "success": False,
             "data": {
                 "message": "invocation of service fails: " + url + ". " + str(err),
+                "resources": payload,
             },
         }
     return result

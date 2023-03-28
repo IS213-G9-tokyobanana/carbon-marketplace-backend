@@ -15,16 +15,19 @@ class ProjectPoliceTemporalWorkflow:
     @workflow.run
     async def run(self, data: dict) -> dict:
         status_arr = []
-        # Execute activity to remove reserved offset
-        result1 = await workflow.execute_activity(
-            remove_reserved_offset, data, start_to_close_timeout=timedelta(seconds=5)
-        )
-        status_arr.append(result1["success"])
         # Execute activity to retrieve payment intent
-        result2 = await workflow.execute_activity(
+        result1 = await workflow.execute_activity(
             get_payment_intent, start_to_close_timeout=timedelta(seconds=5)
         )
         status_arr.append(result2["success"])
+        # Execute activity to remove reserved offset
+        result2 = await workflow.execute_activity(
+            remove_reserved_offset,
+            data,
+            result1,
+            start_to_close_timeout=timedelta(seconds=5),
+        )
+        status_arr.append(result1["success"])
         # Execute activity to send message to Notifier
         result3 = await workflow.execute_activity(
             send_to_notifier, data, start_to_close_timeout=timedelta(seconds=5)
@@ -34,7 +37,13 @@ class ProjectPoliceTemporalWorkflow:
         if all(status_arr):
             return {
                 "success": True,
-                "data": {"message": "Workflow executed successfully"},
+                "data": {
+                    "message": "Workflow executed successfully",
+                    "resources": data,
+                },
             }
         else:
-            return {"success": False, "data": {"message": "Workflow execution failed"}}
+            return {
+                "success": False,
+                "data": {"message": "Workflow execution failed", "resources": data},
+            }

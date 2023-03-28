@@ -13,7 +13,7 @@ async def main(data):
     workflow_result = await client.execute_workflow(
         ProjectPoliceTemporalWorkflow.run,
         data,
-        id="project-workflow8",
+        id="project-workflow-test",
         task_queue="my-task-queue",
     )
 
@@ -22,7 +22,7 @@ async def main(data):
             "success": True,
             "data": {
                 "message": "Workflow executed successfully",
-                "resources": workflow_result,
+                "resources": data,
             },
         }
     else:
@@ -30,9 +30,8 @@ async def main(data):
             "success": False,
             "data": {
                 "message": "Workflow execution failed",
-                "resources": workflow_result,
+                "resources": data,
             },
         }
-
     print("Workflow result:", workflow_result)
     return result

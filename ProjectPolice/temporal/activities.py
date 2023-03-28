@@ -14,10 +14,12 @@ from config.config import (
 
 # Request to Project Microservice to remove reserved offset
 @activity.defn
-async def remove_reserved_offset(data) -> dict:
+async def remove_reserved_offset(data, payment_result) -> dict:
+    # payment_id = payment_result["data"]["payment_id"]
+    # data["data"]["payment_id"] = payment_id
     # milestone_id = data["data"]["milestone_id"]
     # project_id = data["data"]["project_id"]
-    # payload = format_message(milestone_id, project_id, data["data"])
+    # payload = format_message(milestone_id, "remove_reserved_offset", data["data"])
     # url = format_url(project_id, milestone_id, "offset")
 
     # # Send request to Project Microservice
@@ -35,7 +37,7 @@ async def remove_reserved_offset(data) -> dict:
     return {
         "success": True,
         "data": {
-            "message": "invocation of service fails" 
+            "message": "invocation of service fails",
         },
     }
 
