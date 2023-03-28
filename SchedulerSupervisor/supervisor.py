@@ -45,6 +45,7 @@ def check_status(data: dict):
         print("Task completed successfully!")
     else:
         payload = data["data"]["resource"]
+        payload = json.dumps(payload)
         publish_message(
             connection=connection,
             channel=channel,
