@@ -14,14 +14,14 @@ MS_BASE_URL = getenv("MS_BASE_URL")
 
 
 QUEUE_PROJECT_CREATE = "project_create"
-QUEUE_PROJECT_MILESTONES_REWARD = "project_milestones_reward"
-QUEUE_PROJECT_MILESTONES_PENALISE = "project_milestones_penalise"
-QUEUE_PROJECT_MILESTONES_VERIFY = "project_milestones_verify"
-QUEUE_PROJECT_MILESTONES_UPDATE = "project_milestone_update"
-QUEUE_BUY_PROJECTS_PAYMENT_SUCCESS = "buy_projects_payment_success"
-QUEUE_BUY_PROJECTS_PAYMENT_FAILED = "buy_projects_payment_failed"
-QUEUE_BUY_PROJECTS_NOTIFY_PAYMENT_FAILED = "buy_projects_notify_payment_failed"
-QUEUE_UPCOMING_MILESTONE_PROJECT_POLICE = "upcoming_milestone_project_police"
+QUEUE_PROJECT_MILESTONES_REWARD = "ratings_reward"
+QUEUE_PROJECT_MILESTONES_PENALISE = "ratings_penalise"
+QUEUE_PROJECT_MILESTONES_VERIFY = "project_verify"
+QUEUE_PROJECT_MILESTONES_UPDATE = "milestone_add"
+QUEUE_BUY_PROJECTS_PAYMENT_SUCCESS = "payment_success"
+QUEUE_BUY_PROJECTS_PAYMENT_FAILED = "payment_failed"
+QUEUE_BUY_PROJECTS_NOTIFY_PAYMENT_FAILED = "payment_failed"
+QUEUE_UPCOMING_MILESTONE_PROJECT_POLICE = "milestone_upcoming"
 
 
 connection = pika.BlockingConnection(pika.ConnectionParameters(
@@ -44,62 +44,53 @@ SUBJECT = 'subject'
 QUEUES = {
     QUEUE_PROJECT_CREATE:  
     {   
-        ROUTING_KEY: "events.projects.public.project.create",
         BINDING_KEY: "events.projects.*.project.create", 
         SUBJECT: "Project has been created"
     },
 
     QUEUE_PROJECT_MILESTONES_REWARD: 
      {  
-        ROUTING_KEY: "events.projects.public.ratings.reward",
         BINDING_KEY: "events.projects.*.ratings.reward" ,
         SUBJECT: "Project has been rewarded"
      },
 
     QUEUE_PROJECT_MILESTONES_PENALISE: 
     {
-        ROUTING_KEY: "events.projects.public.ratings.penalise",
         BINDING_KEY: "events.projects.*.ratings.penalise" ,
         SUBJECT: "Project has been penalised"
     },
 
     QUEUE_PROJECT_MILESTONES_VERIFY:  
     {
-        ROUTING_KEY: "events.projects.public.project.verify",
         BINDING_KEY: "events.projects.*.project.verify" ,
         SUBJECT: "Project has been verified"
     }, 
     
     QUEUE_PROJECT_MILESTONES_UPDATE:  
     {
-        ROUTING_KEY: "events.projects.public.milestone.add",
         BINDING_KEY: "events.projects.*.milestone.add" ,
         SUBJECT: "Project Milestone has been added"
     },
     
     QUEUE_BUY_PROJECTS_PAYMENT_SUCCESS:  
     {
-        ROUTING_KEY: "events.buyprojects.notify.payment.success",
         BINDING_KEY: "events.buyprojects.notify.payment.success" ,
         SUBJECT: "Payment has been successful"
     }, 
     
     QUEUE_BUY_PROJECTS_PAYMENT_FAILED: 
     {   
-        ROUTING_KEY: "events.buyprojects.public.payment.failed",
         BINDING_KEY:"events.buyprojects.public.payment.failed" ,
         SUBJECT: "Payment made failed"
     },
 
     QUEUE_BUY_PROJECTS_NOTIFY_PAYMENT_FAILED:  
     {   
-        ROUTING_KEY: "events.buyprojects.notify.payment.failed",
         BINDING_KEY: "events.buyprojects.notify.payment.failed" ,
         SUBJECT: "Payment made failed"
     },
     QUEUE_UPCOMING_MILESTONE_PROJECT_POLICE: 
     {
-        ROUTING_KEY: "events.police.notify.milestone.upcoming",
         BINDING_KEY: "events.police.notify.milestone.upcoming" ,
         SUBJECT: "Upcoming Milestone"
     }
