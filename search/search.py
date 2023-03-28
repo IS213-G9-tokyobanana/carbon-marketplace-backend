@@ -75,7 +75,19 @@ def callback(channel, method, properties, body):
     # print(" [x] Received %r" % body)
     # after receiving a message, call the scheduler
     try:
+        client = meilisearch.Client('http://search:7700')
         data = json.loads(body)
+        # if data['type'] == 'project.verify' or data['type'] == 'offset.rollback' or data['type'] == 'offset.reserve':
+        client.index('projects').add_documents(data)
+        # else:
+        #     # for milestone add
+        #     response = client.index('projects').get_document(data['data']['project_id'])
+        #     document = response.data
+        #     document['milestones'].append(data['data']['milestones'][0])
+        #     # new = json.dumps(document)
+        #     # print(json.loads(new))
+        #     client.index('projects').add_documents(document)
+
     except json.decoder.JSONDecodeError as e:
         print("--NOT JSON:", e)
         print("--DATA:", body)
@@ -83,12 +95,4 @@ def callback(channel, method, properties, body):
 if __name__ == "__main__":
     check_setup()
     receiveMsg()
-
-
-
-
-client = meilisearch.Client('http://search:7700')
-
-json_file = open('movies.json')
-movies = json.load(json_file)
-client.index('movies').add_documents(movies)
+    
