@@ -192,7 +192,7 @@ def update_project_milestone_status(id, mid):
     # increase project rating + publish to project_verified queue
     if body['status'] == MilestoneStatus.MET.value:
         project.rating += 10
-        amqp_data = { "project": project.json() }
+        amqp_data = { "project": project.json() } 
         payload =  Payload(resource_id=str(milestone.id), type=AmqpPayloadType.MILESTONE_REWARD.value, data=amqp_data)
         payload_serialised = json.dumps(payload.json()) 
         publish_message(connection=connection, channel=channel, hostname=RABBITMQ_HOSTNAME, exchangename=exchangename, port=RABBITMQ_PORT, exchangetype=exchangetype, routing_key=QUEUES[PROJECTS_MILESTONES_REWARD_QUEUE][ROUTING_KEY], message=payload_serialised)
@@ -200,7 +200,7 @@ def update_project_milestone_status(id, mid):
     # decrease project rating + publish to project_penalised queue
     elif body['status'] == MilestoneStatus.REJECTED.value:
         project.rating -= 10
-        amqp_data = { "project": project.json() }
+        amqp_data = { "project": project.json() } 
         payload =  Payload(resource_id=str(milestone.id), type=AmqpPayloadType.MILESTONE_PENALISE.value, data=amqp_data)
         payload_serialised = json.dumps(payload.json()) 
         publish_message(connection=connection, channel=channel, hostname=RABBITMQ_HOSTNAME, exchangename=exchangename, port=RABBITMQ_PORT, exchangetype=exchangetype, routing_key=QUEUES[PROJECTS_MILESTONES_PENALISE_QUEUE][ROUTING_KEY], message=payload_serialised)
