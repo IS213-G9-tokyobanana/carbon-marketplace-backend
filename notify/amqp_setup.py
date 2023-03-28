@@ -1,24 +1,27 @@
 import os 
 import pika
 from os import getenv
+from dotenv import load_dotenv
 
+load_dotenv()
 RABBITMQ_HOSTNAME = getenv("RABBITMQ_HOSTNAME") or "13.229.231.31"
 RABBITMQ_PORT = getenv("RABBITMQ_PORT") or 5672
 RABBITMQ_USERNAME = getenv("RABBITMQ_USERNAME") or "guest"
 RABBITMQ_PASSWORD = getenv("RABBITMQ_PASSWORD") or "guest"
-EXCHANGE = "topic_exchange"
-EXCHANGE_TYPE = "topic"
-MS_BASE_URL = "http://localhost:5001"
+EXCHANGE = getenv("EXCHANGE")
+EXCHANGE_TYPE = getenv("EXCHANGE_TYPE")
+MS_BASE_URL = getenv("MS_BASE_URL")
 
-PROJECT_CREATE_QUEUE = "project_create"
-PROJECT_MILESTONES_REWARD_QUEUE = "project_milestones_reward"
-PROJECT_MILESTONES_PENALISE_QUEUE = "project_milestones_penalise"
-PROJECT_MILESTONES_VERIFY_QUEUE = "project_milestones_verify"
-PROJECT_MILESTONES_UPDATE_QUEUE = "project_milestone_update"
-BUY_PROJECTS_PAYMENT_SUCCESS_QUEUE = "buy_projects_payment_success"
-BUY_PROJECTS_PAYMENT_FAILED_QUEUE = "buy_projects_payment_failed"
-BUY_PROJECTS_NOTIFY_PAYMENT_FAILED_QUEUE = "buy_projects_notify_payment_failed"
-UPCOMING_MILESTONE_PROJECT_POLICE_QUEUE = "upcoming_milestone_project_police"
+
+QUEUE_PROJECT_CREATE = "project_create"
+QUEUE_PROJECT_MILESTONES_REWARD = "project_milestones_reward"
+QUEUE_PROJECT_MILESTONES_PENALISE = "project_milestones_penalise"
+QUEUE_PROJECT_MILESTONES_VERIFY = "project_milestones_verify"
+QUEUE_PROJECT_MILESTONES_UPDATE = "project_milestone_update"
+QUEUE_BUY_PROJECTS_PAYMENT_SUCCESS = "buy_projects_payment_success"
+QUEUE_BUY_PROJECTS_PAYMENT_FAILED = "buy_projects_payment_failed"
+QUEUE_BUY_PROJECTS_NOTIFY_PAYMENT_FAILED = "buy_projects_notify_payment_failed"
+QUEUE_UPCOMING_MILESTONE_PROJECT_POLICE = "upcoming_milestone_project_police"
 
 
 connection = pika.BlockingConnection(pika.ConnectionParameters(
@@ -34,59 +37,69 @@ channel = connection.channel()
 # method: spec.Basic.Deliver
 # properties: spec.BasicProperties
 
+ROUTING_KEY = 'routing_key'
 BINDING_KEY = 'binding_key'
 SUBJECT = 'subject'
 
 QUEUES = {
-    PROJECT_CREATE_QUEUE:  
-    {
+    QUEUE_PROJECT_CREATE:  
+    {   
+        ROUTING_KEY: "events.projects.public.project.create",
         BINDING_KEY: "events.projects.*.project.create", 
         SUBJECT: "Project has been created"
     },
 
-    PROJECT_MILESTONES_REWARD_QUEUE: 
-     {
+    QUEUE_PROJECT_MILESTONES_REWARD: 
+     {  
+        ROUTING_KEY: "events.projects.public.ratings.reward",
         BINDING_KEY: "events.projects.*.ratings.reward" ,
         SUBJECT: "Project has been rewarded"
      },
 
-    PROJECT_MILESTONES_PENALISE_QUEUE: 
+    QUEUE_PROJECT_MILESTONES_PENALISE: 
     {
+        ROUTING_KEY: "events.projects.public.ratings.penalise",
         BINDING_KEY: "events.projects.*.ratings.penalise" ,
         SUBJECT: "Project has been penalised"
     },
 
-    PROJECT_MILESTONES_VERIFY_QUEUE:  
+    QUEUE_PROJECT_MILESTONES_VERIFY:  
     {
+        ROUTING_KEY: "events.projects.public.project.verify",
         BINDING_KEY: "events.projects.*.project.verify" ,
         SUBJECT: "Project has been verified"
     }, 
     
-    PROJECT_MILESTONES_UPDATE_QUEUE:  
+    QUEUE_PROJECT_MILESTONES_UPDATE:  
     {
+        ROUTING_KEY: "events.projects.public.milestone.add",
         BINDING_KEY: "events.projects.*.milestone.add" ,
         SUBJECT: "Project Milestone has been added"
     },
     
-    BUY_PROJECTS_PAYMENT_SUCCESS_QUEUE:  
+    QUEUE_BUY_PROJECTS_PAYMENT_SUCCESS:  
     {
+        ROUTING_KEY: "events.buyprojects.notify.payment.success",
         BINDING_KEY: "events.buyprojects.notify.payment.success" ,
         SUBJECT: "Payment has been successful"
     }, 
     
-    BUY_PROJECTS_PAYMENT_FAILED_QUEUE: 
-    {
+    QUEUE_BUY_PROJECTS_PAYMENT_FAILED: 
+    {   
+        ROUTING_KEY: "events.buyprojects.public.payment.failed",
         BINDING_KEY:"events.buyprojects.public.payment.failed" ,
         SUBJECT: "Payment made failed"
     },
 
-    BUY_PROJECTS_NOTIFY_PAYMENT_FAILED_QUEUE:  
-    {
+    QUEUE_BUY_PROJECTS_NOTIFY_PAYMENT_FAILED:  
+    {   
+        ROUTING_KEY: "events.buyprojects.notify.payment.failed",
         BINDING_KEY: "events.buyprojects.notify.payment.failed" ,
         SUBJECT: "Payment made failed"
     },
-    UPCOMING_MILESTONE_PROJECT_POLICE_QUEUE: 
+    QUEUE_UPCOMING_MILESTONE_PROJECT_POLICE: 
     {
+        ROUTING_KEY: "events.police.notify.milestone.upcoming",
         BINDING_KEY: "events.police.notify.milestone.upcoming" ,
         SUBJECT: "Upcoming Milestone"
     }
