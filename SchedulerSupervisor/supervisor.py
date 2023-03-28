@@ -9,9 +9,9 @@ from config.config import (
 from amqp_setup import check_setup, publish_message, create_connection
 
 
-def callback(channel, method_frame, header_frame, body):
+def callback(channel, method, properties, body):
     data = json.loads(body)
-    channel.basic_ack(delivery_tag=method_frame.delivery_tag)
+    channel.basic_ack(delivery_tag=method.delivery_tag)
     check_status(data)
 
 
@@ -41,15 +41,16 @@ def consume_message(
 
 
 def check_status(data: dict):
-    if data["success"] == True:
+    if data["success"] == "True":
         print("Task completed successfully!")
     else:
+        payload = data["data"]["resource"]
         publish_message(
             connection=connection,
             channel=channel,
-            exchange_name=EXCHANGE_NAME,
+            exchangename=EXCHANGE_NAME,
             routing_key=SCHEDULER_SUPERVISOR_SCHEDULER_ROUTING_KEY,
-            message=data,
+            message=payload,
         )
 
 
