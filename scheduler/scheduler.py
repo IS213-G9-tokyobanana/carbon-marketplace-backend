@@ -18,7 +18,7 @@ def checkType(msg):
     elif msg['type'] == 'offsets.reserve':
         # Start tracking the TTL for the offset (1hr)
         payment_id = msg['resource_id']
-        projId = msg['data']['project_id']
+        projId = msg['data']['project']['id']
         milestone_id = msg['data']['milestone_id']
         newOffsetTrack(payment_id, msg['data']['created_at'], projId, milestone_id)
     elif msg['type'] == 'offsets.commit' or msg['type'] == 'payment.failed':
@@ -71,7 +71,7 @@ def milestoneRemove(milestone_id, project_id):
 def addProject(project_id, milestones):
     print('in scheduler addProject')
     for milestone in milestones:
-        milestone_id = milestone['milestone_id']
+        milestone_id = milestone['id']
         addMilestoneJob(milestone_id, project_id, milestone)
 
 # Function that will be called repeatedly to add a new milestone job
