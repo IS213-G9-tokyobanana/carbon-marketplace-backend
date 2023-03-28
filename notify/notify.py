@@ -131,6 +131,7 @@ def send_email_to_user(user_email, message, subject_retrieved):
             print("An error occurred:", e)
         
 
+
 if __name__ == "__main__":
     try:
         for queue_name, binding_key in QUEUES.items():
