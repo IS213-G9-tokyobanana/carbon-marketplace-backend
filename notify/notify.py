@@ -27,9 +27,6 @@ load_dotenv()
 
 
 def process_message(data, SUBJECT):
-    # send message to user (the message is an email)
-    # sample message data
-
     retrieved_message = data
     print("this is data", retrieved_message)
     subject_retrieved = SUBJECT
@@ -57,6 +54,12 @@ def process_message(data, SUBJECT):
 
     send_email_to_user(retrieved_user_email, result_message, subject_retrieved)
 
+#pass into key word arguments and try to search
+#if project_id in kwargs: then factor the message 
+
+# def format_message(payload, message, queue_name):
+#     message = message.replace
+#     format()
 
 def project_created_details(retrieved_message):
     project_id = retrieved_message.get("data").get("milestones", {}).get("project_id")
@@ -169,14 +172,11 @@ def on_queue_callback(channel, method, properties, body):
     try:
         SUBJECT = "subject"
         data = json.loads(body)
-        print("this is the method retrieved", method)
-        pub_queue_routing_key = ".".join(method.routing_key.split(".")[-5:])
-        for queue_name, binding_key in QUEUES.items():
-            if pub_queue_routing_key == binding_key[ROUTING_KEY]:
-
-                subject = QUEUES[queue_name][SUBJECT]
-                # this is the data retrieved from the publisher
-                process_message(data, subject)
+        queue_name = "_".join(method.routing_key.split(".")[-2:])
+        subject = QUEUES[queue_name][SUBJECT]
+        
+        # this is the data retrieved from the publisher
+        process_message(data, subject)
 
     except Exception as err:
         logging.exception("Error processing message: %s", err)
