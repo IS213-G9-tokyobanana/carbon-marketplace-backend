@@ -15,4 +15,4 @@ COPY . ./
 RUN poetry config virtualenvs.create false \
   && poetry install --no-interaction --no-ansi
 
-CMD ["python", "checkAmqp.py"]
+CMD ["python", "./checkAmqp.py"]
