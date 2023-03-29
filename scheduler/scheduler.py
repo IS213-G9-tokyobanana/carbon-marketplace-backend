@@ -6,7 +6,7 @@ def checkType(msg):
     print(msg)
     if msg['type'] == 'milestone.add':
         # Creation of a new milestone for a specific project
-        projId = msg['data']['project_id']
+        projId = msg['data']['id']
         milestoneId = msg['resource_id']
         milestone = msg['data']['milestones'][0]
         addMilestoneJob(milestoneId, projId, milestone)
@@ -18,7 +18,7 @@ def checkType(msg):
     elif msg['type'] == 'offsets.reserve':
         # Start tracking the TTL for the offset (1hr)
         payment_id = msg['resource_id']
-        projId = msg['data']['project_id']
+        projId = msg['data']['id']
         milestone_id = msg['data']['milestone_id']
         newOffsetTrack(payment_id, msg['data']['created_at'], projId, milestone_id)
     elif msg['type'] == 'offsets.commit' or msg['type'] == 'payment.failed':
@@ -30,7 +30,7 @@ def checkType(msg):
     elif msg['type'] == 'milestone.reward' or msg['type'] == 'milestone.penalise':
         # Milestone has been rewarded, need to remove from cron
         milestone_id = msg['resource_id']
-        projId = msg['data']['project_id']
+        projId = msg['data']['id']
         milestoneRemove(milestone_id, projId)
     elif msg['type'] in ["upcoming", "penalise","rollback"]:
         # Re-publish the task to the exchange
@@ -74,7 +74,7 @@ def milestoneRemove(milestone_id, project_id):
 def addProject(project_id, milestones):
     print('in scheduler addProject')
     for milestone in milestones:
-        milestone_id = milestone['milestone_id']
+        milestone_id = milestone['id']
         addMilestoneJob(milestone_id, project_id, milestone)
 
 # Function that will be called repeatedly to add a new milestone job
