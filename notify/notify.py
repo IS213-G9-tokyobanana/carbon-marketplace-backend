@@ -1,14 +1,13 @@
 import json
 import logging
 import requests
-from os import getenv
-from dotenv import load_dotenv
 from config import (
     RABBITMQ_HOSTNAME,
     RABBITMQ_PORT,
     EXCHANGE,
     EXCHANGE_TYPE,
-    MS_BASE_URL
+    MS_BASE_URL,
+    SENDGRID_API_KEY
 )
 from amqp_setup import (
     connection,
@@ -21,8 +20,6 @@ from amqp_setup import (
 )
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
-
-load_dotenv()
 
 def process_message(data, queue_name, SUBJECT):
     retrieved_message = data
@@ -83,7 +80,7 @@ def send_email_to_user(user_email, message, subject_retrieved):
     plain_text_content = str(message)
     message = Mail(from_email, to_emails, subject, plain_text_content)
     try:
-        sg = SendGridAPIClient(getenv("SENDGRID_API_KEY"))
+        sg = SendGridAPIClient(SENDGRID_API_KEY)
         response = sg.send(message)
     except requests.exceptions.HTTPError as e:
         if e.response.status_code == 401:
