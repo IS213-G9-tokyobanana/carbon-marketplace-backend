@@ -37,7 +37,10 @@ def checkType(msg):
         event = msg['type']
         print('in scheduler task.add')
         print(msg)
-        publishTask(event, msg['data']['project_id'], msg['data']['milestone_id'])
+        payment_id = ''
+        if msg['type'] == 'rollback':
+            payment_id = msg['data']['payment_id']
+        publishTask(event, msg['data']['project_id'], msg['data']['milestone_id'], payment_id)
         # print(msg)
 
 
@@ -52,8 +55,8 @@ def removeOffsetTrack(payment_id):
 def newOffsetTrack(payment_id, created_at, project_id, milestone_id):
     print('in scheduler newOffsetTrack')
     cron = CronTab(user=True)
-    job  = cron.new(command=f'/usr/local/bin/python /app/publisher.py --type offset --proj {project_id} --mile {milestone_id}', comment=f'offset_{payment_id}')
-    job.setall(datetime.fromisoformat(created_at) + timedelta(hours=1))
+    job  = cron.new(command=f'/usr/local/bin/python /app/publisher.py --type offset --proj {project_id} --mile {milestone_id} --payment {payment_id}', comment=f'offset_{payment_id}')
+    job.setall(datetime.strptime(created_at,"%Y-%m-%dT%H:%M:%SZ") + timedelta(hours=1))
     # Can be used for testing, will schedule the job to run in 1 minute
     # job.setall(datetime.fromisoformat(due_date) + timedelta(minutes=1))
     cron.write()
@@ -84,13 +87,13 @@ def addMilestoneJob(milestone_id, project_id, milestone):
     due_date = milestone['due_date']
     cron = CronTab(user=True)
     job  = cron.new(command=f'/usr/local/bin/python /app/publisher.py --type upcoming --proj {project_id} --mile {milestone_id}', comment=f'upcoming_{project_id}_{milestone_id}')
-    job.setall(datetime.fromisoformat(due_date) - timedelta(30))
+    job.setall(datetime.strptime(due_date,"%Y-%m-%dT%H:%M:%SZ") - timedelta(30))
     # Can be used for testing, will schedule the job to run in 1 minute
     # job.setall(datetime.fromisoformat(due_date) + timedelta(minutes=1))
     cron.write()
 
     job  = cron.new(command=f'/usr/local/bin/python /app/publisher.py --type overdue --proj {project_id} --mile {milestone_id}', comment=f'overdue_{project_id}_{milestone_id}')
-    job.setall(datetime.fromisoformat(due_date) + timedelta(1))
+    job.setall(datetime.strptime(due_date,"%Y-%m-%dT%H:%M:%SZ")+ timedelta(1))
     # Can be used for testing, will schedule the job to run in 1 minute
     # job.setall(datetime.fromisoformat(due_date) + timedelta(minutes=1))
     cron.write()
