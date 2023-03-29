@@ -82,7 +82,7 @@ def check_message(data: dict):
             result = police.publish_to_notifier(data, channel)
         elif data["type"] == "penalise":
             result = police.send_to_projectms(data)
-        elif data["type"] == "overdue":
+        elif data["type"] == "rollback":
             result = asyncio.run(main(data))
         else:
             result = {

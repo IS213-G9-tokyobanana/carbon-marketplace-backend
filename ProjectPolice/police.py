@@ -43,7 +43,7 @@ def send_to_projectms(message):
 
     # Send request to Project Microservice
     try:
-        result = requests.patch(url, json=payload)
+        result = requests.patch(url, data={"status": "rejected"})
         result.raise_for_status()
     except requests.exceptions.HTTPError as err:
         result = {
