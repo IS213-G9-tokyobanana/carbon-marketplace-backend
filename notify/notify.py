@@ -3,128 +3,57 @@ import logging
 import requests
 from os import getenv
 from dotenv import load_dotenv
-from amqp_setup import (
-    RABBITMQ_HOSTNAME,
-    RABBITMQ_PORT,
-    connection,
-    channel,
+from config import (
     RABBITMQ_HOSTNAME,
     RABBITMQ_PORT,
     EXCHANGE,
     EXCHANGE_TYPE,
-    QUEUES,
-    BINDING_KEY,
-    ROUTING_KEY,
-    SUBJECT,
-    MS_BASE_URL,
-    channel_consume,
+    MS_BASE_URL
 )
-
+from amqp_setup import (
+    connection,
+    channel,
+    QUEUES,
+    message,
+    channel_consume,
+    message_buyer,
+    message_seller
+)
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 
 load_dotenv()
 
-
-def process_message(data, SUBJECT):
+def process_message(data, queue_name, SUBJECT):
     retrieved_message = data
-    print("this is data", retrieved_message)
     subject_retrieved = SUBJECT
+    result_message = format_message(queue_name, retrieved_message)
     retrieved_user_email = retrieve_users_information()
-    result_message = ""
-
-    if retrieved_message["type"] == "project.create":
-        result_message = project_created_details(retrieved_message)
-    elif retrieved_message["type"] == "milestone.reward":
-        result_message = project_milestone_rewarded_details(retrieved_message)
-    elif retrieved_message["type"] == "milestone.penalise":
-        result_message = project_milestone_penalised_details(retrieved_message)
-    elif retrieved_message["type"] == "milestone.verify":
-        result_message = project_milestone_verify_details(retrieved_message)
-    elif retrieved_message["type"] == "milestone.add":
-        result_message = project_milestone_add(retrieved_message)
-    elif retrieved_message["type"] == "buyprojects.payment.success":
-        result_message = buyproject_payment_success(retrieved_message)
-    elif retrieved_message["type"] == "buyprojects.public.payment.fail":
-        result_message = buyproject_payment_failure(retrieved_message)
-    elif retrieved_message["type"] == "buyprojects.notify.payment.fail":
-        result_message = buyproject_payment_failure(retrieved_message)
-    elif retrieved_message["type"] == "milestone.upcoming":
-        result_message = police_notify_upcoming_milestone(retrieved_message)
-
     send_email_to_user(retrieved_user_email, result_message, subject_retrieved)
 
-#pass into key word arguments and try to search
-#if project_id in kwargs: then factor the message 
 
-# def format_message(payload, message, queue_name):
-#     message = message.replace
-#     format()
+def format_message(queue_name, retrieved_message):
+    format_project_id = retrieved_message.get("data").get("milestones", {}).get("project_id")
+    format_milestone_id = retrieved_message.get("data").get("milestones", {}).get("id")
+    format_buyer_id = retrieved_message.get("data").get("buyer_id", {})
+    format_seller_id = retrieved_message.get("data").get("seller_id",{})
+    format_role = retrieved_message.get("data")
 
-def project_created_details(retrieved_message):
-    project_id = retrieved_message.get("data").get("milestones", {}).get("project_id")
-    message = f"Project with {project_id} has been created"
-    return message
-
-
-def project_milestone_rewarded_details(retrieved_message):
-    project_id = retrieved_message.get("data").get("milestones", {}).get("project_id")
-    milestone_id = retrieved_message.get("data").get("milestones", {}).get("id")
-    message = f"Project {project_id} with milestone {milestone_id} has been rewarded"
-    return message
-
-
-def project_milestone_penalised_details(retrieved_message):
-    project_id = retrieved_message.get("data").get("milestones", {}).get("project_id")
-    milestone_id = retrieved_message.get("data").get("milestones", {}).get("id")
-    message = f"Project {project_id} with milestone {milestone_id} has been penalised"
-    return message
-
-
-def project_milestone_verify_details(retrieved_message):
-    project_id = retrieved_message.get("data").get("milestones", {}).get("project_id")
-    milestone_id = retrieved_message.get("data").get("milestones", {}).get("id")
-    message = f"Project {project_id} with milestone {milestone_id} has been verified"
-    return message
-
-
-def project_milestone_add(retrieved_message):
-    project_id = retrieved_message.get("data").get("milestones", {}).get("project_id")
-    milestone_id = retrieved_message.get("data").get("milestones", {}).get("id")
-    message = f"Project {project_id} with milestone {milestone_id} has been added"
-    return message
-
-
-def buyproject_payment_success(retrieved_message):
-    buyer_id = retrieved_message.get("buyer_id", {})
-    seller_id = retrieved_message.get("seller_id", {})
-    role = retrieved_message.get("role", {})
-    if role == 1:
-        message = f"Buyer {buyer_id} has successfully paid for the project"
-    else:
-        message = (
-            f"Seller {seller_id} has successfully received payment for the project"
-        )
-    return message
-
-
-def buyproject_payment_failure(retrieved_message):
-    buyer_id = retrieved_message.get("buyer_id", {})
-    # assuming that role 1 is buyer and 2 is seller
-    role = retrieved_message.get("role", {})
-
-    if role == 1 and (retrieved_message["type"] == "buyprojects.public.payment.fail"):
-        message = f"Buyer {buyer_id} payment has failed for the project"
-    if role == 1 and (retrieved_message["type"] == "buyprojects.notify.payment.fail"):
-        message = f"Buyer {buyer_id} payment has failed for the project"
-    return message
-
-
-def police_notify_upcoming_milestone(retrieved_message):
-    project_id = retrieved_message.get("data").get("project_id")
-    milestone_id = retrieved_message.get("data").get("milestone_id")
-    message = f"Project {project_id} with milestone {milestone_id} is upcoming"
-    return message
+    for dict_queue_name, binding_key in QUEUES.items():
+        if queue_name == dict_queue_name:
+            message_retrieved = QUEUES[queue_name][message]
+            new_message_retrieved = message_retrieved.format(project_id=format_project_id, milestone_id=format_milestone_id)
+            if new_message_retrieved is None:
+                if format_role == 1:
+                    message_retrieved = QUEUES[queue_name][message_buyer]
+                    new_message_retrieved = message_retrieved.format(buyer_id=format_buyer_id)
+                else: 
+                    message_retrieved = QUEUES[queue_name][message_seller]
+                    new_message_retrieved = message_retrieved.format(seller_id=format_seller_id)
+            else:
+                return new_message_retrieved
+            
+            return new_message_retrieved
 
 
 # communicate with the user microservice to retrieve users information
@@ -156,7 +85,6 @@ def send_email_to_user(user_email, message, subject_retrieved):
     try:
         sg = SendGridAPIClient(getenv("SENDGRID_API_KEY"))
         response = sg.send(message)
-        # response.raise_for_status()
     except requests.exceptions.HTTPError as e:
         if e.response.status_code == 401:
             print(
@@ -174,10 +102,9 @@ def on_queue_callback(channel, method, properties, body):
         data = json.loads(body)
         queue_name = "_".join(method.routing_key.split(".")[-2:])
         subject = QUEUES[queue_name][SUBJECT]
-        
+        channel.basic_ack(delivery_tag=method.delivery_tag)
         # this is the data retrieved from the publisher
-        process_message(data, subject)
-
+        process_message(data, queue_name, subject)
     except Exception as err:
         logging.exception("Error processing message: %s", err)
 
@@ -198,4 +125,5 @@ if __name__ == "__main__":
         channel.start_consuming()
         print("consumed message on all queues")
     except KeyboardInterrupt:
+        channel.stop_consuming()
         connection.close()

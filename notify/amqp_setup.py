@@ -1,27 +1,18 @@
 import os 
 import pika
 from os import getenv
-from dotenv import load_dotenv
-
-load_dotenv()
-RABBITMQ_HOSTNAME = getenv("RABBITMQ_HOSTNAME") or "13.229.231.31"
-RABBITMQ_PORT = getenv("RABBITMQ_PORT") or 5672
-RABBITMQ_USERNAME = getenv("RABBITMQ_USERNAME") or "guest"
-RABBITMQ_PASSWORD = getenv("RABBITMQ_PASSWORD") or "guest"
-EXCHANGE = getenv("EXCHANGE")
-EXCHANGE_TYPE = getenv("EXCHANGE_TYPE")
-MS_BASE_URL = getenv("MS_BASE_URL")
+from config import RABBITMQ_HOSTNAME, RABBITMQ_PORT, RABBITMQ_USERNAME, RABBITMQ_PASSWORD, EXCHANGE, EXCHANGE_TYPE
 
 
 QUEUE_PROJECT_CREATE = "project_create"
-QUEUE_PROJECT_MILESTONES_REWARD = "ratings_reward"
-QUEUE_PROJECT_MILESTONES_PENALISE = "ratings_penalise"
-QUEUE_PROJECT_MILESTONES_VERIFY = "project_verify"
-QUEUE_PROJECT_MILESTONES_UPDATE = "milestone_add"
-QUEUE_BUY_PROJECTS_PAYMENT_SUCCESS = "payment_success"
-QUEUE_BUY_PROJECTS_PAYMENT_FAILED = "payment_failed"
-QUEUE_BUY_PROJECTS_NOTIFY_PAYMENT_FAILED = "payment_failed"
-QUEUE_UPCOMING_MILESTONE_PROJECT_POLICE = "milestone_upcoming"
+QUEUE_PROJECT_RATINGS_REWARD = "ratings_reward"
+QUEUE_PROJECT_RATINGS_PENALISE = "ratings_penalise"
+QUEUE_PROJECT_VERIFY = "project_verify"
+QUEUE_PROJECT_MILESTONES_ADD = "milestone_add"
+QUEUE_BUYPROJECTS_PAYMENT_SUCCESS = "payment_success"
+QUEUE_BUYPROJECTS_PUBLIC_PAYMENT_FAILED = "payment_failed"
+QUEUE_BUYPROJECTS_NOTIFY_PAYMENT_FAILED = "payment_failed"
+QUEUE_PROJECTPOLICE_MILESTONE_UPCOMING = "milestone_upcoming"
 
 
 connection = pika.BlockingConnection(pika.ConnectionParameters(
@@ -40,59 +31,75 @@ channel = connection.channel()
 ROUTING_KEY = 'routing_key'
 BINDING_KEY = 'binding_key'
 SUBJECT = 'subject'
+message = ''
+message_buyer = ''
+message_seller = ''
 
 QUEUES = {
     QUEUE_PROJECT_CREATE:  
     {   
         BINDING_KEY: "events.projects.*.project.create", 
-        SUBJECT: "Project has been created"
+        SUBJECT: "Project has been created",
+        message: "Project with {project_id} has been created"
+        
     },
 
-    QUEUE_PROJECT_MILESTONES_REWARD: 
+    QUEUE_PROJECT_RATINGS_REWARD: 
      {  
         BINDING_KEY: "events.projects.*.ratings.reward" ,
-        SUBJECT: "Project has been rewarded"
+        SUBJECT: "Project has been rewarded",
+        message: "Project {project_id} with milestone {milestone_id} has been rewarded"
      },
 
-    QUEUE_PROJECT_MILESTONES_PENALISE: 
+    QUEUE_PROJECT_RATINGS_PENALISE: 
     {
         BINDING_KEY: "events.projects.*.ratings.penalise" ,
-        SUBJECT: "Project has been penalised"
+        SUBJECT: "Project has been penalised", 
+        message: "Project {project_id} with milestone {milestone_id} has been penalised"
     },
 
-    QUEUE_PROJECT_MILESTONES_VERIFY:  
+    QUEUE_PROJECT_VERIFY:  
     {
         BINDING_KEY: "events.projects.*.project.verify" ,
-        SUBJECT: "Project has been verified"
+        SUBJECT: "Project has been verified",
+        message: "Project {project_id} has been verified"
     }, 
     
-    QUEUE_PROJECT_MILESTONES_UPDATE:  
+    QUEUE_PROJECT_MILESTONES_ADD:  
     {
         BINDING_KEY: "events.projects.*.milestone.add" ,
-        SUBJECT: "Project Milestone has been added"
+        SUBJECT: "Project Milestone has been added",
+        message: "Project {project_id} with milestone {milestone_id} has been added"
     },
     
-    QUEUE_BUY_PROJECTS_PAYMENT_SUCCESS:  
+    QUEUE_BUYPROJECTS_PAYMENT_SUCCESS:  
     {
         BINDING_KEY: "events.buyprojects.notify.payment.success" ,
-        SUBJECT: "Payment has been successful"
+        SUBJECT: "Payment has been successful",
+        message_buyer: "Buyer {buyer_id} has successfully paid for the project",
+        message_seller: "Seller {seller_id} has successfully received payment for the project"
     }, 
     
-    QUEUE_BUY_PROJECTS_PAYMENT_FAILED: 
+    QUEUE_BUYPROJECTS_PUBLIC_PAYMENT_FAILED: 
     {   
         BINDING_KEY:"events.buyprojects.public.payment.failed" ,
-        SUBJECT: "Payment made failed"
+        SUBJECT: "Payment made failed",
+        message_buyer: "Buyer {buyer_id} payment has failed for the project",
+        message_seller: "Seller {seller_id} payment has failed for the project"
     },
 
-    QUEUE_BUY_PROJECTS_NOTIFY_PAYMENT_FAILED:  
+    QUEUE_BUYPROJECTS_NOTIFY_PAYMENT_FAILED:  
     {   
         BINDING_KEY: "events.buyprojects.notify.payment.failed" ,
-        SUBJECT: "Payment made failed"
+        SUBJECT: "Payment made failed",
+        message_buyer: "Buyer {buyer_id} payment has failed for the project",
+        message_seller: "Seller {seller_id} payment has failed for the project"
     },
-    QUEUE_UPCOMING_MILESTONE_PROJECT_POLICE: 
+    QUEUE_PROJECTPOLICE_MILESTONE_UPCOMING: 
     {
         BINDING_KEY: "events.police.notify.milestone.upcoming" ,
-        SUBJECT: "Upcoming Milestone"
+        SUBJECT: "Upcoming Milestone",
+        message: "Project {project_id} with milestone {milestone_id} is upcoming"
     }
 }
 
@@ -124,4 +131,4 @@ def check_setup(connection, channel, host, port, exchangename, exchangetype):
 
 def channel_consume(connection, channel, host, port, exchangename, exchangetype, queue, on_message_callback):
     check_setup(connection, channel, host, port, exchangename, exchangetype)
-    channel.basic_consume(queue, on_message_callback, auto_ack=True)
+    channel.basic_consume(queue, on_message_callback)
