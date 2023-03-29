@@ -13,7 +13,10 @@ QUEUE_NAME = "task_execute"
 POLICE_SCHEDULER_MANAGER_ROUTING_KEY = "events.police.public.task.status"
 PROJECT_MS_URL = os.getenv("projectms")
 PROJECT_STATUS_URL = (
-    PROJECT_MS_URL + "/project/{project_id}/milestone/{milestone_id}/{task}"
+    PROJECT_MS_URL + "/project/{project_id}/milestone/{milestone_id}/status"
+)
+PROJECT_OFFSET_URL = (
+    PROJECT_MS_URL + "/project/{project_id}/milestone/{milestone_id}/offset"
 )
 PAYMENT_MS_URL = os.getenv("paymentms")
 TEMPORAL_SERVICE_URL = os.getenv("temporalservice")

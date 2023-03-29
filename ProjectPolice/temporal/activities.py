@@ -5,7 +5,7 @@ import requests
 # add the path to the main directory of your project to the system path
 from police import format_message, format_url, publish_to_notifier
 from config.config import (
-    PAYMENT_MS_URL,
+    PROJECT_OFFSET_URL,
     RMQHOSTNAME,
     RMQPORT,
     RMQUSERNAME,
@@ -20,7 +20,7 @@ async def remove_reserved_offset(data, payment_result) -> dict:
     # milestone_id = data["data"]["milestone_id"]
     # project_id = data["data"]["project_id"]
     # payload = format_message(milestone_id, "remove_reserved_offset", data["data"])
-    # url = format_url(project_id, milestone_id, "offset")
+    # url = format_url(PROJECT_OFFSET_URL, project_id, milestone_id)
 
     # # Send request to Project Microservice
     # try:
@@ -61,9 +61,7 @@ async def get_payment_intent() -> dict:
     # return result
     return {
         "success": True,
-        "data": {
-            "message": "invocation of service fails"
-        },
+        "data": {"message": "invocation of service fails"},
     }
 
 
