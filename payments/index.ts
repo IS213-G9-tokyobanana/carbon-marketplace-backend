@@ -43,6 +43,30 @@ app.listen(port, () => {
 	console.log(`Example app listening on port ${port}`)
 })
 
+// route to get Payment Intent saved in MongoDB
+app.get("/payments", async (req, res) => {
+	const input: string = req.query.paymentid
+
+	try {
+		const result = await collections.paymentintents.findOne({
+			$or: [{ payment_id: input }],
+		})
+		if (result) {
+			res.send({ success: true, data: { paymentIntent: result } })
+		} else {
+			res.send({
+				success: false,
+				data: { message: "No payment intent with that ID found." },
+			})
+		}
+	} catch (e) {
+		res.status(400).send({
+			success: false,
+			data: { message: e.message },
+		})
+	}
+})
+
 // route to create Payment Intent in Stripe
 app.post("/payments", async (req, res) => {
 	const input: TransactionInput = req.body
