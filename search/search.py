@@ -1,3 +1,4 @@
+import meilisearch
 import json
 import pika
 from config import (
@@ -8,7 +9,6 @@ from config import (
     TOPIC_EXCHANGE_NAME,
     BINDING_KEYS,
 )
-import scheduler
 
 # Connect to RabbitMQ
 connection = pika.BlockingConnection(
@@ -46,7 +46,6 @@ def check_setup():
             exchange=TOPIC_EXCHANGE_NAME, exchange_type="topic", durable=True
         )
 
-
 def is_connection_open(connection):
     try:
         connection.process_data_events()
@@ -72,13 +71,38 @@ def receiveMsg():
         )
     channel.start_consuming()
 
-
 def callback(channel, method, properties, body):
     # print(" [x] Received %r" % body)
     # after receiving a message, call the scheduler
     try:
+        client = meilisearch.Client('http://search:7700')
         data = json.loads(body)
-        scheduler.checkType(data)
+        if data['type'] == 'project.verify' or data['type'] == 'offset.rollback':
+            client.index('projects').add_documents([data['data']], primary_key='id')
+        elif data['type'] == 'milestone.add':
+            # for milestone add
+            response = client.index('projects').get_document(document_id = data['data']['project_id'])
+            old = response.milestones
+            new = data['data']['milestones']
+            new.extend(old)
+            client.index('projects').update_documents(
+                [{
+                    "id": data['data']['project_id'],
+                    "milestones": new
+                }],
+                primary_key="id"
+            )
+        elif data['type'] == 'offset.reserve':
+            response = client.index('projects').get_document(document_id = data['resource_id'])
+            new = data['data']['milestones']
+            client.index('projects').update_documents(
+                [{
+                    "id": data['resource_id'],
+                    "milestones": new
+                }],
+                primary_key="id"
+            )
+
     except json.decoder.JSONDecodeError as e:
         print("--NOT JSON:", e)
         print("--DATA:", body)
@@ -86,3 +110,4 @@ def callback(channel, method, properties, body):
 if __name__ == "__main__":
     check_setup()
     receiveMsg()
+    
