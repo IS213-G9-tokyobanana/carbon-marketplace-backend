@@ -36,15 +36,17 @@ def check_setup(connection, channel, RMQHOSTNAME, RMQPORT):
         )
 
 # Function to format message before sending to Notifier / Project Microservice
-def format_message(resource_id, type, milestone_id):
+def format_message(resource_id, type, milestone_id, payment_id):
+
     new_data = {
         "project_id": resource_id,
-        "milestone_id": milestone_id
+        "milestone_id": milestone_id,
+        "payment_id": payment_id
     }
     return json.dumps({"resource_id": resource_id, "type": type, "data": new_data})
 
 # Function that republishes tasks that failed
-def publishTask(event, project_id, milestone_id):
+def publishTask(event, project_id, milestone_id, payment_intent_id=None):
     type = ""
     if event == "upcoming":
         type = "upcoming"
@@ -53,7 +55,7 @@ def publishTask(event, project_id, milestone_id):
     else:
         type = "rollback"
     
-    payload = format_message(project_id, type, milestone_id)
+    payload = format_message(project_id, type, milestone_id, payment_intent_id)
     connection = pika.BlockingConnection(
     pika.ConnectionParameters(
         host=RMQHOSTNAME, port=RMQPORT,
@@ -73,6 +75,7 @@ if __name__ == "__main__":
     parser.add_argument('--type', type=str, help='Type of task to be published')
     parser.add_argument('--proj', type=str, help='Project ID of task to be published')
     parser.add_argument('--mile', type=str, help='Milestone ID of task to be published')
+    parser.add_argument('--payment', type=str, help='Payment Intent ID of task to be published', required=False)
     args = parser.parse_args()
     event = ""
     if args.type == 'upcoming':
@@ -81,4 +84,4 @@ if __name__ == "__main__":
         event = "overdue"
     else:
         event = "offset"
-    publishTask(event, args.proj, args.mile)
+    publishTask(event, args.proj, args.mile, args.payment)
