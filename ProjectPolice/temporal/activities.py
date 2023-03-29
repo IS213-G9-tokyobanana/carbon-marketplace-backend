@@ -10,13 +10,12 @@ from config.config import (
     RMQPORT,
     RMQUSERNAME,
     RMQPASSWORD,
+    PAYMENT_MS_URL,
 )
 
 # Request to Project Microservice to remove reserved offset
 @activity.defn
-async def remove_reserved_offset(data, payment_result) -> dict:
-    # payment_id = payment_result["data"]["payment_id"]
-    # data["data"]["payment_id"] = payment_id
+async def remove_reserved_offset(data) -> dict:
     # milestone_id = data["data"]["milestone_id"]
     # project_id = data["data"]["project_id"]
     # payload = format_message(milestone_id, "remove_reserved_offset", data["data"])
@@ -44,21 +43,19 @@ async def remove_reserved_offset(data, payment_result) -> dict:
 
 # Request to Payment Microservice to retrieve relevant payment intent
 @activity.defn
-async def get_payment_intent() -> dict:
+async def get_buyer_id(data) -> dict:
+    # payment_id = data["data"]["payment_id"]
     # try:
-    #     result = requests.get(PAYMENT_MS_URL)
+    #     result = requests.get(f"{PAYMENT_MS_URL}/payment/{payment_id}")
     #     result.raise_for_status()
     # except requests.exceptions.HTTPError as err:
     #     result = {
     #         "success": False,
     #         "data": {
-    #             "message": "invocation of service fails: "
-    #             + PAYMENT_MS_URL
-    #             + ". "
-    #             + str(err),
+    #             "message": f"invocation of service fails: {PAYMENT_MS_URL}. {str(err)}"
     #         },
     #     }
-    # return result
+    # return result["buyer_id"]
     return {
         "success": True,
         "data": {"message": "invocation of service fails"},
@@ -67,7 +64,8 @@ async def get_payment_intent() -> dict:
 
 # Request to Messgae Broker to send message to Notifier
 @activity.defn
-async def send_to_notifier(data) -> dict:
+async def send_to_notifier(data, buyer_id) -> dict:
+    data["data"]["buyer_id"] = buyer_id
     parameters = pika.ConnectionParameters(
         host=RMQHOSTNAME,
         port=RMQPORT,

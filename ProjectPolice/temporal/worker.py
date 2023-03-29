@@ -4,7 +4,7 @@ from temporalio.worker import Worker
 # Import the activity and workflow from our other files
 from temporal.activities import (
     remove_reserved_offset,
-    get_payment_intent,
+    get_buyer_id,
     send_to_notifier,
 )
 from temporal.workflow import ProjectPoliceTemporalWorkflow
@@ -20,6 +20,6 @@ async def main():
         client,
         task_queue="my-task-queue",
         workflows=[ProjectPoliceTemporalWorkflow],
-        activities=[remove_reserved_offset, get_payment_intent, send_to_notifier],
+        activities=[remove_reserved_offset, get_buyer_id, send_to_notifier],
     )
     await worker.run()
