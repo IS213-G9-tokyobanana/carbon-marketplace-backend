@@ -5,10 +5,10 @@ env = "production"
 TOPIC_EXCHANGE_NAME = "topic_exchange"
 # Binding Keys that scheduler has to listen to
 BINDING_KEYS = {
-    "milestone_add":"events.projects.*.milestone.add",
-    "project_verify":"events.projects.*.project.verify",
-    "offsets_reserve":"events.projects.*.offsets.reserve",
-    "offsets_rollback":"events.projects.*.offsets.rollback",
+    "search.milestone.add":"events.projects.*.milestone.add",
+    "search.project.verify":"events.projects.*.project.verify",
+    "search.offsets.reserve":"events.projects.*.offsets.reserve",
+    "search.offsets.rollback":"events.projects.*.offsets.rollback",
 }
 
 
