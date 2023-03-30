@@ -35,6 +35,7 @@ message = ''
 message_buyer = ''
 message_seller = ''
 
+
 QUEUES = {
     QUEUE_PROJECT_CREATE:  
     {   
@@ -76,24 +77,24 @@ QUEUES = {
     {
         BINDING_KEY: "events.buyprojects.notify.payment.success" ,
         SUBJECT: "Payment has been successful",
-        message_buyer: "Buyer {buyer_id} has successfully paid for the project",
-        message_seller: "Seller {seller_id} has successfully received payment for the project"
+        message_buyer: "Hi Buyer {buyer_id} has successfully paid for the project",
+        message_seller: "Hi Seller {seller_id} has successfully received payment for the project"
     }, 
     
     QUEUE_BUYPROJECTS_PUBLIC_PAYMENT_FAILED: 
     {   
         BINDING_KEY:"events.buyprojects.public.payment.failed" ,
         SUBJECT: "Payment made failed",
-        message_buyer: "Buyer {buyer_id} payment has failed for the project",
-        message_seller: "Seller {seller_id} payment has failed for the project"
+        message_buyer: "Hi Buyer {buyer_id} payment has failed for the project",
+        message_seller: "Hi Seller {seller_id} payment has failed for the project"
     },
 
     QUEUE_BUYPROJECTS_NOTIFY_PAYMENT_FAILED:  
     {   
         BINDING_KEY: "events.buyprojects.notify.payment.failed" ,
         SUBJECT: "Payment made failed",
-        message_buyer: "Buyer {buyer_id} payment has failed for the project",
-        message_seller: "Seller {seller_id} payment has failed for the project"
+        message_buyer: "Hi Buyer {buyer_id} payment has failed for the project",
+        message_seller: "Hi Seller {seller_id} payment has failed for the project"
     },
     QUEUE_PROJECTPOLICE_MILESTONE_UPCOMING: 
     {

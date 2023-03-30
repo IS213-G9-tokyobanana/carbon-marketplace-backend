@@ -24,35 +24,45 @@ from sendgrid.helpers.mail import Mail
 def process_message(data, queue_name, SUBJECT):
     retrieved_message = data
     subject_retrieved = SUBJECT
-    result_message = format_message(queue_name, retrieved_message)
-    retrieved_user_email = retrieve_users_information()
+    retrieved_role = ""
+    retrieved_user_email, retrieved_role = retrieve_users_information()
+    print(retrieved_role)
+    result_message = format_message(queue_name, retrieved_message, retrieved_role)
     send_email_to_user(retrieved_user_email, result_message, subject_retrieved)
 
+#buyer_id 
+#seller_id 
+def format_message(queue_name, retrieved_message, retrieved_role):
+    print(queue_name)
 
-def format_message(queue_name, retrieved_message):
-    format_project_id = retrieved_message.get("data").get("milestones", {}).get("project_id")
-    format_milestone_id = retrieved_message.get("data").get("milestones", {}).get("id")
+    if queue_name == "ratings_reward" or queue_name == "ratings_penalise":
+        format_resource_id = retrieved_message.get("resource_id",{})
+        format_milestone_id = retrieved_message.get("data").get("milestones", {}).get("id", {})
+    elif queue_name == "milestone_upcoming":
+        format_resource_id = retrieved_message.get("data").get("project_id", {})
+        format_milestone_id = retrieved_message.get("data").get("milestone_id", {})
+    else:
+        format_resource_id = retrieved_message.get("resource_id",{})
+        format_milestone = retrieved_message.get("data").get("milestones", {})[0]
+        format_milestone_id = format_milestone.get("id", {})
+
     format_buyer_id = retrieved_message.get("data").get("buyer_id", {})
     format_seller_id = retrieved_message.get("data").get("seller_id",{})
-    format_role = retrieved_message.get("data")
 
-    for dict_queue_name, binding_key in QUEUES.items():
+    for dict_queue_name in QUEUES.items():
         if queue_name == dict_queue_name:
             message_retrieved = QUEUES[queue_name][message]
-            new_message_retrieved = message_retrieved.format(project_id=format_project_id, milestone_id=format_milestone_id)
+            new_message_retrieved = message_retrieved.format(project_id=format_resource_id, milestone_id=format_milestone_id)
             if new_message_retrieved is None:
-                if format_role == 1:
+                if retrieved_role == "buyer":
                     message_retrieved = QUEUES[queue_name][message_buyer]
                     new_message_retrieved = message_retrieved.format(buyer_id=format_buyer_id)
-                else: 
+                elif retrieved_role == "seller":
                     message_retrieved = QUEUES[queue_name][message_seller]
                     new_message_retrieved = message_retrieved.format(seller_id=format_seller_id)
             else:
                 return new_message_retrieved
-            
-            return new_message_retrieved
-
-
+        
 # communicate with the user microservice to retrieve users information
 def retrieve_users_information():
     try:
@@ -66,11 +76,11 @@ def retrieve_users_information():
     role = data_object.get("data", {}).get("role")
     if role == "buyer":
         user_email_detail = "ownagersg+test@gmail.com"
-    elif role == "verifier":
+    elif role == "seller":
         user_email_detail = "ownagersg+test1@gmail.com"
     else:
         user_email_detail = "ownagersg+test2@gmail.com"
-    return user_email_detail
+    return (user_email_detail,role)
 
 
 def send_email_to_user(user_email, message, subject_retrieved):
