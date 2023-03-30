@@ -1,0 +1,11 @@
+{
+    "resource_id": "6fbbfd6e-e2bc-435b-a323-fcb6997a0353",
+    "type": "payment.failed",
+    "data": {
+        "created_at": "2023-03-16 07:45:00",
+        "payment_id": "6fbbfd6e-e2bc-435b-a323-fcb6997a0353",
+        "milestone_id": "123",
+        "buyer_id": "456",
+        "amount": 10.0
+    }
+}
