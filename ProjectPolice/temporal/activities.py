@@ -64,7 +64,7 @@ async def get_buyer_id(data) -> dict:
 
 # Request to Messgae Broker to send message to Notifier
 @activity.defn
-async def send_to_notifier(data, buyer_id) -> dict:
+async def send_to_notifier(data) -> dict:
     # data["data"]["buyer_id"] = buyer_id
     # parameters = pika.ConnectionParameters(
     #     host=RMQHOSTNAME,
