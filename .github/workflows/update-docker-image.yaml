@@ -25,7 +25,18 @@ jobs:
 
       - name: Determine changes
         id: changes
-        run: echo "::set-output name=changed_dirs::$(git diff --name-only HEAD~1 HEAD | cut -d '/' -f1 | uniq)"
+        run: |
+          if [ $(git rev-list --count HEAD) -gt 1 ]; then
+            echo "::set-output name=changed_dirs::$(git diff --name-only HEAD~1 HEAD | cut -d '/' -f1 | uniq)"
+          else
+            echo "::set-output name=changed_dirs::"
+          fi
+
+      - name: Exit job if no relevant changes
+        if: steps.changes.outputs.changed_dirs != matrix.microservices
+        run: |
+          echo "No changes in ${{ matrix.microservices }}. Skipping build and push."
+          exit 0
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
@@ -40,7 +51,6 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build and push Docker image
-        if: contains(steps.changes.outputs.changed_dirs, matrix.microservices)
         uses: docker/build-push-action@v2
         with:
           context: ./${{ matrix.microservices }}
