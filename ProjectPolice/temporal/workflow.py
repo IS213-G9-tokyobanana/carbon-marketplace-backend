@@ -19,14 +19,14 @@ class ProjectPoliceTemporalWorkflow:
         result1 = await workflow.execute_activity(
             get_buyer_id, data, start_to_close_timeout=timedelta(seconds=5)
         )
-        status_arr.append(result2["success"])
+        status_arr.append(result1["success"])
         # Execute activity to remove reserved offset
         result2 = await workflow.execute_activity(
             remove_reserved_offset,
             data,
             start_to_close_timeout=timedelta(seconds=5),
         )
-        status_arr.append(result1["success"])
+        status_arr.append(result2["success"])
         # Execute activity to send message to Notifier
         result3 = await workflow.execute_activity(
             send_to_notifier, data, result1, start_to_close_timeout=timedelta(seconds=5)
