@@ -5,7 +5,7 @@ from datetime import datetime
 from classes.response import ResponseBodyJSON
 from classes.exception import CustomException
 from classes.amqp_payload import Payload
-from classes.enums import MilestoneStatus, ProjectStatus
+from classes.enums import MilestoneStatus, ProjectStatus, AmqpPayloadType
 from sqlalchemy.exc import IntegrityError
 from config.amqp_setup import (
     RABBITMQ_HOSTNAME, RABBITMQ_PORT, exchangename, exchangetype, connection, channel, ROUTING_KEY, QUEUES, 
@@ -99,7 +99,7 @@ def create_project():
     data = project.json() # project will have all the milestones populated due to the `relationship()` in models.py
 
     # publish to project_created queue
-    payload =  Payload(resource_id=str(project.id), type='project.create', data=data)
+    payload =  Payload(resource_id=str(project.id), type=AmqpPayloadType.PROJECT_CREATE, data=data)
     payload_serialised = json.dumps(payload.json())
     publish_message(connection=connection, channel=channel, hostname=RABBITMQ_HOSTNAME, exchangename=exchangename, port=RABBITMQ_PORT, exchangetype=exchangetype, routing_key=QUEUES[PROJECTS_CREATED_QUEUE][ROUTING_KEY], message=payload_serialised)
 
@@ -126,7 +126,7 @@ def update_project_status(id):
     project.status = body['status']
     db.session.commit()
 
-    payload =  Payload(resource_id=str(project.id), type='project.verify', data=data)
+    payload =  Payload(resource_id=str(project.id), type=AmqpPayloadType.PROJECT_VERIFY, data=data)
     payload_serialised = json.dumps(payload.json()) 
     publish_message(connection=connection, channel=channel, hostname=RABBITMQ_HOSTNAME, exchangename=exchangename, port=RABBITMQ_PORT, exchangetype=exchangetype, routing_key=QUEUES[PROJECTS_VERIFIED_QUEUE][ROUTING_KEY], message=payload_serialised)
 
@@ -139,34 +139,30 @@ def create_project_milestone(id):
     """
     body = request.get_json()
 
-    milestones = body.pop('milestones')
-
     # Get project by id
     project = db.session.execute(db.select(Project).where(Project.id == id)).scalars().first()
     if project is None:
         abort(404, description=f"Project {str(id)} not found.")
     
-    milestone_objects = []
-    for milestone in milestones:
-        milestone['due_date'] = datetime.strptime(milestone['due_date'], request_time_format) # parse iso format string in request body to datetime
-        m = Milestone(**milestone, project=project, offsets_total=milestone['offsets_available'])
-        db.session.add(m)
-        milestone_objects.append(m)
+    body['due_date'] = datetime.strptime(body['due_date'], request_time_format) # parse iso format string in request body to datetime
+    milestone = Milestone(**body, project=project, offsets_total=body['offsets_available'])
+    db.session.add(milestone)
 
     db.session.commit()
+    rest_data = milestone.json()
     
-    res_data = []
-    data = project.json()
+    amqp_data = project.json()
+    amqp_data['milestones'] = [milestone.json()]
     # publish each milestone to queue
-    for milestone in milestone_objects:
-        milestone_json = milestone.json()
-        data['milestones'] = [milestone_json]
-        payload =  Payload(resource_id=str(milestone.id), type='milestone.add', data=data)
-        payload_serialised = json.dumps(payload.json())
-        publish_message(connection=connection, channel=channel, hostname=RABBITMQ_HOSTNAME, exchangename=exchangename, port=RABBITMQ_PORT, exchangetype=exchangetype, routing_key=QUEUES[PROJECTS_MILESTONES_ADD_QUEUE][ROUTING_KEY], message=payload_serialised)
-        res_data.append(milestone_json)
+    # for milestone in milestone_objects:
+        # milestone_json = milestone.json()
+        # data['milestones'] = [milestone_json]
+    payload =  Payload(resource_id=str(milestone.id), type=AmqpPayloadType.MILESTONE_ADD, data=amqp_data)
+    payload_serialised = json.dumps(payload.json())
+    publish_message(connection=connection, channel=channel, hostname=RABBITMQ_HOSTNAME, exchangename=exchangename, port=RABBITMQ_PORT, exchangetype=exchangetype, routing_key=QUEUES[PROJECTS_MILESTONES_ADD_QUEUE][ROUTING_KEY], message=payload_serialised)
+        # res_data.append(milestone_json)
 
-    res = ResponseBodyJSON(True, res_data).json()
+    res = ResponseBodyJSON(True, rest_data).json()
     return jsonify(res), 201
 
     
@@ -202,7 +198,7 @@ def update_project_milestone_status(id, mid):
         project.rating += 10
         amqp_data = project.json()
         amqp_data['milestones'] = milestone.json() # only publish the milestone that was met
-        payload =  Payload(resource_id=str(milestone.id), type='milestone.reward', data=amqp_data)
+        payload =  Payload(resource_id=str(milestone.id), type=AmqpPayloadType.MILESTONE_REWARD, data=amqp_data)
         payload_serialised = json.dumps(payload.json()) 
         publish_message(connection=connection, channel=channel, hostname=RABBITMQ_HOSTNAME, exchangename=exchangename, port=RABBITMQ_PORT, exchangetype=exchangetype, routing_key=QUEUES[PROJECTS_MILESTONES_REWARD_QUEUE][ROUTING_KEY], message=payload_serialised)
         
@@ -211,7 +207,7 @@ def update_project_milestone_status(id, mid):
         project.rating -= 10
         amqp_data = project.json()
         amqp_data['milestones'] = milestone.json() # only publish the milestone that was rejected
-        payload =  Payload(resource_id=str(milestone.id), type='milestone.penalise', data=amqp_data)
+        payload =  Payload(resource_id=str(milestone.id), type=AmqpPayloadType.MILESTONE_PENALISE, data=amqp_data)
         payload_serialised = json.dumps(payload.json()) 
         publish_message(connection=connection, channel=channel, hostname=RABBITMQ_HOSTNAME, exchangename=exchangename, port=RABBITMQ_PORT, exchangetype=exchangetype, routing_key=QUEUES[PROJECTS_MILESTONES_PENALISE_QUEUE][ROUTING_KEY], message=payload_serialised)
 
@@ -277,7 +273,7 @@ def create_reserved_offset(id, mid):
     # publish to queue
     amqp_data = reserved_offset.json()  # add project to the payload for search
     amqp_data['project'] = project.json() # add project to the payload for search
-    payload =  Payload(resource_id=reserved_offset.payment_id, type='offset.reserved', data=amqp_data)
+    payload =  Payload(resource_id=reserved_offset.payment_id, type=AmqpPayloadType.OFFSETS_RESERVE, data=amqp_data)
     payload_serialised = json.dumps(payload.json())
     publish_message(connection=connection, channel=channel, hostname=RABBITMQ_HOSTNAME, exchangename=exchangename, port=RABBITMQ_PORT, exchangetype=exchangetype, routing_key=QUEUES[PROJECTS_MILESTONES_OFFSETS_RESERVE_QUEUE][ROUTING_KEY], message=payload_serialised)
 
@@ -313,7 +309,7 @@ def commit_reserved_offset():
     db.session.commit()
 
     # publish to project_milestone_offsets_commit queue
-    payload =  Payload(resource_id=data['payment_id'], type='offset.commit', data=data)
+    payload =  Payload(resource_id=data['payment_id'], type=AmqpPayloadType.OFFSETS_COMMIT, data=data)
     payload_serialised = json.dumps(payload.json())
     publish_message(connection=connection, channel=channel, hostname=RABBITMQ_HOSTNAME, exchangename=exchangename, port=RABBITMQ_PORT, exchangetype=exchangetype, routing_key=QUEUES[PROJECTS_MILESTONES_OFFSETS_COMMIT_QUEUE][ROUTING_KEY], message=payload_serialised)
 
@@ -346,7 +342,7 @@ def rollback_reserved_offset():
     data = reservation.json()
     project = db.session.execute(db.select(Project).where(Project.id == milestone.project_id)).scalars().first()
     data['project'] = project.json() # add project to the payload for search
-    payload =  Payload(resource_id=reservation.payment_id, type='offset.rollback', data=data)
+    payload =  Payload(resource_id=reservation.payment_id, type=AmqpPayloadType.OFFSETS_ROLLBACK, data=data)
     payload_serialised = json.dumps(payload.json())
     publish_message(connection=connection, channel=channel, hostname=RABBITMQ_HOSTNAME, exchangename=exchangename, port=RABBITMQ_PORT, exchangetype=exchangetype, routing_key=QUEUES[PROJECTS_MILESTONES_OFFSETS_ROLLBACK_QUEUE][ROUTING_KEY], message=payload_serialised)
 
