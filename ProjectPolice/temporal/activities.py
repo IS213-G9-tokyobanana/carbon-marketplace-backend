@@ -36,7 +36,7 @@ async def remove_reserved_offset(data) -> dict:
     return {
         "success": True,
         "data": {
-            "message": "invocation of service fails",
+            "message": "Example test message from remove_reserved_offset",
         },
     }
 
@@ -58,22 +58,25 @@ async def get_buyer_id(data) -> dict:
     # return result
     return {
         "success": True,
-        "data": {"message": "invocation of service fails"},
+        "data": {"message": "Example test message from get_buyer_id"},
     }
 
 
 # Request to Messgae Broker to send message to Notifier
 @activity.defn
 async def send_to_notifier(data, buyer_id) -> dict:
-    data["data"]["buyer_id"] = buyer_id
-    parameters = pika.ConnectionParameters(
-        host=RMQHOSTNAME,
-        port=RMQPORT,
-        heartbeat=3600,
-        credentials=pika.PlainCredentials(RMQUSERNAME, RMQPASSWORD),
-        blocked_connection_timeout=3600,
-    )
-    connection = pika.BlockingConnection(parameters=parameters)
-    channel = connection.channel()
-    result = publish_to_notifier(data, channel)
-    return result
+    # data["data"]["buyer_id"] = buyer_id
+    # parameters = pika.ConnectionParameters(
+    #     host=RMQHOSTNAME,
+    #     port=RMQPORT,
+    #     heartbeat=3600,
+    #     credentials=pika.PlainCredentials(RMQUSERNAME, RMQPASSWORD),
+    #     blocked_connection_timeout=3600,
+    # )
+    # connection = pika.BlockingConnection(parameters=parameters)
+    # channel = connection.channel()
+    # result = publish_to_notifier(data, channel)
+    return {
+        "success": True,
+        "data": {"message": "Example test message from send_to_notifier"},
+    }
