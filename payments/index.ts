@@ -7,7 +7,13 @@ dotenv.config()
 import express from "express"
 
 const app = express()
-app.use(express.json())
+app.use((req, res, next) => {
+	if (req.originalUrl === "/webhooks") {
+		next()
+	} else {
+		express.json()(req, res, next)
+	}
+})
 const port = 5000
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
 	apiVersion: "2022-11-15",
@@ -119,3 +125,58 @@ app.post("/payments", async (req, res) => {
 		})
 	}
 })
+
+// route to receive webhooks from Stripe
+app.post(
+	"/webhooks",
+	express.raw({ type: "application/json" }),
+	async (req, res) => {
+		const sig = req.headers["stripe-signature"]
+
+		let event
+
+		try {
+			event = stripe.webhooks.constructEvent(
+				req.body,
+				sig,
+				process.env.STRIPE_ENDPOINT_SECRET
+			)
+		} catch (err) {
+			console.log(err.message)
+			res.status(400).send(`Webhook Error: ${err.message}`)
+			return
+		}
+
+		switch (event.type) {
+			case "charge.succeeded":
+				const charge = event.data.object
+				console.log(charge)
+			case "payment_intent.created":
+				const paymentIntent = event.data.object
+				console.log(paymentIntent)
+			case "payment_intent.succeeded":
+				const paymentIntentStatus = event.data.object
+				console.log(paymentIntentStatus)
+				break
+			case "payment_method.attached":
+				const paymentMethod = event.data.object
+				console.log(paymentMethod)
+				break
+			default:
+				console.log(`Unhandled event type ${event.type}`)
+		}
+
+		res.send({ received: true })
+
+		// if (req.body) {
+		// 	res.send({ success: true, data: req.body })
+		// } else {
+		// 	res.status(400).send({
+		// 		success: false,
+		// 		data: {
+		// 			message: "No message received.",
+		// 		},
+		// 	})
+		// }
+	}
+)
