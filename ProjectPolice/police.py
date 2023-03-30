@@ -29,7 +29,7 @@ def publish_to_notifier(message, channel):
         "success": True,
         "data": {
             "message": "message sent to Notifier",
-            "resources": payload,
+            "resource": payload,
         },
     }
 
@@ -50,7 +50,7 @@ def send_to_projectms(message):
             "success": False,
             "data": {
                 "message": "invocation of service fails: " + url + ". " + str(err),
-                "resources": payload,
+                "resource": payload,
             },
         }
     return result
