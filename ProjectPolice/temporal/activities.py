@@ -55,7 +55,7 @@ async def get_buyer_id(data) -> dict:
     #             "message": f"invocation of service fails: {PAYMENT_MS_URL}. {str(err)}"
     #         },
     #     }
-    # return result["buyer_id"]
+    # return result
     return {
         "success": True,
         "data": {"message": "invocation of service fails"},
