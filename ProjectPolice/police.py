@@ -29,16 +29,15 @@ def publish_to_notifier(message, channel):
         "success": True,
         "data": {
             "message": "message sent to Notifier",
-            "resource": payload,
+            "resource": message,
         },
     }
 
 
 # Function to send message to Project Microservice
 def send_to_projectms(message):
-    milestone_id = message["data"]["milestone_id"]
     project_id = message["data"]["project_id"]
-    payload = format_message(milestone_id, project_id, message["data"])
+    milestone_id = message["data"]["milestone_id"]
     url = format_url(PROJECT_STATUS_URL, project_id, milestone_id)
 
     # Send request to Project Microservice
@@ -50,7 +49,7 @@ def send_to_projectms(message):
             "success": False,
             "data": {
                 "message": "invocation of service fails: " + url + ". " + str(err),
-                "resource": payload,
+                "resource": message,
             },
         }
     return result
