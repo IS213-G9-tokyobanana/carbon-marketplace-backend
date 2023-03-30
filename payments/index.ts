@@ -119,3 +119,19 @@ app.post("/payments", async (req, res) => {
 		})
 	}
 })
+
+// route to receive webhooks from Stripe
+app.post("/webhooks", async (req, res) => {
+	console.log(req.body)
+
+	if (req.body) {
+		res.send({ success: true, data: req.body })
+	} else {
+		res.status(400).send({
+			success: false,
+			data: {
+				message: "No message received.",
+			},
+		})
+	}
+})
