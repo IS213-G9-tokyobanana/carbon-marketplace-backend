@@ -1,0 +1,30 @@
+{
+    "resource_id": "48d727ec-4d74-466c-bc3a-f0e566792250",
+    "type": "milestone.add",
+    "data": {
+        "id": "dd95aa97-f0b4-44c2-b069-22c3a4975f52",
+        "name": "100.5MW Wind Power Project in Madhya Pradesh, India",
+        "owner_id": "3b08a327-42b2-4694-bbeb-f61ad526ec47",
+        "description": "desc3",
+        "types": ["carbon capture", "local green initiative (small project)"],
+        "status": "pending",
+        "created_at": "2023-03-28T07:51:54Z",
+        "updated_at": "2023-03-28T07:51:54Z",
+        "rating": 100.0,
+        "milestones": [
+            {
+                "id": "48d727ec-4d74-466c-bc3a-f0e566792250",
+                "name": "0.2 million tCO2e saved by year 2",
+                "description": "0.2 million tCO2e saved by year 2 after project launch",
+                "type": "Temporal",
+                "offsets_available": 20.0,
+                "offsets_total": 20.0,
+                "status": "pending",
+                "created_at": "2023-03-28T08:25:12Z",
+                "updated_at": "2023-03-28T08:25:12Z",
+                "due_date": "2025-03-21T09:31:23Z",
+                "project_id": "dd95aa97-f0b4-44c2-b069-22c3a4975f52",
+            }
+        ],
+    },
+}
