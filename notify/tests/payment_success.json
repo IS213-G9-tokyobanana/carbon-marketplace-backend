@@ -5,8 +5,8 @@
 			"created_at": "2023-03-17 08:45:00",
 			"payment_id": "6fbbfd6e-e2bc-435b-a323-fcb6997a0353",
 			"milestone_id": "123",
-			"buyer_id": "456",
-			"seller_id": "789",
+			"buyer_id": "9204031a-ef0b-47f8-a1ee-6965552e8f3c",
+			"seller_id": "b06e2940-76c0-41a2-a673-c3f40a8f7c68",
 			"amount": 10.0
 	}
 }
