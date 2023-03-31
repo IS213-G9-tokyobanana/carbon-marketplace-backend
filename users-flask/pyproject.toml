@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "users-flask-app"
+version = "0.1.0"
+description = ""
+authors = ["Jaylin0312 <68802506+Jaylin0312@users.noreply.github.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+sqlalchemy = "^2.0.5.post1"
+Flask = "^2.0.2"
+flask-cors = "^3.0.10"
+flask-sqlalchemy = "^3.0.3"
+psycopg2-binary = "^2.9.5"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
