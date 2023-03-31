@@ -10,8 +10,8 @@ QUEUE_PROJECT_RATINGS_PENALISE = "ratings_penalise"
 QUEUE_PROJECT_VERIFY = "project_verify"
 QUEUE_PROJECT_MILESTONES_ADD = "milestone_add"
 QUEUE_BUYPROJECTS_PAYMENT_SUCCESS = "payment_success"
-QUEUE_BUYPROJECTS_PUBLIC_PAYMENT_FAILED = "payment_failed"
-QUEUE_BUYPROJECTS_NOTIFY_PAYMENT_FAILED = "payment_failed"
+QUEUE_BUYPROJECTS_PAYMENT_FAILED = "payment_failed"
+QUEUE_BUYPROJECTS_ROLLBACK_PAYMENT_FAILED = "payment_failed"
 QUEUE_PROJECTPOLICE_MILESTONE_UPCOMING = "milestone_upcoming"
 
 
@@ -31,9 +31,9 @@ channel = connection.channel()
 ROUTING_KEY = 'routing_key'
 BINDING_KEY = 'binding_key'
 SUBJECT = 'subject'
-message = ''
-message_buyer = ''
-message_seller = ''
+message = 'message'
+message_buyer = 'message_buyer'
+message_seller = 'message_seller'
 
 
 QUEUES = {
@@ -42,7 +42,6 @@ QUEUES = {
         BINDING_KEY: "events.projects.*.project.create", 
         SUBJECT: "Project has been created",
         message: "Project with {project_id} has been created"
-        
     },
 
     QUEUE_PROJECT_RATINGS_REWARD: 
@@ -81,20 +80,18 @@ QUEUES = {
         message_seller: "Hi Seller {seller_id} has successfully received payment for the project"
     }, 
     
-    QUEUE_BUYPROJECTS_PUBLIC_PAYMENT_FAILED: 
+    QUEUE_BUYPROJECTS_PAYMENT_FAILED: 
     {   
-        BINDING_KEY:"events.buyprojects.public.payment.failed" ,
+        BINDING_KEY:"events.buyprojects.notify.payment.failed" ,
         SUBJECT: "Payment made failed",
-        message_buyer: "Hi Buyer {buyer_id} payment has failed for the project",
-        message_seller: "Hi Seller {seller_id} payment has failed for the project"
+        message_buyer: "Hi Buyer {buyer_id} payment has failed for the project"
     },
 
-    QUEUE_BUYPROJECTS_NOTIFY_PAYMENT_FAILED:  
+    QUEUE_BUYPROJECTS_ROLLBACK_PAYMENT_FAILED:  
     {   
-        BINDING_KEY: "events.buyprojects.notify.payment.failed" ,
+        BINDING_KEY: "events.buyprojects.public.payment.failed" ,
         SUBJECT: "Payment made failed",
         message_buyer: "Hi Buyer {buyer_id} payment has failed for the project",
-        message_seller: "Hi Seller {seller_id} payment has failed for the project"
     },
     QUEUE_PROJECTPOLICE_MILESTONE_UPCOMING: 
     {
