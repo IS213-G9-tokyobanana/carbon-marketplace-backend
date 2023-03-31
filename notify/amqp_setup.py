@@ -36,7 +36,6 @@ message_buyer = 'message_buyer'
 message_seller = 'message_seller'
 
 
-
 QUEUES = {
     QUEUE_PROJECT_CREATE:  
     {   
