@@ -11,8 +11,8 @@ from amqp_setup import check_setup, publish_message, create_connection
 
 def callback(channel, method, properties, body):
     data = json.loads(body)
-    channel.basic_ack(delivery_tag=method.delivery_tag)
     check_status(data)
+    channel.basic_ack(delivery_tag=method.delivery_tag)
 
 
 def consume_message(
