@@ -1,5 +1,9 @@
 {
   "resource_id": "274487fhsdbchb-23ecsdv",
   "type": "upcoming",
-  "data": { "project_id": "1", "milestone_id": "2" }
+  "data": { 
+    "owner_id": "dcc33975-e00e-4225-be35-2291f9f97fd0",
+    "project_id": "1", 
+    "milestone_id": "2" 
+  }
 }
