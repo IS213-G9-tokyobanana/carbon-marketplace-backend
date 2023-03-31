@@ -67,5 +67,5 @@ poetry install
 3. Run the app
 
 ```
-python3 checkAmqp.py
+python3 supervisor.py
 ```
