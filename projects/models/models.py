@@ -51,7 +51,7 @@ class Milestone(db.Model):
     type = Column(VARCHAR(20), nullable=False) # -- 'Temporal' | 'Qualitative' | 'Quantitative'
     offsets_available = Column(FLOAT, nullable=False)
     offsets_total = Column(FLOAT, nullable=False)
-    status = Column(VARCHAR(20), nullable=False, default=ProjectStatus.PENDING) # -- "pending" | "met" | "rejected"
+    status = Column(VARCHAR(20), nullable=False, default=MilestoneStatus.PENDING) # -- "pending" | "met" | "rejected"
     created_at = Column(TIMESTAMP, nullable=False, default=datetime.utcnow) 
     updated_at = Column(TIMESTAMP, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
     due_date = Column(TIMESTAMP, nullable=False)

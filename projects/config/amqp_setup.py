@@ -1,9 +1,6 @@
 import pika
-
-from dotenv import load_dotenv
 from os import getenv
 
-load_dotenv()
 RABBITMQ_HOSTNAME = getenv('RABBITMQ_HOSTNAME')
 RABBITMQ_USERNAME = getenv('RABBITMQ_USERNAME')
 RABBITMQ_PASSWORD = getenv('RABBITMQ_PASSWORD')
@@ -75,13 +72,13 @@ channel.exchange_declare(exchange=exchangename, exchange_type=exchangetype, dura
 #     channel.queue_bind(exchange=exchangename, queue=queue_name, routing_key=queue_info[BINDING_KEY])
 
 def publish_message(connection, channel, hostname, port, exchangename, exchangetype, routing_key, message):
-    """This function in this module publishes a message (persistent) to the exchange with a routing key.
+    """This function publishes a message (persistent) to the exchange with a routing key.
     """
     check_setup(connection, channel, hostname, port, exchangename, exchangetype)
     channel.basic_publish(exchange=exchangename, routing_key=routing_key, body=message, properties=pika.BasicProperties(delivery_mode=2)) # make message persistent
 
 def check_setup(connection, channel, hostname, port, exchangename, exchangetype):
-    """This function in this module sets up a connection and a channel to a local AMQP broker,
+    """This function sets up a connection and a channel to a local AMQP broker,
     and declares a 'topic' exchange to be used by the microservices in the solution.
     """
     if not is_connection_open(connection):
