@@ -4,7 +4,7 @@ This is the Schedular Supervisor complex microservice. It is a Flask microservic
 
 ### Built With
 
-- Python
+- Python 3.11
 - Poetry
 
 ### Prerequisites
