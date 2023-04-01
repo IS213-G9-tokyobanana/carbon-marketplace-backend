@@ -47,15 +47,10 @@ def format_message(resource_id, type, milestone_id, payment_id):
 
 # Function that republishes tasks that failed
 def publishTask(event, project_id, milestone_id, payment_intent_id=None):
-    type = ""
-    if event == "upcoming":
-        type = "upcoming"
-    elif event == "overdue":
-        type = "penalise"
-    else:
-        type = "rollback"
+    if event == "overdue" or event == "penalise":
+        event = "penalise"
     
-    payload = format_message(project_id, type, milestone_id, payment_intent_id)
+    payload = format_message(project_id, event, milestone_id, payment_intent_id)
     connection = pika.BlockingConnection(
     pika.ConnectionParameters(
         host=RMQHOSTNAME, port=RMQPORT,
@@ -80,8 +75,8 @@ if __name__ == "__main__":
     event = ""
     if args.type == 'upcoming':
         event = "upcoming"
-    elif args.type == 'overdue':
+    elif args.type == 'overdue' or args.type == 'penalise':
         event = "overdue"
     else:
-        event = "offset"
+        event = "rollback"
     publishTask(event, args.proj, args.mile, args.payment)
