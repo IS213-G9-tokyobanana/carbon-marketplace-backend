@@ -31,7 +31,7 @@ def create_connection():
     parameters = pika.ConnectionParameters(
         host=RMQHOSTNAME,
         port=RMQPORT,
-        heartbeat=3600,
+        heartbeat=30,
         credentials=pika.PlainCredentials(RMQUSERNAME, RMQPASSWORD),
         blocked_connection_timeout=3600,
     )
