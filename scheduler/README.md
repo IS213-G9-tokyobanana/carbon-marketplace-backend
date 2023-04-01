@@ -12,6 +12,8 @@ Follow these steps to install and set up this flask template.
 
 2. Spin up the container
 
+For Windows testers, please ensure the the End-of-Line for the start.sh file is LF and not CRLF. If it is CRLF, please change it to LF from your vscode. 
+
 ```
 docker compose up
 ```
