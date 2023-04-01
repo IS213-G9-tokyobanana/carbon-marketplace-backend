@@ -36,16 +36,17 @@ Follow these steps to set up this complex microservice.
 
 1. Ensure docker server is running
 
-2. Build the docker container image
+2. Spin up the docker container
 
 ```
-docker build -t projectpolice .
+docker compose up
 ```
 
-3. Run the docker container
+Once the container is set up and running, you should be able to see the following output:
 
 ```
-docker run -d -p 5000:5000 projectpolice
+temporal_worker  | Starting worker
+amqp             | monitoring the exchange topic_exchange on binding key events.*.*.task.execute ...
 ```
 
 ### Local Development
@@ -69,3 +70,13 @@ poetry install
 ```
 python3 checkAmqp.py
 ```
+
+### Testing
+
+As this complex microservice heavily depends on the other microservices, the current testing that can be done is to check whether each scenario will be executed as expected based on the message received by Project Police. The following are the scenarios that can be tested:
+
+1. Trigger message flags project milestone as upcoming. In this case, Project Police will publish a message to Notifier ms through RabbitMQ (to request verifier to verify the milestone).
+2. Trigger message flags project milestone as penalise. In this case, Project Police will send a HTTP request to Project ms (to request a change in project's rating)
+3. Trigger message flags reserved offset as overdue. In this case, Project Police will trigger temporal workflow to perform these functions
+
+To test the above scenarios, publish message to exchange `topic_exchange` on queue `task_execute`.
