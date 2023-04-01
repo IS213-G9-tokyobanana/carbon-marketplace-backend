@@ -1,0 +1,14 @@
+version: "3.8"
+services: 
+  amqp:
+    build: 
+      dockerfile: ./amqp.Dockerfile
+    image: amqp
+    restart: always
+    container_name: amqp
+  temporal_worker:
+    build: 
+      dockerfile: ./temporal_worker.Dockerfile
+    image: temporal_worker
+    restart: always
+    container_name: temporal_worker
