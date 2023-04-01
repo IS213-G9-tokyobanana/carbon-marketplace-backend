@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 
 services:
   mongo:
@@ -11,14 +11,15 @@ services:
       - MONGO_INITDB_DATABASE=project
     ports:
       - "27017:27017"
-    volumes: 
+    volumes:
       - /mongo/data:/data/db
     networks:
       - payment-network
 
   payments:
-    build: 
-      dockerfile: ./payments.Dockerfile
+    build:
+      context: .
+      dockerfile: Dockerfile
     image: payments
     restart: always
     ports:
@@ -28,7 +29,7 @@ services:
       - payment-network
     depends_on:
       - mongo
-  
+
 networks:
   payment-network:
     driver: bridge
