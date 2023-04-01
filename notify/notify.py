@@ -59,7 +59,9 @@ def process_message(data, queue_name, SUBJECT):
 # communicate with the user microservice to retrieve users information
 def retrieve_user_email(id):
     try:
-        response = requests.get(MS_BASE_URL + id)
+        get_user_url = "".join([MS_BASE_URL, id])
+        print(get_user_url)
+        response = requests.get(get_user_url)
         response.raise_for_status()
         #handles 404,403 and 500 error
     except requests.exceptions.HTTPError as e:
@@ -70,6 +72,7 @@ def retrieve_user_email(id):
     data_object = response.json()
     user_email = data_object.get("data", {}).get("email")
     retrieved_role = data_object.get("data").get("type", {})
+    print(user_email)
     return (user_email, retrieved_role)
 
 def format_message(data, queue_name, retrieved_role):
@@ -119,7 +122,6 @@ def send_email_to_user(user_email, message, subject_retrieved):
     try:
   
         sg = SendGridAPIClient(SENDGRID_API_KEY)
-        print("hello this is invoked ")
         response = sg.send(message)
         print("Email has been successfully sent")
     except requests.exceptions.HTTPError as e:

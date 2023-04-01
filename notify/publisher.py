@@ -5,28 +5,28 @@ connection = pika.BlockingConnection(
 )
 channel = connection.channel()
 
-with open('tests/milestone_add.json') as milestone_add:
+with open('tests/milestone_add_verifier.json') as milestone_add:
     milestone_add_data = json.load(milestone_add)
 
-with open('tests/milestone_upcoming.json') as milestone_upcoming:
+with open('tests/milestone_upcoming_verifier.json') as milestone_upcoming:
     milestone_upcoming_data = json.load(milestone_upcoming)
 
-with open('tests/milestone_penalise.json') as milestone_penalise:
+with open('tests/milestone_penalise_seller.json') as milestone_penalise:
     milestone_penalise_data = json.load(milestone_penalise) 
 
-with open('tests/milestone_reward.json') as milestone_reward:
+with open('tests/milestone_reward_seller.json') as milestone_reward:
     milestone_reward_data = json.load(milestone_reward)
 
-with open('tests/payment_failed.json') as payment_failed:
+with open('tests/payment_failed_buyer.json') as payment_failed:
     payment_failed_data = json.load(payment_failed)
 
-with open('tests/payment_success.json') as payment_success:
+with open('tests/payment_success_buyer_seller.json') as payment_success:
     payment_success_data = json.load(payment_success)
 
-with open('tests/project_create.json') as project_create:
+with open('tests/project_create_verifier.json') as project_create:
     project_create_data = json.load(project_create)
 
-with open('tests/project_verify.json') as project_verify:
+with open('tests/project_verify_seller.json') as project_verify:
     project_verify_data = json.load(project_verify)
 
 channel.basic_publish(

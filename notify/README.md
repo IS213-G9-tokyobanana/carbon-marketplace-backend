@@ -38,13 +38,15 @@ RABBITMQ_PASSWORD=changeme
 ```
 5. Add in the `SENDGRID_API_KEY` in the `.env` file
 
-6. Set up the users microservice and ensure that you are able to create users with `buyer`, `seller` and `verifier` roles. Ensure that the email of the users you are testing for is enterprisesolutiondevg9t1@gmail.com. 
+6. Set up the users microservice and ensure that you are able to create users with `buyer`, `seller` and `verifier` roles. Ensure that the email of the users you are testing for is configured with enterprisesolutiondevg9t1@gmail.com in the body params.
 
-7. Open the `tests` folder and update the `owner_id` of the json files according to the user that you are notifying based on the queue that you are listening on.
+7. Open the `tests` folder and update the `owner_id` of the json files according to the user that you are notifying based on the queue that you are listening on with the `id` of the respective user role retrieved from the get multiple users request from postman.
 
 8. Run python3 `publisher.py` to publish the messages 
 
 9. Run docker compose to receive the messages
+
+10. Enter the 
 
 ```bash 
 docker build -t notify .
