@@ -32,4 +32,4 @@ jobs:
         with:
           context: SchedulerSupervisor
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/SchedulerSupervisor:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/schedulersupervisor:latest  # tag names MUST be lowercase
