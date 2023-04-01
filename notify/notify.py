@@ -7,7 +7,8 @@ from config import (
     EXCHANGE,
     EXCHANGE_TYPE,
     MS_BASE_URL,
-    SENDGRID_API_KEY
+    SENDGRID_API_KEY,
+    SENDGRID_FROM_EMAIL
 )
 from amqp_setup import (
     connection,
@@ -25,7 +26,6 @@ def callback(channel, method, properties, body):
     try:
         data = json.loads(body)
         queue_name = "_".join(method.routing_key.split(".")[-2:])
-        print(queue_name)
         email_subject = QUEUES[queue_name][SUBJECT]
         # this is the data retrieved from the publisher
         process_message(data, queue_name, email_subject)
@@ -45,6 +45,7 @@ def process_message(data, queue_name, SUBJECT):
         retrieved_email_seller, retrieved_role_seller = retrieve_user_email(seller_id)
         result_message = format_message(data, queue_name, retrieved_role_seller)
         send_email_to_user(retrieved_email_seller, result_message, SUBJECT)
+
     elif queue_name == "payment_failed" or queue_name == "rollbackpayment_failed":
         buyer_id = data.get("data").get("buyer_id", {})
         retrieved_email_buyer, retrieved_role_buyer = retrieve_user_email(buyer_id)
@@ -66,13 +67,12 @@ def retrieve_user_email(id):
         #handles 404,403 and 500 error
     except requests.exceptions.HTTPError as e:
         status_code = e.response.status_code
-        print("this is the status_code retrieved from HTTP Error:" + status_code)
+        print("this is the status_code retrieved from HTTP Error:", status_code)
         if status_code == 404:
             print("User not found")
     data_object = response.json()
     user_email = data_object.get("data", {}).get("email")
     retrieved_role = data_object.get("data").get("type", {})
-    print(user_email)
     return (user_email, retrieved_role)
 
 def format_message(data, queue_name, retrieved_role):
@@ -113,16 +113,16 @@ def format_message(data, queue_name, retrieved_role):
             return message_retrieved.format(seller_id=format_seller_id)
         
 def send_email_to_user(user_email, message, subject_retrieved):
-
-    from_email = "esdg9t1@gmail.com"
+    from_email = SENDGRID_FROM_EMAIL
     to_emails = user_email
     subject = subject_retrieved
     plain_text_content = str(message)
     message = Mail(from_email, to_emails, subject, plain_text_content)
     try:
-  
         sg = SendGridAPIClient(SENDGRID_API_KEY)
+        print(SENDGRID_API_KEY)
         response = sg.send(message)
+        print(response.status_code)
         print("Email has been successfully sent")
     except requests.exceptions.HTTPError as e:
         if e.response.status_code == 401:
