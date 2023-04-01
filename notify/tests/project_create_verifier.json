@@ -1,10 +1,10 @@
 {
     "resource_id": "3a99ba93-6494-44fc-a3de-19bc5b9fbf6e",
-    "type": "project.verify",
+    "type": "project.create",
     "data": {
         "id": "3a99ba93-6494-44fc-a3de-19bc5b9fbf6e",
         "name": "100.5MW Wind Power Project in Madhya Pradesh, India",
-        "owner_id": "b06e2940-76c0-41a2-a673-c3f40a8f7c68",
+        "owner_id": "6ec9ee54-64e9-4450-946e-77ab09d081de",
         "description": "desc3",
         "types": ["carbon capture", "local green initiative (small project)"],
         "status": "Pending",
