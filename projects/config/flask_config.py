@@ -1,11 +1,9 @@
 from flask import Flask
-
 from flask_cors import CORS
-from dotenv import load_dotenv
 from os import getenv
 
 app = Flask(__name__)
-load_dotenv()
+
 POSTGRES_USER = getenv('POSTGRES_USER')
 POSTGRES_PASSWORD = getenv('POSTGRES_PASSWORD')
 POSTGRES_HOSTNAME = getenv('POSTGRES_HOSTNAME')
