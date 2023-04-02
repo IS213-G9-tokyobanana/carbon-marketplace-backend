@@ -1,21 +1,20 @@
 from temporalio.client import Client
 
 # Import the workflow
-from temporal.workflow import ProjectPoliceTemporalWorkflow
 from config.config import TEMPORAL_SERVICE_URL
 import time
 
 
-async def main(data):
+async def main(data, workflow, queue):
     # Create client connected to server at the given address
     client = await Client.connect(TEMPORAL_SERVICE_URL)
 
     # Execute a workflow
     workflow_result = await client.execute_workflow(
-        ProjectPoliceTemporalWorkflow.run,
+        workflow,
         data,
-        id=f"rollback-reserved-offset-workflow-{time.time()}",
-        task_queue="my-task-queue",
+        id=f"{workflow}-workflow-{time.time()}",
+        task_queue=queue,
     )
 
     if workflow_result["success"] == True:

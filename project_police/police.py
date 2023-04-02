@@ -32,24 +32,3 @@ def publish_to_notifier(message, channel):
             "resource": message,
         },
     }
-
-
-# Function to send message to Project Microservice
-def send_to_projectms(message):
-    project_id = message["data"]["project_id"]
-    milestone_id = message["data"]["milestone_id"]
-    url = format_url(PROJECT_STATUS_URL, project_id, milestone_id)
-
-    # Send request to Project Microservice
-    try:
-        result = requests.patch(url, data={"status": "rejected"})
-        result.raise_for_status()
-    except requests.exceptions.HTTPError as err:
-        result = {
-            "success": False,
-            "data": {
-                "message": "invocation of service fails: " + url + ". " + str(err),
-                "resource": message,
-            },
-        }
-    return result

@@ -7,7 +7,7 @@ from temporal.activities import (
     get_buyer_id,
     send_to_notifier,
 )
-from temporal.workflow import ProjectPoliceTemporalWorkflow
+from temporal.rollback_workflow import RollbackTemporalWorkflow
 from config.config import TEMPORAL_SERVICE_URL
 
 
@@ -15,11 +15,17 @@ async def main():
     # Create client connected to server at the given address
     client = await Client.connect(TEMPORAL_SERVICE_URL, namespace="default")
 
-    # Run the worker
+    # Create a worker that will poll the given task queue
     worker = Worker(
         client,
-        task_queue="my-task-queue",
-        workflows=[ProjectPoliceTemporalWorkflow],
-        activities=[remove_reserved_offset, get_buyer_id, send_to_notifier],
+        task_queue="rollback-task-queue",
+        workflows=[RollbackTemporalWorkflow],
+        activities=[
+            remove_reserved_offset,
+            get_buyer_id,
+            send_to_notifier,
+        ],
     )
+
+    # Start polling for tasks
     await worker.run()
