@@ -1,0 +1,27 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: projects
+  namespace: staging
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: projects
+  template:
+    metadata:
+      labels:
+        app: projects
+        istio: monitor
+    spec:
+      containers:
+        - image: esdg9t1/projects:latest
+          imagePullPolicy: Always
+          name: projects
+          env:
+            - name: SERVICE
+              value: projects
+          ports:
+            - name: http
+              containerPort: 8080

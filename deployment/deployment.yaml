@@ -1,0 +1,179 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: tokyobanana
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: search-deployment
+  namespace: tokyobanana
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: search
+  template:
+    metadata:
+      labels:
+        app: search
+    spec:
+      containers:
+        - name: search
+          image: esdg9t1/search:latest
+          ports:
+            - containerPort: 80
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: projects-deployment
+  namespace: tokyobanana
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: projects
+  template:
+    metadata:
+      labels:
+        app: projects
+    spec:
+      containers:
+        - name: projects
+          image: esdg9t1/projects:latest
+          ports:
+            - containerPort: 80
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: project-police-deployment
+  namespace: tokyobanana
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: project-police
+  template:
+    metadata:
+      labels:
+        app: project-police
+    spec:
+      containers:
+        - name: project-police
+          image: esdg9t1/project-police:latest
+          ports:
+            - containerPort: 80
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kong
+  namespace: myapp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kong
+  template:
+    metadata:
+      labels:
+        app: kong
+    spec:
+      containers:
+        - name: kong-proxy
+          image: kong:latest
+          env:
+            - name: KONG_DATABASE
+              value: "off"
+            - name: KONG_PROXY_ACCESS_LOG
+              value: "/dev/stdout"
+            - name: KONG_ADMIN_ACCESS_LOG
+              value: "/dev/stdout"
+            - name: KONG_PROXY_ERROR_LOG
+              value: "/dev/stderr"
+            - name: KONG_ADMIN_ERROR_LOG
+              value: "/dev/stderr"
+          ports:
+            - name: proxy
+              containerPort: 8000
+            - name: proxy-ssl
+              containerPort: 8443
+            - name: admin
+              containerPort: 8001
+            - name: admin-ssl
+              containerPort: 8444
+        - name: kong-ingress-controller
+          image: kong/kubernetes-ingress-controller:latest
+          env:
+            - name: KONG_ADMIN_URL
+              value: http://localhost:8001
+          args:
+            - /kong-ingress-controller
+            - --publish-service=myapp/kong-proxy
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kong-proxy
+  namespace: myapp
+spec:
+  selector:
+    app: kong
+  ports:
+    - name: proxy
+      protocol: TCP
+      port: 80
+      targetPort: 8000
+    - name: proxy-ssl
+      protocol: TCP
+      port: 443
+      targetPort: 8443
+  type: LoadBalancer
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: myapp-ingress
+  namespace: myapp
+  annotations:
+    kubernetes.io/ingress.class: kong
+spec:
+  rules:
+    - host: search.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: search-service
+                port:
+                  number: 80
+    - host: projects.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: projects-service
+                port:
+                  number: 80
+    - host: project-police.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: project-police-service
+                port:
+                  number: 80

@@ -35,26 +35,10 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/buy_project-app:latest # tag names MUST be lowercase
 
-      - name: Build and push temporal worker for start payment workflow
+      - name: Build and push temporal worker
         uses: docker/build-push-action@v4
         with:
           context: buy_project
-          file: buy_project/temporal_start_payment.Dockerfile
+          file: buy_project/temporal_worker.Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/buy_project-payment_start-tmplwrkr:latest # tag names MUST be lowercase
-
-      - name: Build and push temporal worker for payment success workflow
-        uses: docker/build-push-action@v4
-        with:
-          context: buy_project
-          file: buy_project/temporal_payment_success.Dockerfile
-          push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/buy_project-payment_failed-tmplwrkr:latest # tag names MUST be lowercase
-
-      - name: Build and push temporal worker for payment failed workflow
-        uses: docker/build-push-action@v4
-        with:
-          context: buy_project
-          file: buy_project/temporal_payment_failed.Dockerfile
-          push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/buy_project-payment_success-tmplwrkr:latest # tag names MUST be lowercase
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/buy_project-tmplwrkr:latest # tag names MUST be lowercase

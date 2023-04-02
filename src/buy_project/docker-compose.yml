@@ -1,0 +1,17 @@
+version: "3.8"
+services:
+  buy_projects:
+    build:
+      context: ./
+      dockerfile: app.Dockerfile
+    container_name: buy_projects
+    restart: always
+    ports:
+      - "5000:5000"
+  temporal_worker:
+    build:
+      context: ./
+      dockerfile: temporal_worker.Dockerfile
+    image: temporal_worker
+    restart: always
+    container_name: temporal_worker
