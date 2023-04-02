@@ -10,15 +10,16 @@ Follow these steps to install and set up this flask template.
 
 1. Ensure docker engine is running
 
-2. Docker compose up
+2. Spin up the container
 
 ```
 docker compose up
 ```
 
 ### Testing
-For windows users, change the `CRLF` to `LF` in the `start.sh` file
+
 1. Check that the Deployed RabbitMQ is up and running
-2. For testing of crontab, uncomment the comments with "Uncomment below for testing" in the `scheduler.py` file 
+2. For testing of crontab, Please change lines 55, 86, 92 accordingly to test each of the different queues.
     2.1. These test lines are there so that a cronjob that does the same thing will start in 1 minute
-3. Refer to Projects MS notion page below for the payload to consume from each queue and the expected result e.g. whether to publish to another queue or delete cron job
+3. On rabbitMQ UI got to under topic_exchange and publish a message to the topic exchange to test each of the queues
+4. On rabbitMQ UI, go to the queue "task_triggered_topic_queue" to see that there are messages queued once the cronjob runs

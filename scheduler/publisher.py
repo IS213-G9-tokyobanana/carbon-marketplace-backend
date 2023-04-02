@@ -1,96 +1,49 @@
 import argparse
 import pika
 import json
-from config import (
-    RMQHOSTNAME,
-    RMQPORT,
-    RMQUSERNAME,
-    RMQPASSWORD,
-    TOPIC_EXCHANGE_NAME,
-    PUBLISHED_TASK_EXECUTE_ROUTING_KEY
+from config.rabbitmq_setup import (
+    RMQHOSTNAME, RMQPORT, RMQUSERNAME, RMQPASSWORD, connection, channel, EXCHANGE_TYPE, PUBLISHED_TASK_EXECUTE_ROUTING_KEY, TOPIC_EXCHANGE_NAME, publish_message
 )
+from classes.enums import TaskType
+from classes.Message import Message
 
-def is_connection_open(connection):
-    try:
-        connection.process_data_events()
-        return True
-    except pika.exceptions.AMQPError as e:
-        print("AMQP Error:", e)
-        print("...creating a new connection.")
-        return False
+def republish_task(message: dict):
+    message_serialised = json.dumps(message)
+    publish_message(
+        connection=connection, channel=channel, hostname=RMQHOSTNAME, port=RMQPORT, username=RMQUSERNAME, password=RMQPASSWORD, exchange_name=TOPIC_EXCHANGE_NAME, exchange_type=EXCHANGE_TYPE, 
+        routing_key=PUBLISHED_TASK_EXECUTE_ROUTING_KEY, 
+        message=message_serialised)
 
-def check_setup(connection, channel, RMQHOSTNAME, RMQPORT):
-    if not is_connection_open(connection):
-        connection = pika.BlockingConnection(
-            pika.ConnectionParameters(
-                host=RMQHOSTNAME,
-                port=RMQPORT,
-                heartbeat=3600,
-                blocked_connection_timeout=3600,
-            )
-        )
-    if channel.is_closed:
-        channel = connection.channel()
-        channel.exchange_declare(
-            exchange=TOPIC_EXCHANGE_NAME, exchange_type="topic", durable=True
-        )
-
-# Function to format message before sending to Notifier / Project Microservice
-def format_message(resource_id, type, milestone_id):
-    new_data = {
-        "project_id": resource_id,
-        "milestone_id": milestone_id
+def publish_task(type: str, project_id=None, milestone_id=None, payment_id=None):
+    resource_id = milestone_id
+    if type == TaskType.PAYMENT_OVERDUE.value:    
+        resource_id = payment_id
+    
+    data = {
+        "project_id": project_id,
+        "milestone_id": milestone_id,
+        "payment_id": payment_id
     }
-    return json.dumps({"resource_id": resource_id, "type": type, "data": new_data})
 
-# Function that republishes tasks that failed
-def publishTask(event, project_id, milestone_id):
-    type = ""
-    if event == "upcoming":
-        type = "upcoming"
-    elif event == "overdue":
-        type = "penalise"
-    else:
-        type = "rollback"
-    
-    payload = format_message(project_id, type, milestone_id)
-    connection = pika.BlockingConnection(
-    pika.ConnectionParameters(
-        host=RMQHOSTNAME, port=RMQPORT,
-        heartbeat=3600, blocked_connection_timeout=3600,
-        credentials=pika.PlainCredentials(RMQUSERNAME, RMQPASSWORD)
-    ))
-    channel = connection.channel()
-    check_setup(connection, channel, RMQHOSTNAME, RMQPORT)
-    channel.basic_publish(exchange=TOPIC_EXCHANGE_NAME, routing_key=PUBLISHED_TASK_EXECUTE_ROUTING_KEY, body=payload, properties=pika.BasicProperties(delivery_mode=2))
-    
-def republishTask(msg):
-    connection = pika.BlockingConnection(
-    pika.ConnectionParameters(
-        host=RMQHOSTNAME, port=RMQPORT,
-        heartbeat=3600, blocked_connection_timeout=3600,
-        credentials=pika.PlainCredentials(RMQUSERNAME, RMQPASSWORD)
-    ))
-    channel = connection.channel()
-    check_setup(connection, channel, RMQHOSTNAME, RMQPORT)
-    channel.basic_publish(exchange=TOPIC_EXCHANGE_NAME, routing_key=PUBLISHED_TASK_EXECUTE_ROUTING_KEY, body=msg, properties=pika.BasicProperties(delivery_mode=2))
+    message = Message(resource_id=resource_id, type=type, data=data).json()
+    message_serialised = json.dumps(message)
+    publish_message(
+        connection=connection, channel=channel, hostname=RMQHOSTNAME, port=RMQPORT, username=RMQUSERNAME, password=RMQPASSWORD, exchange_name=TOPIC_EXCHANGE_NAME, exchange_type=EXCHANGE_TYPE, 
+        routing_key=PUBLISHED_TASK_EXECUTE_ROUTING_KEY, 
+        message=message_serialised)
 
 
 if __name__ == "__main__":
-    # Need to have 3 options that can be passed in
-    # 1. Upcoming Milestone
-    # 2. Overdue Milestone
-    # 3. Reserve Offset
     parser = argparse.ArgumentParser(prog='publisher.py', description='Publishes tasks to the exchange')
     parser.add_argument('--type', type=str, help='Type of task to be published')
-    parser.add_argument('--proj', type=str, help='Project ID of task to be published')
-    parser.add_argument('--mile', type=str, help='Milestone ID of task to be published')
+    parser.add_argument('--project', type=str, help='Project ID of task to be published')
+    parser.add_argument('--milestone', type=str, help='Milestone ID of task to be published')
+    parser.add_argument('--payment', type=str, help='Payment Intent ID of task to be published', required=False)
     args = parser.parse_args()
-    event = ""
-    if args.type == 'upcoming':
-        event = "upcoming"
-    elif args.type == 'overdue':
-        event = "overdue"
-    else:
-        event = "offset"
-    publishTask(event, args.proj, args.mile)
+    
+    type = args.type
+    milestone_id = args.milestone
+    project_id = args.project
+    payment_id = args.payment
+    
+    publish_task(type=type, project_id=project_id, milestone_id=milestone_id, payment_id=payment_id)
