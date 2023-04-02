@@ -5,6 +5,7 @@ from sqlalchemy.orm import relationship
 import uuid
 from datetime import datetime
 from sqlalchemy.dialects.postgresql import ARRAY, VARCHAR, TEXT, TIMESTAMP, FLOAT, UUID
+from classes.enums import ProjectStatus, MilestoneStatus
 
 db = SQLAlchemy(app)
 
@@ -17,7 +18,7 @@ class Project(db.Model):
     owner_id = Column(TEXT, nullable=False)
     description = Column(TEXT, nullable=False)
     types = Column(ARRAY(TEXT))
-    status = Column(VARCHAR(20), nullable=False, default="pending")
+    status = Column(VARCHAR(20), nullable=False, default=ProjectStatus.PENDING)
     created_at = Column(TIMESTAMP, nullable=False, default=datetime.utcnow)
     updated_at = Column(TIMESTAMP, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
     rating = Column(FLOAT, nullable=False, default=100.00)
@@ -50,7 +51,7 @@ class Milestone(db.Model):
     type = Column(VARCHAR(20), nullable=False) # -- 'Temporal' | 'Qualitative' | 'Quantitative'
     offsets_available = Column(FLOAT, nullable=False)
     offsets_total = Column(FLOAT, nullable=False)
-    status = Column(VARCHAR(20), nullable=False, default="pending") # -- "pending" | "verified" | "met" | "rejected"
+    status = Column(VARCHAR(20), nullable=False, default=MilestoneStatus.PENDING) # -- "pending" | "met" | "rejected"
     created_at = Column(TIMESTAMP, nullable=False, default=datetime.utcnow) 
     updated_at = Column(TIMESTAMP, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
     due_date = Column(TIMESTAMP, nullable=False)
