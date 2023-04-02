@@ -51,14 +51,29 @@ app.listen(port, () => {
 
 // route to get Payment Intent saved in MongoDB
 app.get("/payments", async (req, res) => {
-	const input: string = req.query.paymentid
+	let input
+
+	if (req.query.payment_id) {
+		input = req.query.payment_id
+	} else {
+		input = req.query.milestone_id
+	}
 
 	try {
-		const result = await collections.paymentintents.findOne({
-			$or: [{ payment_id: input }],
-		})
+		let result
+
+		if (req.query.payment_id) {
+			result = await collections.paymentintents.findOne({
+				$or: [{ payment_id: input }],
+			})
+		} else {
+			result = await collections.paymentintents.findOne({
+				$or: [{ milestone_id: input }],
+			})
+		}
+
 		if (result) {
-			res.send({ success: true, data: { paymentIntent: result } })
+			res.send({ success: true, data: { payment_data: result } })
 		} else {
 			res.send({
 				success: false,
