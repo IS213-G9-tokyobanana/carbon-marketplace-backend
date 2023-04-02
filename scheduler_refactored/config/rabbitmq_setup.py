@@ -1,6 +1,8 @@
 import pika
 import os
+from dotenv import load_dotenv
 
+load_dotenv()
 RMQHOSTNAME = os.getenv('rmqhostname')
 RMQUSERNAME = os.getenv('rmqusername')
 RMQPASSWORD = os.getenv('rmqpassword')
