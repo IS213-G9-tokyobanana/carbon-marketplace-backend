@@ -5,7 +5,7 @@ volumes:
 
 services:
   users-db:
-    image: postgres:latest
+    image: postgres:13.3
     container_name: users-db
     restart: always
     environment:

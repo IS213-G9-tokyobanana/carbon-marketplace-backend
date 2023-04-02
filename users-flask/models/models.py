@@ -5,7 +5,7 @@ from sqlalchemy.orm import relationship
 import uuid
 from datetime import datetime
 from sqlalchemy.dialects.postgresql import VARCHAR, TEXT, TIMESTAMP, FLOAT, UUID, BOOLEAN
-from classes.enums import OffsetStatus
+from classes.enums import OffsetStatus, UserRole
 
 db = SQLAlchemy(app)
 
@@ -17,7 +17,7 @@ class User(db.Model):
     id = Column(UUID(as_uuid=True), primary_key=True, nullable=False, default=uuid.uuid4)
     name = Column(TEXT, nullable=False)
     email = Column(TEXT, nullable=False)
-    is_verifier = Column(BOOLEAN, nullable=False, default=False)
+    role = Column(VARCHAR(20), nullable=False, default=UserRole.BUYER.value)
     footprint_in_tCO2e = Column(FLOAT, nullable=False, default=0.00)
     created_at = Column(TIMESTAMP, nullable=False, default=datetime.utcnow)
     updated_at = Column(TIMESTAMP, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -29,7 +29,7 @@ class User(db.Model):
             "id": str(self.id), 
             "name": self.name,
             "email": self.email,
-            "is_verifier": self.is_verifier,
+            "role": self.role,
             "footprint_in_tCO2e": self.footprint_in_tCO2e,
             "created_at": self.created_at.strftime(time_format),
             "updated_at": self.updated_at.strftime(time_format),
@@ -45,7 +45,7 @@ class Offset(db.Model):
     payment_id = Column(TEXT, primary_key=True)
     milestone_id = Column(TEXT, nullable=False)
     amount = Column(FLOAT, nullable=False)
-    status = Column(VARCHAR(20), nullable=False, default=OffsetStatus.PENDING) # "pending" | "confirmed"
+    status = Column(VARCHAR(20), nullable=False, default=OffsetStatus.PENDING.value) # "pending" | "confirmed"
     created_at = Column(TIMESTAMP, nullable=False, default=datetime.utcnow)
     updated_at = Column(TIMESTAMP, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
     buyer_id = Column(UUID(as_uuid=True), ForeignKey('user.id'))

@@ -1,4 +1,4 @@
-from classes.enums import OffsetStatus
+from classes.enums import OffsetStatus, UserRole
 from config.flask_config import app
 from models.models import User, Offset, db
 from flask import abort, request, jsonify
@@ -58,6 +58,12 @@ def find_all_users():
         res =  ResponseBodyJSON(True, data).json()
         return jsonify(res), 200
 
+    elif args.get('role') == UserRole.VERIFIER.value:
+        users = db.session.execute(db.select(User).where(User.role == UserRole.VERIFIER.value)).scalars().all()
+        data = [user.json() for user in users]
+        res =  ResponseBodyJSON(True, data).json()
+        return jsonify(res), 200
+
     else:
         users = db.session.execute(db.select(User)).scalars().all()
         data = [user.json() for user in users]
@@ -86,14 +92,6 @@ def create_user():
     data = user.json()
     res = ResponseBodyJSON(True, data).json()
     return jsonify(res), 201
-    
-
-@app.route("/users/verifiers")
-def find_verifiers():
-    verifiers = db.session.execute(db.select(User).where(User.is_verifier)).scalars().all()
-    data = [v.json() for v in verifiers]
-    res = ResponseBodyJSON(True, data).json()
-    return jsonify(res), 200
 
 
 @app.route("/users/<uuid:id>/offset", methods=['POST'])
