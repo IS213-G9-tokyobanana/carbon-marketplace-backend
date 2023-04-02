@@ -107,7 +107,7 @@ To get a local copy of all the microservices up and running follow these steps.
    make init
    ```
 
-   <u>OR</u>
+   <ins><em>OR</em></ins>
 
    ```bash
    cp ./deployment/.docker/.env.example .env
@@ -120,7 +120,7 @@ To get a local copy of all the microservices up and running follow these steps.
    make dev
    ```
 
-   <u>OR</u>
+   <ins><em>OR</em></ins>
 
    ```bash
    docker-compose -f ./deployment/.docker/docker-compose.yaml up --build --remove-orphans --force-recreate -d
@@ -133,7 +133,7 @@ To get a local copy of all the microservices up and running follow these steps.
    make stop
    ```
 
-   <u>OR</u>
+   <ins><em>OR</em></ins>
 
    ```bash
    docker-compose -f ./deployment/.docker/docker-compose.yaml --env-file .env down
@@ -146,7 +146,7 @@ To get a local copy of all the microservices up and running follow these steps.
    make prune-all
    ```
 
-   <u>OR</u>
+   <ins><em>OR</em></ins>
 
    ```bash
    docker system prune -a --volumes
