@@ -16,6 +16,12 @@ To create a new PaymentIntent in Stripe, submit a POST request to localhost:3000
 
 The PaymentIntent object from Stripe will be saved in MongoDB with the PaymentIntent_Id as the identifier, and other necessary fields.
 
+To retrieve previously created and saved Payment Intents, submit a GET request to localhost:3000/payments with a paymentid query. You will receive one saved transaction with the same payment_id.
+
+To test webhooks (temporary while pending deployment):
+You need my Stripe account and the CLI but the link with instructions is here: 
+https://dashboard.stripe.com/test/webhooks/create?endpoint_location=local
+
 # To run the container
 1. Load the .env file in the payments folder.
 2. Simply docker-compose up.

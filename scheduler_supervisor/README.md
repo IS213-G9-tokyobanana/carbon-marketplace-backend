@@ -1,11 +1,11 @@
 # Project Polica complex microservice
 
-This is the Project Police complex microservice. It is a Flask microservice that uses RabbitMQ as the message broker.
+This is the Schedular Supervisor complex microservice. It is a Flask microservice that uses RabbitMQ as the message broker.
 
 ### Built With
 
-- Python
-- Poetry
+- Python 3.11.x
+- Poetry 1.4.0
 
 ### Prerequisites
 
@@ -39,13 +39,13 @@ Follow these steps to set up this complex microservice.
 2. Build the docker container image
 
 ```
-docker build -t projectpolice .
+docker build -t supervisor .
 ```
 
 3. Run the docker container
 
 ```
-docker run -d -p 5000:5000 projectpolice
+docker run -d supervisor
 ```
 
 ### Local Development
@@ -67,5 +67,5 @@ poetry install
 3. Run the app
 
 ```
-python3 checkAmqp.py
+python3 supervisor.py
 ```
