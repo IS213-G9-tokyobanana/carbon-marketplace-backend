@@ -26,7 +26,6 @@ from sendgrid.helpers.mail import Mail
 def callback(channel, method, properties, body):
     try:
         data = json.loads(body)
-        print("this is method routing key", method.routing_key)
         queue_name = "_".join(method.routing_key.split(".")[-2:])
         queue_name = "notify_" + queue_name
 
@@ -72,8 +71,9 @@ def get_all_verifiers():
     response = requests.get(VERIFIERS_EMAILS)
     data_object = response.json()
     verifiers_emails = []
-    for item in data_object:
-        verifiers_emails.append(item.get("email"))
+    payload = data_object.get("data", {})
+    for item in payload:
+        verifiers_emails.append(item["email"])
     return verifiers_emails
 
 # communicate with the user microservice to retrieve users information
