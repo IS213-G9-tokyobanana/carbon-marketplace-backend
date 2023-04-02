@@ -1,11 +1,11 @@
-name: Build and Publish Scheduler Supervisor Service Docker Image
+name: Build and Publish Projects Service Docker Image
 
 on:
   push:
     branches:
       - main
     paths:
-      - "projects/**"
+      - "src/projects/**"
 
 jobs:
   docker:
@@ -30,6 +30,6 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v4
         with:
-          context: projects
+          context: src/projects
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/projects:latest # tag names MUST be lowercase

@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - "project_police/**"
+      - "src/project_police/**"
 
 jobs:
   docker:
@@ -30,15 +30,15 @@ jobs:
       - name: Build and push project police app
         uses: docker/build-push-action@v4
         with:
-          context: project_police
-          file: project_police/app.Dockerfile
+          context: src/project_police
+          file: src/project_police/app.Dockerfile
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/project_police-app:latest # tag names MUST be lowercase
 
       - name: Build and push project police temporal worker
         uses: docker/build-push-action@v4
         with:
-          context: project_police
-          file: project_police/temporal_worker.Dockerfile
+          context: src/project_police
+          file: src/project_police/temporal_worker.Dockerfile
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/project_police-tmplwrkr:latest # tag names MUST be lowercase

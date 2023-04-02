@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - "users/**"
+      - "src/users/**"
 
 jobs:
   docker:
@@ -30,6 +30,6 @@ jobs:
       - name: Build and push project police amqp app
         uses: docker/build-push-action@v4
         with:
-          context: users
+          context: src/users
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/users:latest # tag names MUST be lowercase

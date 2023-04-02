@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - "scheduler_supervisor/**"
+      - "src/scheduler_supervisor/**"
 
 jobs:
   docker:
@@ -30,6 +30,6 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v4
         with:
-          context: scheduler_supervisor
+          context: src/scheduler_supervisor
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/scheduler_supervisor:latest # tag names MUST be lowercase
