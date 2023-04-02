@@ -1,0 +1,17 @@
+#!/bin/bash
+
+SCRIPT_DIR=$(dirname $0)
+PROJECT_ROOT=$(dirname $SCRIPT_DIR)
+
+function post_init() {
+    mkdir -p $PROJECT_ROOT/.project_cache/
+    touch $PROJECT_ROOT/.project_cache/init_complete
+}
+
+trap post_init EXIT
+
+echo "Copying env files..."
+
+cp $PROJECT_ROOT/deployment/.docker/.env.example "$PROJECT_ROOT/.env"
+
+echo "env files copied."
