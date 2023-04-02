@@ -1,11 +1,11 @@
-name: Build and Publish Scheduler Supervisor Service Docker Image
+name: Build and Publish Notify Service Docker Image
 
 on:
   push:
     branches:
       - main
     paths:
-      - "notify/**"
+      - "src/notify/**"
 
 jobs:
   docker:
@@ -30,6 +30,6 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v4
         with:
-          context: notify
+          context: src/notify
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/notify:latest # tag names MUST be lowercase

@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - "buy_project/**"
+      - "src/buy_project/**"
 
 jobs:
   docker:
@@ -30,15 +30,15 @@ jobs:
       - name: Build and push buy project app
         uses: docker/build-push-action@v4
         with:
-          context: buy_project
-          file: buy_project/app.Dockerfile
+          context: src/buy_project
+          file: src/buy_project/app.Dockerfile
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/buy_project-app:latest # tag names MUST be lowercase
 
       - name: Build and push temporal worker
         uses: docker/build-push-action@v4
         with:
-          context: buy_project
-          file: buy_project/temporal_worker.Dockerfile
+          context: src/buy_project
+          file: src/buy_project/temporal_worker.Dockerfile
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/buy_project-tmplwrkr:latest # tag names MUST be lowercase
