@@ -80,46 +80,6 @@ print("Send notify service the message on milestone upcoming queue")
 
 channel.basic_publish(
     exchange="topic_exchange",
-    routing_key="events.projects.public.ratings.penalise",
-    body=json.dumps(milestone_penalise_data)
-)
-print(" Sent notify service the message on penalise queue")
-
-channel.basic_publish(
-    exchange="topic_exchange",
-    routing_key="events.projects.public.project.verify",
-    body=json.dumps(project_verify_data)
-)
-
-print(" Sent notify service the message on project verify queue")
-
-channel.basic_publish(
-    exchange="topic_exchange",
-    routing_key="events.projects.public.milestone.add",
-    body=json.dumps(milestone_add_data),
-)
-
-print(" Sent notify service the message on milestone add queue")
-
-channel.basic_publish(
-    exchange="topic_exchange",
-    routing_key="events.projects.public.project.create",
-    body=json.dumps(project_create_data),
-)
-
-print(" Sent notify service the message on project create queue")
-
-channel.basic_publish(
-    exchange="topic_exchange",
-    routing_key="events.police.notify.milestone.upcoming",
-    body=json.dumps(milestone_upcoming_data),
-)
-
-print("Send notify service the message on milestone upcoming queue")
-
-
-channel.basic_publish(
-    exchange="topic_exchange",
     routing_key="events.buyprojects.notify.payment.success",
     body=json.dumps(payment_success_data),
 )
