@@ -11,7 +11,6 @@ QUEUE_PROJECT_VERIFY = "notify_project_verify"
 QUEUE_PROJECT_MILESTONES_ADD = "notify_milestone_add"
 QUEUE_BUYPROJECTS_PAYMENT_SUCCESS = "notify_payment_success"
 QUEUE_BUYPROJECTS_PAYMENT_FAILED = "notify_payment_failed"
-QUEUE_BUYPROJECTS_ROLLBACK_PAYMENT_FAILED = "notify_payment_failed"
 QUEUE_PROJECTPOLICE_MILESTONE_UPCOMING = "notify_milestone_upcoming"
 
 
@@ -74,7 +73,7 @@ QUEUES = {
     
     QUEUE_BUYPROJECTS_PAYMENT_SUCCESS:  
     {
-        BINDING_KEY: "events.buyprojects.notify.payment.success" ,
+        BINDING_KEY: "events.buyprojects.*.payment.success" ,
         SUBJECT: "Payment has been successful",
         message_buyer: "Hi Buyer {buyer_id} has successfully paid for the project",
         message_seller: "Hi Seller {seller_id} has successfully received payment for the project"
@@ -82,17 +81,11 @@ QUEUES = {
     
     QUEUE_BUYPROJECTS_PAYMENT_FAILED: 
     {   
-        BINDING_KEY:"events.buyprojects.notify.payment.failed" ,
+        BINDING_KEY:"events.buyprojects.*.payment.failed" ,
         SUBJECT: "Payment made failed",
         message_buyer: "Hi Buyer {buyer_id} payment has failed for the project"
     },
-
-    QUEUE_BUYPROJECTS_ROLLBACK_PAYMENT_FAILED:  
-    {   
-        BINDING_KEY: "events.buyprojects.public.payment.failed" ,
-        SUBJECT: "Payment made failed",
-        message_buyer: "Hi Buyer {buyer_id} payment has failed for the project",
-    },
+    
     QUEUE_PROJECTPOLICE_MILESTONE_UPCOMING: 
     {
         BINDING_KEY: "events.police.notify.milestone.upcoming" ,
