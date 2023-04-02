@@ -27,13 +27,13 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push project police amqp app
+      - name: Build and push project police app
         uses: docker/build-push-action@v4
         with:
           context: project_police
-          file: project_police/amqp.Dockerfile
+          file: project_police/app.Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/project_police-amqp:latest # tag names MUST be lowercase
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/project_police-app:latest # tag names MUST be lowercase
 
       - name: Build and push project police temporal worker
         uses: docker/build-push-action@v4

@@ -1,0 +1,27 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: search
+  namespace: staging
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: search
+  template:
+    metadata:
+      labels:
+        app: search
+        istio: monitor
+    spec:
+      containers:
+        - image: esdg9t1/search:latest
+          imagePullPolicy: Always
+          name: search
+          env:
+            - name: SERVICE
+              value: search
+          ports:
+            - name: http
+              containerPort: 8080

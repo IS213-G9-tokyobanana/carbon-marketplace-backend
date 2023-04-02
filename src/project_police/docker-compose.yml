@@ -1,0 +1,16 @@
+version: "3.8"
+services:
+  project_police:
+    build:
+      dockerfile: ./app.Dockerfile
+    image: app
+    restart: always
+    container_name: project_police
+
+  temporal_worker:
+    build:
+      context: ./
+      dockerfile: temporal_worker.Dockerfile
+    image: temporal_worker
+    restart: always
+    container_name: temporal_worker
