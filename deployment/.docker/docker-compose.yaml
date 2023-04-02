@@ -1,0 +1,271 @@
+version: "3"
+
+networks:
+  backend-bridged-network:
+    driver: bridge
+
+services:
+  buy_project_app:
+    container_name: buy_project_app
+    image: esdg9t1/buy_project-app:latest
+    ports:
+      - 15000:${APP_PORT}
+    volumes:
+      - buy_project_app:/app
+    networks:
+      - backend-bridged-network
+    depends_on:
+      - buy_project_tmplwrkr
+    environment:
+      rmqhostname: ${RABBITMQ_HOSTNAME}
+      rmqusername: ${RABBITMQ_USERNAME}
+      rmqpassword: ${RABBITMQ_PASSWORD}
+      rmqport: ${RABBITMQ_PORT}
+      projectms: ${PROJECTS_BASE_URL}
+      paymentms: ${PAYMENTS_BASE_URL}
+      userms: ${USERS_BASE_URL}
+      temporalservice: ${TEMPORAL_SERVER_BASE_URL}
+
+  buy_project_tmplwrkr:
+    container_name: buy_project_tmplwrkr
+    image: esdg9t1/buy_project-tmplwrkr:latest
+    volumes:
+      - buy_project_tmplwrkr:/app
+    networks:
+      - backend-bridged-network
+    depends_on:
+      - rabbitmq
+      - users
+      - projects
+      - payments
+    environment:
+      rmqhostname: ${RABBITMQ_HOSTNAME}
+      rmqport: ${RABBITMQ_PORT}
+      rmqusername: ${RABBITMQ_USERNAME}
+      rmqpassword: ${RABBITMQ_PASSWORD}
+      projectms: ${PROJECTS_BASE_URL}
+      paymentms: ${PAYMENTS_BASE_URL}
+      userms: ${USERS_BASE_URL}
+      temporalservice: ${TEMPORAL_SERVER_BASE_URL}
+
+  notify:
+    container_name: notify
+    image: esdg9t1/notify:latest
+    ports:
+      - 15001:${APP_PORT}
+    volumes:
+      - notify:/app
+    networks:
+      - backend-bridged-network
+    depends_on:
+      - rabbitmq
+      - users
+    environment:
+      RABBITMQ_HOSTNAME: ${RABBITMQ_HOSTNAME}
+      RABBITMQ_PORT: ${RABBITMQ_PORT}
+      RABBITMQ_USERNAME: ${RABBITMQ_USERNAME}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
+      EXCHANGE: topic_exchange
+      EXCHANGE_TYPE: topic
+      MS_BASE_URL: ${USERS_BASE_URL}/users
+      VERIFIERS_EMAILS: ${USERS_BASE_URL}/users?role=verifier
+      SENDGRID_API_KEY: ${SENDGRID_API_KEY}
+
+  payments:
+    container_name: payments
+    image: esdg9t1/payments:latest
+    ports:
+      - 15002:${APP_PORT}
+    volumes:
+      - payments:/app
+    networks:
+      - backend-bridged-network
+    depends_on:
+      - mongodb
+    environment:
+      # DB CONFIG (MONGO)
+      MONGO_ROOT_USER: ${MONGO_ROOT_USER}
+      MONGO_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
+      DB_CONN_STRING: "mongodb://${MONGO_ROOT_USER}:${MONGO_ROOT_PASSWORD}@mongodb:27017"
+      DB_NAME: payment
+      COLLECTION_NAME: payment_intents
+      # STRIPE CONFIG
+      STRIPE_PUBLISHABLE_KEY: ${STRIPE_PUBLISHABLE_KEY}
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY}
+
+  project_police_app:
+    container_name: project_police_app
+    image: esdg9t1/project_police-app:latest
+    volumes:
+      - project_police_app:/app
+    networks:
+      - backend-bridged-network
+    depends_on:
+      - project_police_tmplwrkr
+    environment:
+      rmqhostname: ${RABBITMQ_HOSTNAME}
+      rmqport: ${RABBITMQ_PORT}
+      rmqusername: ${RABBITMQ_USERNAME}
+      rmqpassword: ${RABBITMQ_PASSWORD}
+      projectms: ${PROJECTS_BASE_URL}
+      userms: ${USERS_BASE_URL}
+      temporalservice: ${TEMPORAL_SERVER_BASE_URL}
+
+  project_police_tmplwrkr:
+    container_name: project_police_tmplwrkr
+    image: esdg9t1/project_police-tmplwrkr:latest
+    volumes:
+      - project_police_tmplwrkr:/app
+    networks:
+      - backend-bridged-network
+    depends_on:
+      - rabbitmq
+      - users
+      - projects
+    environment:
+      rmqhostname: ${RABBITMQ_HOSTNAME}
+      rmqport: ${RABBITMQ_PORT}
+      rmqusername: ${RABBITMQ_USERNAME}
+      rmqpassword: ${RABBITMQ_PASSWORD}
+      projectms: ${PROJECTS_BASE_URL}
+      userms: ${USERS_BASE_URL}
+      temporalservice: ${TEMPORAL_SERVER_BASE_URL}
+
+  projects:
+    container_name: projects
+    image: esdg9t1/projects:latest
+    ports:
+      - 15003:${APP_PORT}
+    volumes:
+      - projects:/app
+    networks:
+      - backend-bridged-network
+    depends_on:
+      - postgres
+      - rabbitmq
+    environment:
+      POSTGRES_HOSTNAME: postgres # this should be the container name of the db service
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: projects
+
+      RABBITMQ_HOSTNAME: ${RABBITMQ_HOSTNAME}
+      RABBITMQ_PORT: ${RABBITMQ_PORT}
+      RABBITMQ_USERNAME: ${RABBITMQ_USERNAME}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
+
+  scheduler:
+    container_name: scheduler
+    image: esdg9t1/scheduler:latest
+    volumes:
+      - scheduler:/app
+    networks:
+      - backend-bridged-network
+    depends_on:
+      - rabbitmq
+    environment:
+      rmqhostname: ${RABBITMQ_HOSTNAME}
+      rmqport: ${RABBITMQ_PORT}
+      rmqusername: ${RABBITMQ_USERNAME}
+      rmqpassword: ${RABBITMQ_PASSWORD}
+
+  scheduler_supervisor:
+    container_name: scheduler_supervisor
+    image: esdg9t1/scheduler_supervisor:latest
+    volumes:
+      - scheduler_supervisor:/app
+    networks:
+      - backend-bridged-network
+    depends_on:
+      - rabbitmq
+    environment:
+      rmqhostname: ${RABBITMQ_HOSTNAME}
+      rmqport: ${RABBITMQ_PORT}
+      rmqusername: ${RABBITMQ_USERNAME}
+      rmqpassword: ${RABBITMQ_PASSWORD}
+
+  search:
+    container_name: search
+    image: esdg9t1/search:latest
+    volumes:
+      - search:/app
+    networks:
+      - backend-bridged-network
+    depends_on:
+      - postgres
+      - meili
+      - rabbitmq
+    environment:
+      rmqhostname: ${RABBITMQ_HOSTNAME}
+      rmqport: ${RABBITMQ_PORT}
+      rmqusername: ${RABBITMQ_USERNAME}
+      rmqpassword: ${RABBITMQ_PASSWORD}
+
+  users:
+    container_name: users
+    image: esdg9t1/users:latest
+    ports:
+      - 15004:${APP_PORT}
+    volumes:
+      - users:/app
+    networks:
+      - backend-bridged-network
+    depends_on:
+      - postgres
+    environment:
+      POSTGRES_HOSTNAME: postgres # this should be the container name of the db service
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: users
+
+  rabbitmq:
+    container_name: rabbitmq
+    image: rabbitmq:3-management
+    ports:
+      - ${RABBITMQ_PORT}:5672
+      - 15672:15672
+    networks:
+      - backend-bridged-network
+
+  postgres:
+    container_name: postgres
+    image: postgres:13.3
+    ports:
+      - 15432:5432
+    volumes:
+      - ./.docker/create_multiple_db.sh:/docker-entrypoint-initdb.d
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - backend-bridged-network
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_PORT: 5432
+      POSTGRES_MULTIPLE_DATABASES: users,projects
+
+  mongodb:
+    container_name: mongodb
+    image: mongo
+    networks:
+      - backend-bridged-network
+    volumes:
+      - mongo_data:/data/db
+    ports:
+      - 127017:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: payment
+
+  meili:
+    image: getmeili/meilisearch
+    container_name: meili_search
+    restart: always
+    ports:
+      - 17700:7700
+    volumes:
+      - search_data:/data.ms
+    networks:
+      - backend-bridged-network

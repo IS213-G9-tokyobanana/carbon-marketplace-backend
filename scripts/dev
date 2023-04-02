@@ -1,0 +1,20 @@
+#!/bin/bash
+
+set -e
+
+SCRIPT_DIR=$(dirname $0)
+PROJECT_ROOT=$(dirname $SCRIPT_DIR)
+
+if [ ! -f $PROJECT_ROOT/.project_cache/init_complete ]; then
+    echo "Have you ran $(make init) yet?"
+    exit 1
+fi
+
+if [ -f $PROJECT_ROOT/.env ]; then
+    # export $(cat $PROJECT_ROOT/.env | sed 's/#.*//g' | xargs)
+    set -o allexport
+    source $PROJECT_ROOT/.env
+    set +o allexport
+fi
+
+docker-compose -f $PROJECT_ROOT/deployment/.docker/docker-compose.yaml up --build --remove-orphans --force-recreate
