@@ -4,10 +4,28 @@ networks:
   backend-bridged-network:
     driver: bridge
 
+volumes:
+  buy_project_app:
+  buy_project_tmplwrkr:
+  notify:
+  payments:
+  project_police_app:
+  project_police_tmplwrkr:
+  projects:
+  scheduler:
+  scheduler_supervisor:
+  search:
+  users:
+  rabbitmq_data:
+  mongo_data:
+  postgres_data:
+  search_data:
+
 services:
   buy_project_app:
     container_name: buy_project_app
     image: esdg9t1/buy_project-app:latest
+    restart: unless-stopped
     ports:
       - 15000:${APP_PORT}
     volumes:
@@ -29,6 +47,7 @@ services:
   buy_project_tmplwrkr:
     container_name: buy_project_tmplwrkr
     image: esdg9t1/buy_project-tmplwrkr:latest
+    restart: unless-stopped
     volumes:
       - buy_project_tmplwrkr:/app
     networks:
@@ -51,6 +70,7 @@ services:
   notify:
     container_name: notify
     image: esdg9t1/notify:latest
+    restart: unless-stopped
     ports:
       - 15001:${APP_PORT}
     volumes:
@@ -74,6 +94,7 @@ services:
   payments:
     container_name: payments
     image: esdg9t1/payments:latest
+    restart: unless-stopped
     ports:
       - 15002:${APP_PORT}
     volumes:
@@ -96,6 +117,7 @@ services:
   project_police_app:
     container_name: project_police_app
     image: esdg9t1/project_police-app:latest
+    restart: unless-stopped
     volumes:
       - project_police_app:/app
     networks:
@@ -114,6 +136,7 @@ services:
   project_police_tmplwrkr:
     container_name: project_police_tmplwrkr
     image: esdg9t1/project_police-tmplwrkr:latest
+    restart: unless-stopped
     volumes:
       - project_police_tmplwrkr:/app
     networks:
@@ -134,6 +157,7 @@ services:
   projects:
     container_name: projects
     image: esdg9t1/projects:latest
+    restart: unless-stopped
     ports:
       - 15003:${APP_PORT}
     volumes:
@@ -158,6 +182,7 @@ services:
   scheduler:
     container_name: scheduler
     image: esdg9t1/scheduler:latest
+    restart: unless-stopped
     volumes:
       - scheduler:/app
     networks:
@@ -173,6 +198,7 @@ services:
   scheduler_supervisor:
     container_name: scheduler_supervisor
     image: esdg9t1/scheduler_supervisor:latest
+    restart: unless-stopped
     volumes:
       - scheduler_supervisor:/app
     networks:
@@ -188,6 +214,7 @@ services:
   search:
     container_name: search
     image: esdg9t1/search:latest
+    restart: unless-stopped
     volumes:
       - search:/app
     networks:
@@ -205,6 +232,7 @@ services:
   users:
     container_name: users
     image: esdg9t1/users:latest
+    restart: unless-stopped
     ports:
       - 15004:${APP_PORT}
     volumes:
@@ -223,19 +251,21 @@ services:
   rabbitmq:
     container_name: rabbitmq
     image: rabbitmq:3-management
+    restart: unless-stopped
     ports:
       - ${RABBITMQ_PORT}:5672
       - 15672:15672
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
     networks:
       - backend-bridged-network
 
   postgres:
     container_name: postgres
     image: postgres:13.3
-    ports:
-      - 15432:5432
+    restart: unless-stopped
     volumes:
-      - ./.docker/create_multiple_db.sh:/docker-entrypoint-initdb.d
+      - ./create_multiple_db.sh:/docker-entrypoint-initdb.d/create_multiple_db.sh:ro
       - postgres_data:/var/lib/postgresql/data
     networks:
       - backend-bridged-network
@@ -248,12 +278,13 @@ services:
   mongodb:
     container_name: mongodb
     image: mongo
+    restart: unless-stopped
     networks:
       - backend-bridged-network
     volumes:
       - mongo_data:/data/db
     ports:
-      - 127017:27017
+      - 37017:27017
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
@@ -262,7 +293,7 @@ services:
   meili:
     image: getmeili/meilisearch
     container_name: meili_search
-    restart: always
+    restart: unless-stopped
     ports:
       - 17700:7700
     volumes:
