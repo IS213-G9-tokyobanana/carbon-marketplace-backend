@@ -1,4 +1,4 @@
-This MS listens on project.verify, milestone.add, offsets.rollback and offsets.reserve queue. When a message comes in to this queue, the search will be updated accordingly.
+This MS listens on `project.verify`, `milestone.add`, `offsets.rollback` and `offsets.reserve` queue. When a message comes in to this queue, the search will be updated accordingly.
 
 ## Deployment
 Run the following command to deploy the search microservice:
