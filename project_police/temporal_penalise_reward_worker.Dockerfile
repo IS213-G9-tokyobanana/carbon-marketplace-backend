@@ -15,4 +15,4 @@ COPY . ./
 RUN poetry config virtualenvs.create false \
   && poetry install --no-interaction --no-ansi
 
-CMD ["python", "./run_worker.py"]
+CMD ["python", "./run_penalise_reward_worker.py"]
