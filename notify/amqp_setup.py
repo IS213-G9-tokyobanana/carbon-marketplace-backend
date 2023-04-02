@@ -4,21 +4,21 @@ from os import getenv
 from config import RABBITMQ_HOSTNAME, RABBITMQ_PORT, RABBITMQ_USERNAME, RABBITMQ_PASSWORD, EXCHANGE, EXCHANGE_TYPE
 
 
-QUEUE_PROJECT_CREATE = "project_create"
-QUEUE_PROJECT_RATINGS_REWARD = "ratings_reward"
-QUEUE_PROJECT_RATINGS_PENALISE = "ratings_penalise"
-QUEUE_PROJECT_VERIFY = "project_verify"
-QUEUE_PROJECT_MILESTONES_ADD = "milestone_add"
-QUEUE_BUYPROJECTS_PAYMENT_SUCCESS = "payment_success"
-QUEUE_BUYPROJECTS_PAYMENT_FAILED = "payment_failed"
-QUEUE_BUYPROJECTS_ROLLBACK_PAYMENT_FAILED = "payment_failed"
-QUEUE_PROJECTPOLICE_MILESTONE_UPCOMING = "milestone_upcoming"
+QUEUE_PROJECT_CREATE = "notify_project_create"
+QUEUE_PROJECT_RATINGS_REWARD = "notify_ratings_reward"
+QUEUE_PROJECT_RATINGS_PENALISE = "notify_ratings_penalise"
+QUEUE_PROJECT_VERIFY = "notify_project_verify"
+QUEUE_PROJECT_MILESTONES_ADD = "notify_milestone_add"
+QUEUE_BUYPROJECTS_PAYMENT_SUCCESS = "notify_payment_success"
+QUEUE_BUYPROJECTS_PAYMENT_FAILED = "notify_payment_failed"
+QUEUE_BUYPROJECTS_ROLLBACK_PAYMENT_FAILED = "notify_payment_failed"
+QUEUE_PROJECTPOLICE_MILESTONE_UPCOMING = "notify_milestone_upcoming"
 
 
 connection = pika.BlockingConnection(pika.ConnectionParameters(
             host=RABBITMQ_HOSTNAME,
             port=RABBITMQ_PORT,
-            heartbeat=3600,
+            heartbeat=30,
             credentials= pika.PlainCredentials(RABBITMQ_USERNAME, RABBITMQ_PASSWORD),
             blocked_connection_timeout=3600))
 

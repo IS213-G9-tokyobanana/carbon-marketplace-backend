@@ -2,9 +2,9 @@
     "resource_id": "ec2b5bc8-19d6-4a4f-a5e5-7b42b7d4851e",
     "type": "milestone.reward",
     "data": {
-        "id": "a3cc8e03-07e4-4211-a029-431beed4ef87",
+        "id": "33c2d7df-13b5-48ae-b033-851383873059",
         "name": "100.5MW Wind Power Project in Madhya Pradesh, India",
-        "owner_id": "67590b56-e006-4caa-9054-7d9ec150e675",
+        "owner_id": "33c2d7df-13b5-48ae-b033-851383873059",
         "description": "desc3",
         "types": ["carbon capture", "local green initiative (small project)"],
         "status": "verified",

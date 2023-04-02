@@ -8,7 +8,8 @@ from config import (
     EXCHANGE_TYPE,
     MS_BASE_URL,
     SENDGRID_API_KEY,
-    SENDGRID_FROM_EMAIL
+    SENDGRID_FROM_EMAIL,
+    VERIFIERS_EMAILS
 )
 from amqp_setup import (
     connection,
@@ -25,7 +26,10 @@ from sendgrid.helpers.mail import Mail
 def callback(channel, method, properties, body):
     try:
         data = json.loads(body)
+        print("this is method routing key", method.routing_key)
         queue_name = "_".join(method.routing_key.split(".")[-2:])
+        queue_name = "notify_" + queue_name
+
         email_subject = QUEUES[queue_name][SUBJECT]
         # this is the data retrieved from the publisher
         process_message(data, queue_name, email_subject)
@@ -34,7 +38,7 @@ def callback(channel, method, properties, body):
         logging.exception("Error processing message: %s", err)
 
 def process_message(data, queue_name, SUBJECT):
-    if queue_name == "payment_success":
+    if queue_name == "notify_payment_success":
         buyer_id = data.get("data").get("buyer_id", {})
         seller_id = data.get("data").get("seller_id", {})
 
@@ -46,17 +50,32 @@ def process_message(data, queue_name, SUBJECT):
         result_message = format_message(data, queue_name, retrieved_role_seller)
         send_email_to_user(retrieved_email_seller, result_message, SUBJECT)
 
-    elif queue_name == "payment_failed" or queue_name == "rollbackpayment_failed":
+    elif queue_name == "notify_payment_failed":
         buyer_id = data.get("data").get("buyer_id", {})
         retrieved_email_buyer, retrieved_role_buyer = retrieve_user_email(buyer_id)
         result_message = format_message(data, queue_name, retrieved_role_buyer)
         send_email_to_user(retrieved_email_buyer, result_message, SUBJECT)
-    else:
+
+    elif queue_name == "notify_milestone_add" or queue_name == "notify_project_create" or queue_name == "notify_milestone_upcoming":
+        verifiers_emails = get_all_verifiers()
+        for email in verifiers_emails:
+            result_message = format_message(data, queue_name, retrieved_role="verifier")
+            send_email_to_user(email, result_message, SUBJECT)
+            
+    elif queue_name == "notify_project_verify":
         owner_id = data.get("data").get("owner_id", {})
         retrieved_email, retrieved_role = retrieve_user_email(owner_id)
         result_message = format_message(data, queue_name, retrieved_role)
         send_email_to_user(retrieved_email, result_message, SUBJECT)
  
+def get_all_verifiers():
+    response = requests.get(VERIFIERS_EMAILS)
+    data_object = response.json()
+    verifiers_emails = []
+    for item in data_object:
+        verifiers_emails.append(item.get("email"))
+    return verifiers_emails
+
 # communicate with the user microservice to retrieve users information
 def retrieve_user_email(id):
     try:
@@ -76,21 +95,20 @@ def retrieve_user_email(id):
     return (user_email, retrieved_role)
 
 def format_message(data, queue_name, retrieved_role):
-    if queue_name == "ratings_reward" or queue_name == "ratings_penalise":
-        format_resource_id = data.get("resource_id",{})
-        format_milestone_id = data.get("data").get("milestones", {}).get("id", {})
-    elif queue_name == "milestone_upcoming":
+    if queue_name == "notify_ratings_reward" or queue_name == "notify_ratings_penalise":
+        format_resource_id = data.get("project",{}).get("id", {})
+        format_milestone_id = data.get("data").get("resource_id", {})
+    elif queue_name == "notify_milestone_upcoming":
         format_resource_id = data.get("data").get("project_id", {})
         format_milestone_id = data.get("data").get("milestone_id", {})
-    elif queue_name == "payment_success":
+    elif queue_name == "notify_payment_success":
         format_buyer_id = data.get("data").get("buyer_id", {})
         format_seller_id = data.get("data").get("seller_id",{})
-    elif queue_name == "payment_failed" or queue_name == "rollbackpayment_failed":
+    elif queue_name == "notify_payment_failed":
         format_buyer_id = data.get("data").get("buyer_id", {})
-    else:
-        format_resource_id = data.get("resource_id",{})
-        format_milestone = data.get("data").get("milestones", {})[0]
-        format_milestone_id = format_milestone.get("id", {})
+    elif queue_name == "notify_milestone_add" or queue_name == "notify_project_create" or queue_name == "notify_project_verify":
+        format_resource_id = data.get("project",{}).get("id", {})
+
 
     if queue_name in QUEUES:
         queue_data = QUEUES[queue_name]
@@ -120,7 +138,6 @@ def send_email_to_user(user_email, message, subject_retrieved):
     message = Mail(from_email, to_emails, subject, plain_text_content)
     try:
         sg = SendGridAPIClient(SENDGRID_API_KEY)
-        print(SENDGRID_API_KEY)
         response = sg.send(message)
         print(response.status_code)
         print("Email has been successfully sent")
