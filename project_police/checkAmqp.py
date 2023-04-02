@@ -10,10 +10,12 @@ from config.config import (
     RMQPORT,
     RMQUSERNAME,
     RMQPASSWORD,
-    POLICE_SCHEDULER_MANAGER_ROUTING_KEY
+    POLICE_SCHEDULER_MANAGER_ROUTING_KEY,
 )
 import police
 from temporal.run_workflow import main
+from temporal.penalise_reward_workflow import PenaliseRewardTemporalWorkflow
+from temporal.rollback_workflow import RollbackTemporalWorkflow
 
 # Global variable
 channel = None
@@ -78,12 +80,12 @@ def callback(channel, method, properties, body):
 # Function is called when message is received, and message type is checked
 def check_message(data: dict):
     try:
-        if data["type"] == "upcoming":
+        if data["type"] == "milestone_upcoming":
             result = police.publish_to_notifier(data, channel)
-        elif data["type"] == "penalise":
-            result = police.send_to_projectms(data)
-        elif data["type"] == "rollback":
-            result = asyncio.run(main(data))
+        elif data["type"] == "milestone_pebalise" or data["type"] == "milestone_reward":
+            result = asyncio.run(main(data, PenaliseRewardTemporalWorkflow, "penalise-reward-task-queue"))
+        elif data["type"] == "payment_overdue":
+            result = asyncio.run(main(data, RollbackTemporalWorkflow, "rollback-task-queue"))
         else:
             result = {
                 "success": False,
@@ -105,6 +107,7 @@ def publish_status(result: dict):
         body=json.dumps(result),
         properties=pika.BasicProperties(delivery_mode=2),
     )
+
 
 if __name__ == "__main__":
     print(

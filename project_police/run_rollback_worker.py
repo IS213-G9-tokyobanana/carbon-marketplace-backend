@@ -1,5 +1,5 @@
 import asyncio
-from temporal.worker import main
+from temporal.rollback_worker import main
 
 if __name__ == "__main__":
     print("Starting worker")

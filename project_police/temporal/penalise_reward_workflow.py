@@ -4,35 +4,44 @@ from temporalio import workflow
 # Import activity, passing it through the sandbox without reloading the module
 with workflow.unsafe.imports_passed_through():
     from temporal.activities import (
-        remove_reserved_offset,
+        get_payment_id,
         get_buyer_id,
-        send_to_notifier,
+        send_to_user,
+        patch_milestone,
     )
 
 
 @workflow.defn
-class ProjectPoliceTemporalWorkflow:
+class PenaliseRewardTemporalWorkflow:
     @workflow.run
-    async def run(self, data: dict) -> dict:
+    async def refund(self, data: dict) -> dict:
         status_arr = []
-        # Execute activity to retrieve payment intent
         result1 = await workflow.execute_activity(
-            get_buyer_id, data, start_to_close_timeout=timedelta(seconds=5)
+            get_payment_id, data, start_to_close_timeout=timedelta(seconds=5)
         )
         status_arr.append(result1["success"])
-        # buyer_id = result1["data"]["buyer_id"]
-        # Execute activity to remove reserved offset
+        data["data"]["payment_id"] = result1["data"]["payment_id"]
+
+        # Execute activity to retrieve buyer id
         result2 = await workflow.execute_activity(
-            remove_reserved_offset,
+            get_buyer_id, data, start_to_close_timeout=timedelta(seconds=5)
+        )
+        status_arr.append(result2["success"])
+        data["data"]["buyer_id"] = result2["data"]["buyer_id"]
+
+        # Execute activity to remove reserved offset
+        result3 = await workflow.execute_activity(
+            patch_milestone,
             data,
             start_to_close_timeout=timedelta(seconds=5),
         )
-        status_arr.append(result2["success"])
-        # Execute activity to send message to Notifier
-        result3 = await workflow.execute_activity(
-            send_to_notifier, data, start_to_close_timeout=timedelta(seconds=5)
-        )
         status_arr.append(result3["success"])
+
+        # Execute activity to send message to Notifier
+        result4 = await workflow.execute_activity(
+            send_to_user, data, start_to_close_timeout=timedelta(seconds=5)
+        )
+        status_arr.append(result4["success"])
 
         if all(status_arr):
             return {

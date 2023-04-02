@@ -6,9 +6,17 @@ services:
     image: amqp
     restart: always
     container_name: amqp
-  temporal_worker:
+  temporal_rollback_worker:
     build: 
-      dockerfile: ./temporal_worker.Dockerfile
-    image: temporal_worker
+      dockerfile: ./temporal_rollback_worker.Dockerfile
+    image: temporal_rollback_worker
     restart: always
-    container_name: temporal_worker
+    container_name: temporal_rollback_worker
+  temporal_penalise_reward_worker:
+    build: 
+      dockerfile: ./temporal_penalise_reward_worker.Dockerfile
+    image: temporal_penalise_reward_worker
+    restart: always
+    container_name: temporal_penalise_reward_worker
+  
+  
