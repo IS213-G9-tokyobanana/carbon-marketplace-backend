@@ -111,7 +111,7 @@ async def patch_milestone(data) -> dict:
     # if data["type"] == "penalise":
     #     payload = {"status": "rejected"}
     # elif data["type"] == "reward":
-    #     payload = {"status": "completed"}
+    #     payload = {"status": "met"}
     # url = format_url(PROJECT_STATUS_URL, project_id, milestone_id)
     # # Send request to Project Microservice
     # try:
@@ -136,9 +136,9 @@ async def send_to_user(data) -> dict:
     # payment_id = data["data"]["payment_id"]
     # buyer_id = data["data"]["buyer_id"]
     # if data["type"] == "penalise":
-    #     payload = {"status": "rejected"}
+    #     payload = {"status": "refund"}
     # elif data["type"] == "reward":
-    #     payload = {"status": "completed"}
+    #     payload = {"status": "confirmed"}
     # # Send request to User Microservice
     # try:
     #     result = requests.post(
