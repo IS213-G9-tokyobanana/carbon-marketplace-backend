@@ -1,69 +1,66 @@
 {
-    "resource_id": "3a99ba93-6494-44fc-a3de-19bc5b9fbf6e",
-    "type": "project.verify",
+    "resource_id": "a3cc8e03-07e4-4211-a029-431beed4ef87",
+    "type": "project_verify",
     "data": {
-        "id": "3a99ba93-6494-44fc-a3de-19bc5b9fbf6e",
+      "project": {
+        "id": "a3cc8e03-07e4-4211-a029-431beed4ef87",
         "name": "100.5MW Wind Power Project in Madhya Pradesh, India",
-        "owner_id": "33c2d7df-13b5-48ae-b033-851383873059",
+        "owner_id": "3b08a327-42b2-4694-bbeb-f61ad526ec47",
         "description": "desc3",
         "types": ["carbon capture", "local green initiative (small project)"],
-        "status": "Pending",
-        "created_at": "2023-03-26T19:10:30Z",
-        "updated_at": "2023-03-26T19:10:30Z",
+        "status": "pending",
+        "created_at": "2023-03-28T09:09:35Z",
+        "updated_at": "2023-03-28T09:09:35Z",
         "rating": 100.0,
-        "milestones": [
-            {
-                "id": "60af22a8-e44f-4300-95db-b776ae703848",
-                "name": "0.5 million tCO2e saved by year 3",
-                "description": "0.5 million tCO2e saved in 3 years after the launch of the windmill",
-                "type": "Temporal",
-                "offsets_available": 50.0,
-                "offsets_total": 50.0,
-                "status": "Pending",
-                "created_at": "2023-03-26T19:10:30Z",
-                "updated_at": "2023-03-26T19:10:30Z",
-                "due_date": "2026-03-21T09:30:00Z",
-                "project_id": "3a99ba93-6494-44fc-a3de-19bc5b9fbf6e"
-            },
-            {
-                "id": "4f5c1fe9-8187-4115-9e1e-c698751b998e",
-                "name": "1 million tCO2e saved by year 6",
-                "description": "1 million tCO2e saved by year 6 after the launch of the windmill",
-                "type": "Temporal",
-                "offsets_available": 50.0,
-                "offsets_total": 50.0,
-                "status": "Pending",
-                "created_at": "2023-03-26T19:10:30Z",
-                "updated_at": "2023-03-26T19:10:30Z",
-                "due_date": "2029-03-21T09:30:00Z",
-                "project_id": "3a99ba93-6494-44fc-a3de-19bc5b9fbf6e"
-            },
-            {
-                "id": "4119b4c1-b392-4e92-8e7a-801ebfdcebd3",
-                "name": "Generation of 180 GWh of clean electricity annually",
-                "description": "Generation of 180 GWh of clean electricity annually after the project has been implemented.",
-                "type": "Temporal",
-                "offsets_available": 50.0,
-                "offsets_total": 50.0,
-                "status": "Pending",
-                "created_at": "2023-03-26T19:10:30Z",
-                "updated_at": "2023-03-26T19:10:30Z",
-                "due_date": "2024-03-21T09:30:00Z",
-                "project_id": "3a99ba93-6494-44fc-a3de-19bc5b9fbf6e"
-            },
-            {
-                "id": "18d09220-bfed-4b98-874d-551eaa0af7f9",
-                "name": "1.23 million tCO2e saved by year 7",
-                "description": "1.23 million tCO2e saved by year 7 after the launch of the windmill",
-                "type": "Temporal",
-                "offsets_available": 50.0,
-                "offsets_total": 50.0,
-                "status": "Pending",
-                "created_at": "2023-03-26T19:10:30Z",
-                "updated_at": "2023-03-26T19:10:30Z",
-                "due_date": "2030-03-21T09:30:00Z",
-                "project_id": "3a99ba93-6494-44fc-a3de-19bc5b9fbf6e"
-            }
-        ]
+        "milestones": [{
+          "id": "ec2b5bc8-19d6-4a4f-a5e5-7b42b7d4851e",
+          "name": "0.5 million tCO2e saved by year 3",
+          "description": "0.5 million tCO2e saved in 3 years after the launch of the windmill",
+          "type": "Temporal",
+          "offsets_available": 50.0,
+          "offsets_total": 50.0,
+          "status": "pending",
+          "created_at": "2023-03-28T09:09:35Z",
+          "updated_at": "2023-03-28T09:09:35Z",
+          "due_date": "2026-03-21T09:30:00Z",
+          "project_id": "a3cc8e03-07e4-4211-a029-431beed4ef87"
+        }, {
+          "id": "ffc330e8-2874-4073-a1cd-b2a0774fe9b6",
+          "name": "1 million tCO2e saved by year 6",
+          "description": "1 million tCO2e saved by year 6 after the launch of the windmill",
+          "type": "Temporal",
+          "offsets_available": 50.0,
+          "offsets_total": 50.0,
+          "status": "pending",
+          "created_at": "2023-03-28T09:09:35Z",
+          "updated_at": "2023-03-28T09:09:35Z",
+          "due_date": "2029-03-21T09:24:14Z",
+          "project_id": "a3cc8e03-07e4-4211-a029-431beed4ef87"
+        }, {
+          "id": "58a460e1-4276-4e25-8c42-520efaca56af",
+          "name": "Generation of 180 GWh of clean electricity annually",
+          "description": "Generation of 180 GWh of clean electricity annually after the project has been implemented.",
+          "type": "Temporal",
+          "offsets_available": 50.0,
+          "offsets_total": 50.0,
+          "status": "pending",
+          "created_at": "2023-03-28T09:09:35Z",
+          "updated_at": "2023-03-28T09:09:35Z",
+          "due_date": "2024-03-21T19:30:22Z",
+          "project_id": "a3cc8e03-07e4-4211-a029-431beed4ef87"
+        }, {
+          "id": "92636c2d-d979-4351-b75a-865e3dd3d5b6",
+          "name": "1.23 million tCO2e saved by year 7",
+          "description": "1.23 million tCO2e saved by year 7 after the launch of the windmill",
+          "type": "Temporal",
+          "offsets_available": 50.0,
+          "offsets_total": 50.0,
+          "status": "pending",
+          "created_at": "2023-03-28T09:09:35Z",
+          "updated_at": "2023-03-28T09:09:35Z",
+          "due_date": "2030-03-21T21:30:23Z",
+          "project_id": "a3cc8e03-07e4-4211-a029-431beed4ef87"
+        }]
+      }
     }
-}
+  }

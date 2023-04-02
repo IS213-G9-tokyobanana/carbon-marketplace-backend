@@ -1,9 +1,9 @@
 {
-  "resource_id": "274487fhsdbchb-23ecsdv",
-  "type": "upcoming",
-  "data": { 
-    "owner_id": "7963a371-f512-4f79-952a-109df3ccc3a3",
-    "project_id": "1", 
-    "milestone_id": "2" 
+  "resource_id": "92636c2d-d979-4351-b75a-865e3dd3d5b6",
+  "type": "milestone_upcoming",
+  "data": {
+    "project_id": "a3cc8e03-07e4-4211-a029-431beed4ef87",
+    "milestone_id": "92636c2d-d979-4351-b75a-865e3dd3d5b6",
+    "payment_id": null
   }
 }

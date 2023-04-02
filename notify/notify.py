@@ -62,7 +62,15 @@ def process_message(data, queue_name, SUBJECT):
             send_email_to_user(email, result_message, SUBJECT)
             
     elif queue_name == "notify_project_verify":
-        owner_id = data.get("data").get("owner_id", {})
+        owner_id = data.get("data").get("project", {}).get("owner_id", {})
+        print('owner_id: ', owner_id, end='\n\n')
+        retrieved_email, retrieved_role = retrieve_user_email(owner_id)
+        result_message = format_message(data, queue_name, retrieved_role)
+        send_email_to_user(retrieved_email, result_message, SUBJECT)
+    
+    else:
+        owner_id = data.get("data").get("project", {}).get("owner_id", {})
+        print('owner_id: ', owner_id, end='\n\n')
         retrieved_email, retrieved_role = retrieve_user_email(owner_id)
         result_message = format_message(data, queue_name, retrieved_role)
         send_email_to_user(retrieved_email, result_message, SUBJECT)
@@ -91,33 +99,44 @@ def retrieve_user_email(id):
             print("User not found")
     data_object = response.json()
     user_email = data_object.get("data", {}).get("email")
-    retrieved_role = data_object.get("data").get("type", {})
+    retrieved_role = data_object.get("data").get("role", {})
     return (user_email, retrieved_role)
 
 def format_message(data, queue_name, retrieved_role):
+    format_milestone_id = None
     if queue_name == "notify_ratings_reward" or queue_name == "notify_ratings_penalise":
-        format_resource_id = data.get("project",{}).get("id", {})
-        format_milestone_id = data.get("data").get("resource_id", {})
+        format_resource_id = data.get('data', {}).get("project",{}).get("id", {})
+        format_milestone_id = data.get("resource_id", {})
     elif queue_name == "notify_milestone_upcoming":
         format_resource_id = data.get("data").get("project_id", {})
-        format_milestone_id = data.get("data").get("milestone_id", {})
+        format_milestone_id = data.get("resource_id", {})
     elif queue_name == "notify_payment_success":
         format_buyer_id = data.get("data").get("buyer_id", {})
         format_seller_id = data.get("data").get("seller_id",{})
     elif queue_name == "notify_payment_failed":
         format_buyer_id = data.get("data").get("buyer_id", {})
-    elif queue_name == "notify_milestone_add" or queue_name == "notify_project_create" or queue_name == "notify_project_verify":
-        format_resource_id = data.get("project",{}).get("id", {})
-
+    elif queue_name == "notify_milestone_add":
+        format_resource_id = data.get("data").get("project").get("id", {})
+        format_milestone_id = data.get("resource_id", {})
+    elif queue_name == "notify_project_create" or queue_name == "notify_project_verify":
+        format_resource_id = data.get('data', {}).get("project",{}).get("id", {})
+    else:
+        format_resource_id = data.get("data").get("project").get("id", {})
+        format_milestone_id = data.get("resource_id", {})
 
     if queue_name in QUEUES:
         queue_data = QUEUES[queue_name]
-    message_retrieved = queue_data.get(message)
+        message_retrieved = queue_data.get(message)
 
     if message_retrieved is not None:
-        new_message_retrieved = message_retrieved.format(
+        if format_milestone_id is not None:
+            new_message_retrieved = message_retrieved.format(
             project_id=format_resource_id,
             milestone_id=format_milestone_id
+        )
+        else:
+            new_message_retrieved = message_retrieved.format(
+            project_id=format_resource_id
         )
         if new_message_retrieved is not None:
             return new_message_retrieved
