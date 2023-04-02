@@ -11,3 +11,9 @@ services:
     restart: always
     networks:
       - scheduler_network
+    environment:
+      - rmqhostname=${rmqhostname}
+      - rmqusername=${rmqusername}
+      - rmqpassword=${rmqpassword}
+      - rmqport=${rmqport}
+  
