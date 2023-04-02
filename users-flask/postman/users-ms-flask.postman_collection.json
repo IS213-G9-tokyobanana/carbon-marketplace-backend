@@ -1,0 +1,940 @@
+{
+	"info": {
+		"_postman_id": "4c6a9150-3071-48a0-bc23-9b0c116b16b4",
+		"name": "users-ms-flask",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "23462792"
+	},
+	"item": [
+		{
+			"name": "Users - Get All",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/users",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"users"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "200 - Success",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5000/users",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"users"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Server",
+							"value": "Werkzeug/2.2.3 Python/3.11.0"
+						},
+						{
+							"key": "Date",
+							"value": "Fri, 31 Mar 2023 18:41:32 GMT"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Content-Length",
+							"value": "2301"
+						},
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "*"
+						},
+						{
+							"key": "Connection",
+							"value": "close"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"data\": [\n        {\n            \"created_at\": \"2023-03-31T18:26:00Z\",\n            \"email\": \"verifier1@gmail.com\",\n            \"footprint_in_tCO2e\": 0,\n            \"id\": \"9c727cd1-d080-4653-a4ab-912b5e8315fc\",\n            \"is_verifier\": true,\n            \"name\": \"verifier1\",\n            \"offsets\": [],\n            \"updated_at\": \"2023-03-31T18:26:00Z\"\n        },\n        {\n            \"created_at\": \"2023-03-31T18:26:22Z\",\n            \"email\": \"verifier2@gmail.com\",\n            \"footprint_in_tCO2e\": 0,\n            \"id\": \"13e7951b-31e3-4f70-97d2-e160ad76d867\",\n            \"is_verifier\": true,\n            \"name\": \"verifier2\",\n            \"offsets\": [],\n            \"updated_at\": \"2023-03-31T18:26:22Z\"\n        },\n        {\n            \"created_at\": \"2023-03-31T18:26:33Z\",\n            \"email\": \"user2@gmail.com\",\n            \"footprint_in_tCO2e\": 15.5,\n            \"id\": \"b2f50637-b8b4-471d-9dc2-e96891dd863f\",\n            \"is_verifier\": false,\n            \"name\": \"user2\",\n            \"offsets\": [\n                {\n                    \"amount\": 15.5,\n                    \"buyer_id\": \"b2f50637-b8b4-471d-9dc2-e96891dd863f\",\n                    \"created_at\": \"2023-03-31T18:29:38Z\",\n                    \"milestone_id\": \"ed9e5902-351d-4c72-9129-f98f5dcc1f7d\",\n                    \"payment_id\": \"pi_3MrCv6GehkGRMk671H2IKsDZ\",\n                    \"status\": \"confirmed\",\n                    \"updated_at\": \"2023-03-31T18:31:47Z\"\n                },\n                {\n                    \"amount\": 10.2,\n                    \"buyer_id\": \"b2f50637-b8b4-471d-9dc2-e96891dd863f\",\n                    \"created_at\": \"2023-03-31T18:37:21Z\",\n                    \"milestone_id\": \"ed9e5902-351d-4c72-9129-f98f5dcc1f7d\",\n                    \"payment_id\": \"pi_3MrCv6GehkGRMk671H2IKsDX\",\n                    \"status\": \"refund\",\n                    \"updated_at\": \"2023-03-31T18:37:41Z\"\n                }\n            ],\n            \"updated_at\": \"2023-03-31T18:33:04Z\"\n        },\n        {\n            \"created_at\": \"2023-03-31T18:25:42Z\",\n            \"email\": \"user1@gmail.com\",\n            \"footprint_in_tCO2e\": 15.5,\n            \"id\": \"3e274174-bc18-46b2-9d9f-7943a1fd6aa1\",\n            \"is_verifier\": false,\n            \"name\": \"user1\",\n            \"offsets\": [\n                {\n                    \"amount\": 15.5,\n                    \"buyer_id\": \"3e274174-bc18-46b2-9d9f-7943a1fd6aa1\",\n                    \"created_at\": \"2023-03-31T18:28:30Z\",\n                    \"milestone_id\": \"ed9e5902-351d-4c72-9129-f98f5dcc1f7d\",\n                    \"payment_id\": \"pi_3MrCv6GehkGRMk671H2IKsDY\",\n                    \"status\": \"confirmed\",\n                    \"updated_at\": \"2023-03-31T18:35:52Z\"\n                }\n            ],\n            \"updated_at\": \"2023-03-31T18:35:52Z\"\n        }\n    ],\n    \"success\": true\n}"
+				}
+			]
+		},
+		{
+			"name": "User - create one",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"Zhi Wei Verifier\",\r\n    \"email\": \"theanzhiwei@gmail.com\",\r\n    \"is_verifier\": true\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5000/users",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"users"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "400 - Invalid fields",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Zhi Wei Verifier\",\r\n    \r\n    \"is_verifier\": true\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5000/users",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"users"
+							]
+						}
+					},
+					"status": "BAD REQUEST",
+					"code": 400,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Server",
+							"value": "Werkzeug/2.2.3 Python/3.11.0"
+						},
+						{
+							"key": "Date",
+							"value": "Fri, 31 Mar 2023 17:15:00 GMT"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Content-Length",
+							"value": "1046"
+						},
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "*"
+						},
+						{
+							"key": "Connection",
+							"value": "close"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"data\": {\n        \"message\": \"Integrity constraint in database are violated. Did you check if all fields are present in request body? Error message: (psycopg2.errors.NotNullViolation) null value in column \\\"email\\\" of relation \\\"user\\\" violates not-null constraint\\nDETAIL:  Failing row contains (3745c7e0-1525-42db-96b9-908db6799d5b, Zhi Wei Verifier, null, t, 0, 2023-03-31 17:15:00.26095, 2023-03-31 17:15:00.26095).\\n\\n[SQL: INSERT INTO \\\"user\\\" (id, name, email, is_verifier, \\\"footprint_in_tCO2e\\\", created_at, updated_at) VALUES (%(id)s::UUID, %(name)s, %(email)s, %(is_verifier)s, %(footprint_in_tCO2e)s, %(created_at)s, %(updated_at)s)]\\n[parameters: {'id': UUID('3745c7e0-1525-42db-96b9-908db6799d5b'), 'name': 'Zhi Wei Verifier', 'email': None, 'is_verifier': True, 'footprint_in_tCO2e': 0.0, 'created_at': datetime.datetime(2023, 3, 31, 17, 15, 0, 260950), 'updated_at': datetime.datetime(2023, 3, 31, 17, 15, 0, 260950)}]\\n(Background on this error at: https://sqlalche.me/e/20/gkpj)\",\n        \"resource\": null\n    },\n    \"success\": false\n}"
+				},
+				{
+					"name": "200 - Success (User)",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"user1\",\r\n    \"email\": \"user1@gmail.com\"\r\n    \r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5000/users",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"users"
+							]
+						}
+					},
+					"status": "CREATED",
+					"code": 201,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Server",
+							"value": "Werkzeug/2.2.3 Python/3.11.0"
+						},
+						{
+							"key": "Date",
+							"value": "Fri, 31 Mar 2023 18:21:57 GMT"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Content-Length",
+							"value": "301"
+						},
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "*"
+						},
+						{
+							"key": "Connection",
+							"value": "close"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"data\": {\n        \"created_at\": \"2023-03-31T18:21:57Z\",\n        \"email\": \"user1@gmail.com\",\n        \"footprint_in_tCO2e\": 0,\n        \"id\": \"0bf5971b-67a8-43f1-981f-fc72ae1cc8fc\",\n        \"is_verifier\": false,\n        \"name\": \"user1\",\n        \"offsets\": [],\n        \"updated_at\": \"2023-03-31T18:21:57Z\"\n    },\n    \"success\": true\n}"
+				},
+				{
+					"name": "200 - Success (Verifier)",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"verifier1\",\r\n    \"email\": \"verifier1@gmail.com\",\r\n    \"is_verifier\": true\r\n    \r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5000/users",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"users"
+							]
+						}
+					},
+					"status": "CREATED",
+					"code": 201,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Server",
+							"value": "Werkzeug/2.2.3 Python/3.11.0"
+						},
+						{
+							"key": "Date",
+							"value": "Fri, 31 Mar 2023 18:26:00 GMT"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Content-Length",
+							"value": "308"
+						},
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "*"
+						},
+						{
+							"key": "Connection",
+							"value": "close"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"data\": {\n        \"created_at\": \"2023-03-31T18:26:00Z\",\n        \"email\": \"verifier1@gmail.com\",\n        \"footprint_in_tCO2e\": 0,\n        \"id\": \"9c727cd1-d080-4653-a4ab-912b5e8315fc\",\n        \"is_verifier\": true,\n        \"name\": \"verifier1\",\n        \"offsets\": [],\n        \"updated_at\": \"2023-03-31T18:26:00Z\"\n    },\n    \"success\": true\n}"
+				}
+			]
+		},
+		{
+			"name": "Users - Get by Id",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/users/fcceeac1-5566-4345-846d-3850ae36e439",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"users",
+						"fcceeac1-5566-4345-846d-3850ae36e439"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "200 - Success",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5000/users/b2f50637-b8b4-471d-9dc2-e96891dd863f",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"users",
+								"b2f50637-b8b4-471d-9dc2-e96891dd863f"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Server",
+							"value": "Werkzeug/2.2.3 Python/3.11.0"
+						},
+						{
+							"key": "Date",
+							"value": "Fri, 31 Mar 2023 18:41:09 GMT"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Content-Length",
+							"value": "983"
+						},
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "*"
+						},
+						{
+							"key": "Connection",
+							"value": "close"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"data\": {\n        \"created_at\": \"2023-03-31T18:26:33Z\",\n        \"email\": \"user2@gmail.com\",\n        \"footprint_in_tCO2e\": 15.5,\n        \"id\": \"b2f50637-b8b4-471d-9dc2-e96891dd863f\",\n        \"is_verifier\": false,\n        \"name\": \"user2\",\n        \"offsets\": [\n            {\n                \"amount\": 15.5,\n                \"buyer_id\": \"b2f50637-b8b4-471d-9dc2-e96891dd863f\",\n                \"created_at\": \"2023-03-31T18:29:38Z\",\n                \"milestone_id\": \"ed9e5902-351d-4c72-9129-f98f5dcc1f7d\",\n                \"payment_id\": \"pi_3MrCv6GehkGRMk671H2IKsDZ\",\n                \"status\": \"confirmed\",\n                \"updated_at\": \"2023-03-31T18:31:47Z\"\n            },\n            {\n                \"amount\": 10.2,\n                \"buyer_id\": \"b2f50637-b8b4-471d-9dc2-e96891dd863f\",\n                \"created_at\": \"2023-03-31T18:37:21Z\",\n                \"milestone_id\": \"ed9e5902-351d-4c72-9129-f98f5dcc1f7d\",\n                \"payment_id\": \"pi_3MrCv6GehkGRMk671H2IKsDX\",\n                \"status\": \"refund\",\n                \"updated_at\": \"2023-03-31T18:37:41Z\"\n            }\n        ],\n        \"updated_at\": \"2023-03-31T18:33:04Z\"\n    },\n    \"success\": true\n}"
+				}
+			]
+		},
+		{
+			"name": "Get all verifiers",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/users/verifiers",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"users",
+						"verifiers"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "200 - Success",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5000/users/verifiers",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"users",
+								"verifiers"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Server",
+							"value": "Werkzeug/2.2.3 Python/3.11.0"
+						},
+						{
+							"key": "Date",
+							"value": "Fri, 31 Mar 2023 18:27:10 GMT"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Content-Length",
+							"value": "634"
+						},
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "*"
+						},
+						{
+							"key": "Connection",
+							"value": "close"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"data\": [\n        {\n            \"created_at\": \"2023-03-31T18:26:00Z\",\n            \"email\": \"verifier1@gmail.com\",\n            \"footprint_in_tCO2e\": 0,\n            \"id\": \"9c727cd1-d080-4653-a4ab-912b5e8315fc\",\n            \"is_verifier\": true,\n            \"name\": \"verifier1\",\n            \"offsets\": [],\n            \"updated_at\": \"2023-03-31T18:26:00Z\"\n        },\n        {\n            \"created_at\": \"2023-03-31T18:26:22Z\",\n            \"email\": \"verifier2@gmail.com\",\n            \"footprint_in_tCO2e\": 0,\n            \"id\": \"13e7951b-31e3-4f70-97d2-e160ad76d867\",\n            \"is_verifier\": true,\n            \"name\": \"verifier2\",\n            \"offsets\": [],\n            \"updated_at\": \"2023-03-31T18:26:22Z\"\n        }\n    ],\n    \"success\": true\n}"
+				}
+			]
+		},
+		{
+			"name": "Offset - create one",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"milestone_id\": \"ed9e5902-351d-4c72-9129-f98f5dcc1f7d\",\r\n    \"amount\": 15.5\r\n\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5000/users/4062d6be-4179-47b9-895e-836d2fa6ae09/offset",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"users",
+						"4062d6be-4179-47b9-895e-836d2fa6ae09",
+						"offset"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "404 - User not found",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"milestone_id\": \"ed9e5902-351d-4c72-9129-f98f5dcc1f7d\",\r\n    \"amount\": 10.0\r\n\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5000/users/fcceeac1-5566-4345-846d-3850ae36e438/offset",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"users",
+								"fcceeac1-5566-4345-846d-3850ae36e438",
+								"offset"
+							]
+						}
+					},
+					"status": "NOT FOUND",
+					"code": 404,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Server",
+							"value": "Werkzeug/2.2.3 Python/3.11.0"
+						},
+						{
+							"key": "Date",
+							"value": "Fri, 31 Mar 2023 17:35:51 GMT"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Content-Length",
+							"value": "147"
+						},
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "*"
+						},
+						{
+							"key": "Connection",
+							"value": "close"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"data\": {\n        \"message\": \"404 Not Found: User fcceeac1-5566-4345-846d-3850ae36e438 not found.\",\n        \"resource\": null\n    },\n    \"success\": false\n}"
+				},
+				{
+					"name": "201 - Success",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"payment_id\": \"pi_3MrCv6GehkGRMk671H2IKsDX\",\r\n    \"milestone_id\": \"ed9e5902-351d-4c72-9129-f98f5dcc1f7d\",\r\n    \"amount\": 10.2\r\n\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5000/users/da686e54-83d2-471b-90f6-404e2077ac59/offset",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"users",
+								"da686e54-83d2-471b-90f6-404e2077ac59",
+								"offset"
+							]
+						}
+					},
+					"status": "CREATED",
+					"code": 201,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Server",
+							"value": "Werkzeug/2.2.3 Python/3.11.0"
+						},
+						{
+							"key": "Date",
+							"value": "Fri, 31 Mar 2023 18:48:39 GMT"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Content-Length",
+							"value": "332"
+						},
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "*"
+						},
+						{
+							"key": "Connection",
+							"value": "close"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"data\": {\n        \"amount\": 10.2,\n        \"buyer_id\": \"da686e54-83d2-471b-90f6-404e2077ac59\",\n        \"created_at\": \"2023-03-31T18:48:39Z\",\n        \"milestone_id\": \"ed9e5902-351d-4c72-9129-f98f5dcc1f7d\",\n        \"payment_id\": \"pi_3MrCv6GehkGRMk671H2IKsDX\",\n        \"status\": \"pending\",\n        \"updated_at\": \"2023-03-31T18:48:39Z\"\n    },\n    \"success\": true\n}"
+				}
+			]
+		},
+		{
+			"name": "Offset - get buyers by milestone id",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/users?milestone_id=ed9e5902-351d-4c72-9129-f98f5dcc1f7d",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"users"
+					],
+					"query": [
+						{
+							"key": "milestone_id",
+							"value": "ed9e5902-351d-4c72-9129-f98f5dcc1f7d"
+						}
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "200 - Success",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5000/users?milestone_id=ed9e5902-351d-4c72-9129-f98f5dcc1f7d",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"users"
+							],
+							"query": [
+								{
+									"key": "milestone_id",
+									"value": "ed9e5902-351d-4c72-9129-f98f5dcc1f7d"
+								}
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Server",
+							"value": "Werkzeug/2.2.3 Python/3.11.0"
+						},
+						{
+							"key": "Date",
+							"value": "Fri, 31 Mar 2023 18:51:03 GMT"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Content-Length",
+							"value": "1700"
+						},
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "*"
+						},
+						{
+							"key": "Connection",
+							"value": "close"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"data\": [\n        {\n            \"created_at\": \"2023-03-31T18:47:09Z\",\n            \"email\": \"user1@gmail.com\",\n            \"footprint_in_tCO2e\": 0,\n            \"id\": \"da686e54-83d2-471b-90f6-404e2077ac59\",\n            \"is_verifier\": false,\n            \"name\": \"user1\",\n            \"offsets\": [\n                {\n                    \"amount\": 10.2,\n                    \"buyer_id\": \"da686e54-83d2-471b-90f6-404e2077ac59\",\n                    \"created_at\": \"2023-03-31T18:48:39Z\",\n                    \"milestone_id\": \"ed9e5902-351d-4c72-9129-f98f5dcc1f7d\",\n                    \"payment_id\": \"pi_3MrCv6GehkGRMk671H2IKsDX\",\n                    \"status\": \"pending\",\n                    \"updated_at\": \"2023-03-31T18:48:39Z\"\n                }\n            ],\n            \"updated_at\": \"2023-03-31T18:47:09Z\"\n        },\n        {\n            \"created_at\": \"2023-03-31T18:47:15Z\",\n            \"email\": \"user2@gmail.com\",\n            \"footprint_in_tCO2e\": 0,\n            \"id\": \"e4ad310c-1e5c-444f-88f1-c71eaef3a031\",\n            \"is_verifier\": false,\n            \"name\": \"user2\",\n            \"offsets\": [\n                {\n                    \"amount\": 15.5,\n                    \"buyer_id\": \"e4ad310c-1e5c-444f-88f1-c71eaef3a031\",\n                    \"created_at\": \"2023-03-31T18:49:56Z\",\n                    \"milestone_id\": \"92636c2d-d979-4351-b75a-865e3dd3d5b6\",\n                    \"payment_id\": \"pi_3MrCv6GehkGRMk671H2IKsDY\",\n                    \"status\": \"pending\",\n                    \"updated_at\": \"2023-03-31T18:49:56Z\"\n                },\n                {\n                    \"amount\": 21.5,\n                    \"buyer_id\": \"e4ad310c-1e5c-444f-88f1-c71eaef3a031\",\n                    \"created_at\": \"2023-03-31T18:50:51Z\",\n                    \"milestone_id\": \"ed9e5902-351d-4c72-9129-f98f5dcc1f7d\",\n                    \"payment_id\": \"pi_3MrCv6GehkGRMk671H2IKsDW\",\n                    \"status\": \"pending\",\n                    \"updated_at\": \"2023-03-31T18:50:51Z\"\n                }\n            ],\n            \"updated_at\": \"2023-03-31T18:47:15Z\"\n        }\n    ],\n    \"success\": true\n}"
+				}
+			]
+		},
+		{
+			"name": "Update buyer offset",
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"status\": \"reward\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5000/users/b2f50637-b8b4-471d-9dc2-e96891dd863f/offset/pi_3MrCv6GehkGRMk671H2IKsDZ",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"users",
+						"b2f50637-b8b4-471d-9dc2-e96891dd863f",
+						"offset",
+						"pi_3MrCv6GehkGRMk671H2IKsDZ"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "400 - Invalid request body",
+					"originalRequest": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"status\": \"reward\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5000/users/b2f50637-b8b4-471d-9dc2-e96891dd863f/offset/pi_3MrCv6GehkGRMk671H2IKsDZ",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"users",
+								"b2f50637-b8b4-471d-9dc2-e96891dd863f",
+								"offset",
+								"pi_3MrCv6GehkGRMk671H2IKsDZ"
+							]
+						}
+					},
+					"status": "BAD REQUEST",
+					"code": 400,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Server",
+							"value": "Werkzeug/2.2.3 Python/3.11.0"
+						},
+						{
+							"key": "Date",
+							"value": "Fri, 31 Mar 2023 18:31:07 GMT"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Content-Length",
+							"value": "190"
+						},
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "*"
+						},
+						{
+							"key": "Connection",
+							"value": "close"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"data\": {\n        \"message\": \"400 Bad Request: Invalid status 'reward'. Status can only be the following: ['pending', 'confirmed', 'refund']\",\n        \"resource\": null\n    },\n    \"success\": false\n}"
+				},
+				{
+					"name": "200 - Success (Refund)",
+					"originalRequest": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"status\": \"refund\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5000/users/da686e54-83d2-471b-90f6-404e2077ac59/offset/pi_3MrCv6GehkGRMk671H2IKsDX",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"users",
+								"da686e54-83d2-471b-90f6-404e2077ac59",
+								"offset",
+								"pi_3MrCv6GehkGRMk671H2IKsDX"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Server",
+							"value": "Werkzeug/2.2.3 Python/3.11.0"
+						},
+						{
+							"key": "Date",
+							"value": "Fri, 31 Mar 2023 18:52:49 GMT"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Content-Length",
+							"value": "642"
+						},
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "*"
+						},
+						{
+							"key": "Connection",
+							"value": "close"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"data\": {\n        \"created_at\": \"2023-03-31T18:47:09Z\",\n        \"email\": \"user1@gmail.com\",\n        \"footprint_in_tCO2e\": 0,\n        \"id\": \"da686e54-83d2-471b-90f6-404e2077ac59\",\n        \"is_verifier\": false,\n        \"name\": \"user1\",\n        \"offsets\": [\n            {\n                \"amount\": 10.2,\n                \"buyer_id\": \"da686e54-83d2-471b-90f6-404e2077ac59\",\n                \"created_at\": \"2023-03-31T18:48:39Z\",\n                \"milestone_id\": \"ed9e5902-351d-4c72-9129-f98f5dcc1f7d\",\n                \"payment_id\": \"pi_3MrCv6GehkGRMk671H2IKsDX\",\n                \"status\": \"refund\",\n                \"updated_at\": \"2023-03-31T18:52:49Z\"\n            }\n        ],\n        \"updated_at\": \"2023-03-31T18:47:09Z\"\n    },\n    \"success\": true\n}"
+				},
+				{
+					"name": "200 - Success (Confirmed)",
+					"originalRequest": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"status\": \"confirmed\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5000/users/e4ad310c-1e5c-444f-88f1-c71eaef3a031/offset/pi_3MrCv6GehkGRMk671H2IKsDW",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"users",
+								"e4ad310c-1e5c-444f-88f1-c71eaef3a031",
+								"offset",
+								"pi_3MrCv6GehkGRMk671H2IKsDW"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Server",
+							"value": "Werkzeug/2.2.3 Python/3.11.0"
+						},
+						{
+							"key": "Date",
+							"value": "Fri, 31 Mar 2023 18:53:47 GMT"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Content-Length",
+							"value": "984"
+						},
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "*"
+						},
+						{
+							"key": "Connection",
+							"value": "close"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"data\": {\n        \"created_at\": \"2023-03-31T18:47:15Z\",\n        \"email\": \"user2@gmail.com\",\n        \"footprint_in_tCO2e\": 21.5,\n        \"id\": \"e4ad310c-1e5c-444f-88f1-c71eaef3a031\",\n        \"is_verifier\": false,\n        \"name\": \"user2\",\n        \"offsets\": [\n            {\n                \"amount\": 15.5,\n                \"buyer_id\": \"e4ad310c-1e5c-444f-88f1-c71eaef3a031\",\n                \"created_at\": \"2023-03-31T18:49:56Z\",\n                \"milestone_id\": \"92636c2d-d979-4351-b75a-865e3dd3d5b6\",\n                \"payment_id\": \"pi_3MrCv6GehkGRMk671H2IKsDY\",\n                \"status\": \"pending\",\n                \"updated_at\": \"2023-03-31T18:49:56Z\"\n            },\n            {\n                \"amount\": 21.5,\n                \"buyer_id\": \"e4ad310c-1e5c-444f-88f1-c71eaef3a031\",\n                \"created_at\": \"2023-03-31T18:50:51Z\",\n                \"milestone_id\": \"ed9e5902-351d-4c72-9129-f98f5dcc1f7d\",\n                \"payment_id\": \"pi_3MrCv6GehkGRMk671H2IKsDW\",\n                \"status\": \"confirmed\",\n                \"updated_at\": \"2023-03-31T18:53:47Z\"\n            }\n        ],\n        \"updated_at\": \"2023-03-31T18:53:47Z\"\n    },\n    \"success\": true\n}"
+				}
+			]
+		},
+		{
+			"name": "Offset - Get all",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/offset",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"offset"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "200 - Success",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5000/offset",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"offset"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Server",
+							"value": "Werkzeug/2.2.3 Python/3.11.0"
+						},
+						{
+							"key": "Date",
+							"value": "Fri, 31 Mar 2023 18:54:11 GMT"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Content-Length",
+							"value": "999"
+						},
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "*"
+						},
+						{
+							"key": "Connection",
+							"value": "close"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"data\": [\n        {\n            \"amount\": 15.5,\n            \"buyer_id\": \"e4ad310c-1e5c-444f-88f1-c71eaef3a031\",\n            \"created_at\": \"2023-03-31T18:49:56Z\",\n            \"milestone_id\": \"92636c2d-d979-4351-b75a-865e3dd3d5b6\",\n            \"payment_id\": \"pi_3MrCv6GehkGRMk671H2IKsDY\",\n            \"status\": \"pending\",\n            \"updated_at\": \"2023-03-31T18:49:56Z\"\n        },\n        {\n            \"amount\": 10.2,\n            \"buyer_id\": \"da686e54-83d2-471b-90f6-404e2077ac59\",\n            \"created_at\": \"2023-03-31T18:48:39Z\",\n            \"milestone_id\": \"ed9e5902-351d-4c72-9129-f98f5dcc1f7d\",\n            \"payment_id\": \"pi_3MrCv6GehkGRMk671H2IKsDX\",\n            \"status\": \"refund\",\n            \"updated_at\": \"2023-03-31T18:52:49Z\"\n        },\n        {\n            \"amount\": 21.5,\n            \"buyer_id\": \"e4ad310c-1e5c-444f-88f1-c71eaef3a031\",\n            \"created_at\": \"2023-03-31T18:50:51Z\",\n            \"milestone_id\": \"ed9e5902-351d-4c72-9129-f98f5dcc1f7d\",\n            \"payment_id\": \"pi_3MrCv6GehkGRMk671H2IKsDW\",\n            \"status\": \"confirmed\",\n            \"updated_at\": \"2023-03-31T18:53:47Z\"\n        }\n    ],\n    \"success\": true\n}"
+				}
+			]
+		}
+	]
+}
