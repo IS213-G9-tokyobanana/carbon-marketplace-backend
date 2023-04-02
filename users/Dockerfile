@@ -1,17 +1,21 @@
-FROM golang:1.20-bullseye
-
+FROM python:3.11-buster
 WORKDIR /app
 
-COPY go.mod ./
-COPY go.sum ./
 
-RUN go mod download
-RUN go install github.com/swaggo/swag/cmd/swag@latest
+ENV PYTHONFAULTHANDLER=1 \
+  PYTHONUNBUFFERED=1 \
+  PYTHONHASHSEED=random \
+  PIP_NO_CACHE_DIR=off \
+  PIP_DISABLE_PIP_VERSION_CHECK=on \
+  PIP_DEFAULT_TIMEOUT=100 \
+  POETRY_VERSION=1.4.0
 
-COPY . /app
+RUN pip install "poetry==$POETRY_VERSION"
 
-RUN swag init
+COPY . ./
+RUN poetry config virtualenvs.create false \
+  && poetry install --no-interaction --no-ansi
 
-EXPOSE 8080
+EXPOSE 5000
 
-CMD go run main.go
+CMD [ "python", "./app.py" ]

@@ -1,13 +1,13 @@
-# Users Microservice
+# Projects Microservice
 
-Built with Go, this microservice is responsible for managing users.
+Built with Python, this microservice is responsible for managing projects, project milestones and reserved offsets (for a milestone, buyer and amount)
 
 ## Prerequisites
 
-- [Docker](https://www.docker.com/)
-- [Go 1.20+](https://go.dev/dl/)
+- Python 3.11 - https://www.python.org/downloads/release/python-3110/
+- Poetry 1.4.0 - https://python-poetry.org/docs/#installation
 
-## Initial Setup
+## Testing using `docker compose` with Provisioned RabbitMQ
 
 1. Clone the repository
 
@@ -15,7 +15,7 @@ Built with Go, this microservice is responsible for managing users.
 git clone
 ```
 
-2. Copy and rename the `.env.example` file to `.env`. Please remember to update the environment variables accordingly.
+2. Copy and rename the `.env.example` file to `.env`.
 
 ```bash
 cp .env.example .env
@@ -27,92 +27,27 @@ cp .env.example .env
 docker compose up
 ```
 
-## Local Development
+5. Test with Postman by importing the collection from the `postman` folder. Expected results are in the `examples` under each request in the postman collection.
 
-1. Stop the go-rest-api container
-
+6. Tear down
 ```bash
-docker stop go-rest-api
+docker compose down
 ```
 
-2. Run the gin app with hot reload
-
-```bash
-go run main.go
-```
-
-3. Make necessary code changes & test with Postman. Restart the go-rest-api container once satisfied.
-
-```bash
-docker start go-rest-api
-```
 
 ## Testing
 
-You can run automated test with postman by importing the collection from the `postman` folder.
-
-## API Documentation
-
-You can view the API documentation by running the app and navigating to `http://localhost:8080/swagger/index.html`
-
-API documentation are automatically generated using [swag](https://github.com/swaggo/swag) and [gin-swagger](https://github.com/swaggo/gin-swagger).
-
-To update the API documentation, run the following command:
-
-```bash
-swag init
-```
-
-For more information on syntax of the comment parameters used to generate the API documentation, refer to the [swag documentation](https://github.com/swaggo/gin-swagger)
-
-Example:
-
-```go
-package controller
-
-import (
-    "fmt"
-    "net/http"
-    "strconv"
-
-    "github.com/gin-gonic/gin"
-    "github.com/swaggo/swag/example/celler/httputil"
-    "github.com/swaggo/swag/example/celler/model"
-)
-
-// ShowAccount godoc
-// @Summary      Show an account
-// @Description  get string by ID
-// @Tags         accounts
-// @Accept       json
-// @Produce      json
-// @Param        id   path      int  true  "Account ID"
-// @Success      200  {object}  model.Account
-// @Failure      400  {object}  httputil.HTTPError
-// @Failure      404  {object}  httputil.HTTPError
-// @Failure      500  {object}  httputil.HTTPError
-// @Router       /accounts/{id} [get]
-func (c *Controller) ShowAccount(ctx *gin.Context) {
-  id := ctx.Param("id")
-  aid, err := strconv.Atoi(id)
-  if err != nil {
-    httputil.NewError(ctx, http.StatusBadRequest, err)
-    return
-  }
-  account, err := model.AccountOne(aid)
-  if err != nil {
-    httputil.NewError(ctx, http.StatusNotFound, err)
-    return
-  }
-  ctx.JSON(http.StatusOK, account)
-}
-//...
-```
+You can test with postman by importing the collection from the `postman` folder.
 
 ## Built With
 
-- [Go](https://golang.org/) - Programming Language
-- [Gin-gonic](https://gin-gonic.com/) - Web framework
-- [GORM](https://gorm.io/) - ORM
+- [Python 3.11](https://www.python.org/downloads/release/python-3110/) - Programming Language
+- [Flask](https://flask.palletsprojects.com/en/2.2.x/quickstart/) - Web framework
+- [Flask SQL Alchemy](https://flask-sqlalchemy.palletsprojects.com/en/2.x/) - ORM
 - [PostgreSQL](https://www.postgresql.org/) - Database
-- [Swagger](https://swagger.io/) - API documentation
+- [Poetry](https://python-poetry.org/docs/basic-usage/) - Dependency Management
+- [Docker](https://docs.docker.com/engine/reference/commandline/cli/) - Containerization
+- [Docker Compose](https://docs.docker.com/engine/reference/commandline/compose/) - Container Orchestration
+
+
+
