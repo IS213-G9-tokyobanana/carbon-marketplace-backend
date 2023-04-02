@@ -1,31 +1,31 @@
 version: '3.8'
 services:
-  db:
-    image: postgres:15.2
-    container_name: db
-    restart: always
-    environment:
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_USER: postgres
-    volumes:
-      - db_data:/var/lib/postgresql/data
-    networks:
-      - flask_postgres
-
-  flask:
-    build: .
-    container_name: flask
+  flaskapp:
+    build: 
+      context: ./
+      dockerfile: app.Dockerfile
+    container_name: buy_projects
     restart: always
     ports:
       - "5000:5000"
-    depends_on:
-      - db
-    networks:
-      - flask_postgres
-  
-volumes:
-  db_data: {}
-
-networks:
-  flask_postgres:
-    external: true
+  temporal_start_payment_worker:
+    build:
+      context: ./
+      dockerfile: temporal_start_payment.Dockerfile
+    image: temporal_start_payment_worker
+    restart: always
+    container_name: temporal_start_payment_worker
+  temporal_payment_success_worker:
+    build: 
+      context: ./
+      dockerfile: temporal_payment_success.Dockerfile
+    image: temporal_payment_success_worker
+    restart: always
+    container_name: temporal_payment_success_worker
+  temporal_payment_failed_worker:
+    build: 
+      context: ./
+      dockerfile: temporal_payment_failed.Dockerfile
+    image: temporal_payment_failed_worker
+    restart: always
+    container_name: temporal_payment_failed_worker
