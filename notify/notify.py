@@ -103,27 +103,30 @@ def retrieve_user_email(id):
     return (user_email, retrieved_role)
 
 def format_message(data, queue_name, retrieved_role):
+    format_resource_id = None
     format_milestone_id = None
+    format_buyer_id = None
+    format_seller_id = None
     if queue_name == "notify_ratings_reward" or queue_name == "notify_ratings_penalise":
         format_resource_id = data.get('data', {}).get("project",{}).get("id", {})
         format_milestone_id = data.get("resource_id", {})
     elif queue_name == "notify_milestone_upcoming":
-        format_resource_id = data.get("data").get("project_id", {})
+        format_resource_id = data.get("data",{}).get("project_id", {})
         format_milestone_id = data.get("resource_id", {})
     elif queue_name == "notify_payment_success":
-        format_buyer_id = data.get("data").get("buyer_id", {})
-        format_seller_id = data.get("data").get("seller_id",{})
+        format_buyer_id = data.get("data",{}).get("buyer_id", {})
+        format_seller_id = data.get("data",{}).get("seller_id",{})
     elif queue_name == "notify_payment_failed":
-        format_buyer_id = data.get("data").get("buyer_id", {})
+        format_buyer_id = data.get("data",{}).get("buyer_id", {})
     elif queue_name == "notify_milestone_add":
-        format_resource_id = data.get("data").get("project").get("id", {})
+        format_resource_id = data.get("data",{}).get("project").get("id", {})
         format_milestone_id = data.get("resource_id", {})
     elif queue_name == "notify_project_create" or queue_name == "notify_project_verify":
         format_resource_id = data.get('data', {}).get("project",{}).get("id", {})
     else:
-        format_resource_id = data.get("data").get("project").get("id", {})
+        format_resource_id = data.get("data",{}).get("project",{}).get("id", {})
         format_milestone_id = data.get("resource_id", {})
-
+    
     if queue_name in QUEUES:
         queue_data = QUEUES[queue_name]
         message_retrieved = queue_data.get(message)
@@ -155,8 +158,11 @@ def send_email_to_user(user_email, message, subject_retrieved):
     subject = subject_retrieved
     plain_text_content = str(message)
     message = Mail(from_email, to_emails, subject, plain_text_content)
+    print("from email", from_email)
+    print("to email", to_emails)
     try:
         sg = SendGridAPIClient(SENDGRID_API_KEY)
+        print("api key retrieved", SENDGRID_API_KEY)
         response = sg.send(message)
         print(response.status_code)
         print("Email has been successfully sent")
