@@ -8,6 +8,7 @@ from config import (
     RMQPASSWORD,
     TOPIC_EXCHANGE_NAME,
     BINDING_KEYS,
+    MEILIBASEURL
 )
 
 # Connect to RabbitMQ
@@ -75,8 +76,9 @@ def callback(channel, method, properties, body):
     # print(" [x] Received %r" % body)
     # after receiving a message, call the scheduler
     try:
-        client = meilisearch.Client('http://search:7700')
+        client = meilisearch.Client(MEILIBASEURL)
         data = json.loads(body)
+        print(data)
         if data['type'] == 'project_verify' or data['type'] == 'offsets_rollback':
             client.index('projects').add_documents([data['data']['project']], primary_key='id')
         elif data['type'] == 'milestone_add':
