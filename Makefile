@@ -30,3 +30,6 @@ stop:
 
 prune-all:
 	@docker system prune -a --volumes
+
+manifest:
+	@./scripts/gen-manifest
