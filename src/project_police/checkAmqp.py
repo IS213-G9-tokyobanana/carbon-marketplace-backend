@@ -82,7 +82,7 @@ def check_message(data: dict):
     try:
         if data["type"] == "milestone_upcoming":
             result = police.publish_to_notifier(data, channel)
-        elif data["type"] == "milestone_pebalise" or data["type"] == "milestone_reward":
+        elif data["type"] == "milestone_penalise" or data["type"] == "milestone_reward":
             result = asyncio.run(main(data, PenaliseRewardTemporalWorkflow, "penalise-reward-task-queue"))
         elif data["type"] == "payment_overdue":
             result = asyncio.run(main(data, RollbackTemporalWorkflow, "rollback-task-queue"))

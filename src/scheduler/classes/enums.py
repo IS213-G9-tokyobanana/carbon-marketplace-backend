@@ -16,7 +16,7 @@ class MessageType(StrEnum):
 class TaskType(StrEnum):
     # Publishing
     MILESTONE_UPCOMING = 'milestone_upcoming'
-    MILESTONE_OVERDUE = 'milestone_overdue'
+    MILESTONE_OVERDUE = 'milestone_penalise'
     PAYMENT_OVERDUE = 'payment_overdue'
 
     @classmethod

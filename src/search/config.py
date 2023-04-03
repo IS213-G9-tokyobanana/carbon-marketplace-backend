@@ -18,9 +18,11 @@ if env == "production":
     RMQUSERNAME = os.getenv('rmqusername')
     RMQPASSWORD = os.getenv('rmqpassword')
     RMQPORT = os.getenv('rmqport')
+    MEILIBASEURL = os.getenv('MEILI')
 else:
     RMQHOSTNAME = "host.docker.internal"
     RMQUSERNAME = "guest"
     RMQPASSWORD = "guest"
     RMQPORT = 5672
+    MEILIBASEURL = os.getenv('MEILI')
     

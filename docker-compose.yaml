@@ -228,6 +228,8 @@ services:
       rmqport: ${RABBITMQ_PORT}
       rmqusername: ${RABBITMQ_USERNAME}
       rmqpassword: ${RABBITMQ_PASSWORD}
+      MEILI: ${MEILI_BASE_URL}
+
 
   users:
     container_name: users
