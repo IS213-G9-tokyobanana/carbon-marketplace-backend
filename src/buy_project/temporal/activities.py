@@ -11,7 +11,7 @@ from config.config import (
     RMQUSERNAME,
     RMQPASSWORD,
     EXCHANGE_NAME,
-    PAYMENT_STATUS_ROUTING_KEY
+    PAYMENT_STATUS_ROUTING_KEY,
 )
 
 
@@ -22,12 +22,9 @@ def format_url(url, pid, mid):
 # Request to Payment MS to create a new payment intent
 @activity.defn
 async def create_payment_intent(data) -> dict:
-    amount = data["amount_of_money"]
-    currency = data["currency"]
+    data["amount"] = data["amount_of_money"]
     try:
-        result = requests.post(
-            f"{PAYMENT_MS_URL}/payments", data={"amount": amount, "currency": currency}
-        )
+        result = requests.post(f"{PAYMENT_MS_URL}/payments", data=data)
         result.raise_for_status()
     except requests.exceptions.HTTPError as err:
         result = {
@@ -44,12 +41,12 @@ async def create_payment_intent(data) -> dict:
 async def reserve_offset(data) -> dict:
     url = format_url(
         PROJECT_OFFSET_URL,
-        data["data"]["project_id"],
-        data["data"]["milestone_id"],
+        data["project_id"],
+        data["milestone_id"],
     )
     payload = {
         "payment_id": data["payment_id"],
-        "amount": data["amount_of_money"],
+        "amount": data["quantity_tco2e"],
         "buyer_id": data["buyer_id"],
     }
     try:
@@ -173,7 +170,7 @@ async def publish_message(data) -> dict:
             "payment_status": data["payment_status"],
             "buyer_id": data["buyer_id"],
         }
-    key = PAYMENT_STATUS_ROUTING_KEY.format(payment_status = data["payment_status"])
+    key = PAYMENT_STATUS_ROUTING_KEY.format(payment_status=data["payment_status"])
     channel.basic_publish(
         exchange=EXCHANGE_NAME,
         routing_key=key,
