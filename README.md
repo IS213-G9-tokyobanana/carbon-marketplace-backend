@@ -123,7 +123,7 @@ To get a local copy of all the microservices up and running follow these steps.
    <ins><em>OR</em></ins>
 
    ```bash
-   docker-compose -f ./deployment/.docker/docker-compose.yaml up --build --remove-orphans --force-recreate -d
+   docker-compose -f ./docker-compose.yaml up --build --remove-orphans --force-recreate -d
    ```
 
 4. To stop the services, run
@@ -136,7 +136,7 @@ To get a local copy of all the microservices up and running follow these steps.
    <ins><em>OR</em></ins>
 
    ```bash
-   docker-compose -f ./deployment/.docker/docker-compose.yaml --env-file .env down
+   docker-compose -f ./docker-compose.yaml --env-file .env down
    ```
 
 5. To prune the services, run
