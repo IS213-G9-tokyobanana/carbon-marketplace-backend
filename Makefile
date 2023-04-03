@@ -26,7 +26,7 @@ dev:
 	@./scripts/dev
 
 stop:
-	@docker-compose -f ./deployment/.docker/docker-compose.yaml --env-file .env down
+	@docker-compose -f ./docker-compose.yaml --env-file .env down
 
 prune-all:
 	@docker system prune -a --volumes

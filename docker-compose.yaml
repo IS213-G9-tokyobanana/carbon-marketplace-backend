@@ -265,7 +265,7 @@ services:
     image: postgres:13.3
     restart: unless-stopped
     volumes:
-      - ./create_multiple_db.sh:/docker-entrypoint-initdb.d/create_multiple_db.sh:ro
+      - ./deployment/.docker/create_multiple_db.sh:/docker-entrypoint-initdb.d/create_multiple_db.sh:ro
       - postgres_data:/var/lib/postgresql/data
     networks:
       - backend-bridged-network
