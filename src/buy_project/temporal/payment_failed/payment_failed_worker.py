@@ -1,10 +1,12 @@
-from temporalio.client import Client
-from temporalio.worker import Worker
+from config.config import TEMPORAL_SERVICE_URL
 
 # Import the activity and workflow from our other files
-from temporal.activities import get_payment_intent, remove_offset, publish_message
-from temporal.payment_failed.payment_failed_workflow import PaymentFailedTemporalWorkflow
-from config.config import TEMPORAL_SERVICE_URL
+from temporal.activities import get_payment_intent, publish_message, remove_offset
+from temporal.payment_failed.payment_failed_workflow import (
+    PaymentFailedTemporalWorkflow,
+)
+from temporalio.client import Client
+from temporalio.worker import Worker
 
 
 async def main():
@@ -14,7 +16,7 @@ async def main():
     # Run the worker
     worker = Worker(
         client,
-        task_queue="paymeny-failed-queue",
+        task_queue="payment_failed",
         workflows=[PaymentFailedTemporalWorkflow],
         activities=[get_payment_intent, remove_offset, publish_message],
     )
