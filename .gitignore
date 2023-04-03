@@ -46,3 +46,5 @@ terraform.rc
 
 # Ignore init gen cache files
 .project_cache
+
+deployment/manifests/**
