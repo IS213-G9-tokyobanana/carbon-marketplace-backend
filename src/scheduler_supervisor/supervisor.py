@@ -1,12 +1,13 @@
-import logging
 import json
+import logging
+
+from amqp_setup import check_setup, create_connection, publish_message
 from config.config import (
     EXCHANGE_NAME,
-    TASK_STATUS_BINDING_KEY,
     QUEUE_NAME,
     SCHEDULER_SUPERVISOR_SCHEDULER_ROUTING_KEY,
+    TASK_STATUS_BINDING_KEY,
 )
-from amqp_setup import check_setup, publish_message, create_connection
 
 
 def callback(channel, method, properties, body):
@@ -41,7 +42,7 @@ def consume_message(
 
 
 def check_status(data: dict):
-    if data["success"] == "True":
+    if data["success"] == True:
         print("Task completed successfully!")
     else:
         payload = data["data"]["resource"]
