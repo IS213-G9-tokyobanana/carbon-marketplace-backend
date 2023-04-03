@@ -2,6 +2,9 @@ from crontab import CronTab
 from datetime import datetime, timedelta
 from classes.enums import MessageType, TaskType
 from publisher import republish_task
+from config.rabbitmq_setup import (
+    RMQHOSTNAME, RMQPORT, RMQUSERNAME, RMQPASSWORD
+)
 
 
 time_format = "%Y-%m-%dT%H:%M:%SZ"
@@ -68,6 +71,10 @@ def create_track_payment_job(payment_id, created_at, project_id, milestone_id):
     job  = cron.new(command=f'{PYTHON_EXE} {PUBLISHER_SCRIPT} --type {type} --project {project_id} --milestone {milestone_id} --payment {payment_id}', comment=f'{type}_{payment_id}')
     time_to_run = datetime.strptime(created_at, time_format) + timedelta(hours=1)
     job.setall(time_to_run)
+    job.env['rmqhostname'] = RMQHOSTNAME
+    job.env['rmqusername'] = RMQUSERNAME
+    job.env['rmqpassword'] = RMQPASSWORD
+    job.env['rmqport'] = RMQPORT
     cron.write()
     print(f'Created {type} job to run at {time_to_run} (UTC)')
     
@@ -75,6 +82,10 @@ def create_track_payment_job(payment_id, created_at, project_id, milestone_id):
     # job  = cron.new(command=f'{PYTHON_EXE} {PUBLISHER_SCRIPT} --type {type} --project {project_id} --milestone {milestone_id} --payment {payment_id}', comment=f'{type}_{payment_id}')
     # test_time = datetime.utcnow() + timedelta(minutes=1)
     # job.setall(test_time)
+    # job.env['rmqhostname'] = RMQHOSTNAME
+    # job.env['rmqusername'] = RMQUSERNAME
+    # job.env['rmqpassword'] = RMQPASSWORD
+    # job.env['rmqport'] = RMQPORT
     # cron.write()
     # print(f'Created {type} job to run at {str(test_time)} (UTC)')
 
@@ -98,6 +109,10 @@ def create_milestone_job(milestone: dict, job_type: TaskType):
         job  = cron.new(command=f'{PYTHON_EXE} {PUBLISHER_SCRIPT} --type {type} --milestone {milestone_id} --project {project_id}', comment=f'{type}_{milestone_id}')
         time_to_run = due_date - timedelta(30)
         job.setall(time_to_run)
+        job.env['rmqhostname'] = RMQHOSTNAME
+        job.env['rmqusername'] = RMQUSERNAME
+        job.env['rmqpassword'] = RMQPASSWORD
+        job.env['rmqport'] = RMQPORT
         cron.write()
         print(f'Created {type} job to run at {str(time_to_run)} (UTC)')
         
@@ -105,6 +120,10 @@ def create_milestone_job(milestone: dict, job_type: TaskType):
         # test_time = datetime.utcnow() + timedelta(minutes=1) # Can be used for testing, will schedule the job to run in 1 minute
         # job  = cron.new(command=f'{PYTHON_EXE} {PUBLISHER_SCRIPT} --type {type} --milestone {milestone_id} --project {project_id}', comment=f'{type}_{milestone_id}')
         # job.setall(test_time)
+        # job.env['rmqhostname'] = RMQHOSTNAME
+        # job.env['rmqusername'] = RMQUSERNAME
+        # job.env['rmqpassword'] = RMQPASSWORD
+        # job.env['rmqport'] = RMQPORT
         # cron.write()
         # print(f'Created {type} job to run at {str(test_time)} (UTC)')
     
@@ -119,6 +138,10 @@ def create_milestone_job(milestone: dict, job_type: TaskType):
         job  = cron.new(command=f'{PYTHON_EXE} {PUBLISHER_SCRIPT} --type {type} --milestone {milestone_id} --project {project_id}', comment=f'{type}_{milestone_id}')
         time_to_run = due_date + timedelta(1)
         job.setall(time_to_run)
+        job.env['rmqhostname'] = RMQHOSTNAME
+        job.env['rmqusername'] = RMQUSERNAME
+        job.env['rmqpassword'] = RMQPASSWORD
+        job.env['rmqport'] = RMQPORT
         cron.write()
         print(f'Created {type} job to run at {str(time_to_run)} (UTC)')
         
@@ -126,5 +149,9 @@ def create_milestone_job(milestone: dict, job_type: TaskType):
         # test_time = datetime.utcnow() + timedelta(minutes=1)
         # job  = cron.new(command=f'{PYTHON_EXE} {PUBLISHER_SCRIPT} --type {type} --milestone {milestone_id} --project {project_id}', comment=f'{type}_{milestone_id}')
         # job.setall(test_time)
+        # job.env['rmqhostname'] = RMQHOSTNAME
+        # job.env['rmqusername'] = RMQUSERNAME
+        # job.env['rmqpassword'] = RMQPASSWORD
+        # job.env['rmqport'] = RMQPORT
         # cron.write()
         # print(f'Created {type} job to run at {str(test_time)} (UTC)')
