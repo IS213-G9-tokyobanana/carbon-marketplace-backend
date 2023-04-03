@@ -42,7 +42,7 @@ spec:
             - name: RABBITMQ_USERNAME
               value: guest
             - name: SENDGRID_API_KEY
-              value: 
+              value: ${SENDGRID_API_KEY}
             - name: VERIFIERS_EMAILS
               value: http://users:5000/users?role=verifier
           image: esdg9t1/notify:latest
