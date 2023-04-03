@@ -43,6 +43,13 @@ QUEUES = {
         message: "Project with {project_id} has been created"
     },
 
+    QUEUE_PROJECT_VERIFY:  
+    {
+        BINDING_KEY: "events.projects.*.project.verify" ,
+        SUBJECT: "Project has been verified",
+        message: "Project {project_id} has been verified"
+    }, 
+
     QUEUE_PROJECT_RATINGS_REWARD: 
      {  
         BINDING_KEY: "events.projects.*.ratings.reward" ,
@@ -57,13 +64,6 @@ QUEUES = {
         message: "Project {project_id} with milestone {milestone_id} has been penalised"
     },
 
-    QUEUE_PROJECT_VERIFY:  
-    {
-        BINDING_KEY: "events.projects.*.project.verify" ,
-        SUBJECT: "Project has been verified",
-        message: "Project {project_id} has been verified"
-    }, 
-    
     QUEUE_PROJECT_MILESTONES_ADD:  
     {
         BINDING_KEY: "events.projects.*.milestone.add" ,
@@ -71,6 +71,13 @@ QUEUES = {
         message: "Project {project_id} with milestone {milestone_id} has been added"
     },
     
+    QUEUE_PROJECTPOLICE_MILESTONE_UPCOMING: 
+    {
+        BINDING_KEY: "events.police.notify.milestone.upcoming" ,
+        SUBJECT: "Upcoming Milestone",
+        message: "Project {project_id} with milestone {milestone_id} is upcoming"
+    },
+
     QUEUE_BUYPROJECTS_PAYMENT_SUCCESS:  
     {
         BINDING_KEY: "events.buyprojects.*.payment.success" ,
@@ -84,13 +91,6 @@ QUEUES = {
         BINDING_KEY:"events.buyprojects.*.payment.failed" ,
         SUBJECT: "Payment made failed",
         message_buyer: "Hi Buyer {buyer_id} payment has failed for the project"
-    },
-    
-    QUEUE_PROJECTPOLICE_MILESTONE_UPCOMING: 
-    {
-        BINDING_KEY: "events.police.notify.milestone.upcoming" ,
-        SUBJECT: "Upcoming Milestone",
-        message: "Project {project_id} with milestone {milestone_id} is upcoming"
     }
 }
 
