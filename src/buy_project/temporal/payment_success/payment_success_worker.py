@@ -1,15 +1,17 @@
-from temporalio.client import Client
-from temporalio.worker import Worker
+from config.config import TEMPORAL_SERVICE_URL
 
 # Import the activity and workflow from our other files
 from temporal.activities import (
-    get_payment_intent,
-    commit_offset,
     add_pending_offset,
+    commit_offset,
+    get_payment_intent,
     publish_message,
 )
-from temporal.payment_success.payment_success_workflow import PaymentSuccessTemporalWorkflow
-from config.config import TEMPORAL_SERVICE_URL
+from temporal.payment_success.payment_success_workflow import (
+    PaymentSuccessTemporalWorkflow,
+)
+from temporalio.client import Client
+from temporalio.worker import Worker
 
 
 async def main():
@@ -19,8 +21,13 @@ async def main():
     # Run the worker
     worker = Worker(
         client,
-        task_queue="payment-success-queue",
+        task_queue="payment_success",
         workflows=[PaymentSuccessTemporalWorkflow],
-        activities=[get_payment_intent, commit_offset, add_pending_offset, publish_message],
+        activities=[
+            get_payment_intent,
+            commit_offset,
+            add_pending_offset,
+            publish_message,
+        ],
     )
     await worker.run()
