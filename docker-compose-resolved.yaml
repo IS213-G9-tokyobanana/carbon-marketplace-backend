@@ -1,0 +1,396 @@
+name: carbon-marketplace-backend
+services:
+  buy_project_app:
+    container_name: buy_project_app
+    depends_on:
+      buy_project_tmplwrkr:
+        condition: service_started
+    environment:
+      paymentms: http://payments:5000
+      projectms: http://projects:5000
+      rmqhostname: rabbitmq
+      rmqpassword: guest
+      rmqport: "5672"
+      rmqusername: guest
+      temporalservice: 13.250.182.148:7233
+      userms: http://users:5000
+    image: esdg9t1/buy_project-app:latest
+    networks:
+      backend-bridged-network: null
+    ports:
+    - mode: ingress
+      target: 5000
+      published: "15000"
+      protocol: tcp
+    restart: unless-stopped
+    volumes:
+    - type: volume
+      source: buy_project_app
+      target: /app
+      volume: {}
+  buy_project_tmplwrkr:
+    container_name: buy_project_tmplwrkr
+    depends_on:
+      payments:
+        condition: service_started
+      projects:
+        condition: service_started
+      rabbitmq:
+        condition: service_started
+      users:
+        condition: service_started
+    environment:
+      paymentms: http://payments:5000
+      projectms: http://projects:5000
+      rmqhostname: rabbitmq
+      rmqpassword: guest
+      rmqport: "5672"
+      rmqusername: guest
+      temporalservice: 13.250.182.148:7233
+      userms: http://users:5000
+    image: esdg9t1/buy_project-tmplwrkr:latest
+    networks:
+      backend-bridged-network: null
+    restart: unless-stopped
+    volumes:
+    - type: volume
+      source: buy_project_tmplwrkr
+      target: /app
+      volume: {}
+  meili:
+    container_name: meili_search
+    image: getmeili/meilisearch
+    networks:
+      backend-bridged-network: null
+    ports:
+    - mode: ingress
+      target: 7700
+      published: "17700"
+      protocol: tcp
+    restart: unless-stopped
+    volumes:
+    - type: volume
+      source: search_data
+      target: /data.ms
+      volume: {}
+  mongodb:
+    container_name: mongodb
+    environment:
+      MONGO_INITDB_DATABASE: payment
+      MONGO_INITDB_ROOT_PASSWORD: changeme
+      MONGO_INITDB_ROOT_USERNAME: someuser
+    image: mongo
+    networks:
+      backend-bridged-network: null
+    ports:
+    - mode: ingress
+      target: 27017
+      published: "37017"
+      protocol: tcp
+    restart: unless-stopped
+    volumes:
+    - type: volume
+      source: mongo_data
+      target: /data/db
+      volume: {}
+  notify:
+    container_name: notify
+    depends_on:
+      rabbitmq:
+        condition: service_started
+      users:
+        condition: service_started
+    environment:
+      EXCHANGE: topic_exchange
+      EXCHANGE_TYPE: topic
+      MS_BASE_URL: http://users:5000/users
+      RABBITMQ_HOSTNAME: rabbitmq
+      RABBITMQ_PASSWORD: guest
+      RABBITMQ_PORT: "5672"
+      RABBITMQ_USERNAME: guest
+      SENDGRID_API_KEY: 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
+      VERIFIERS_EMAILS: http://users:5000/users?role=verifier
+    image: esdg9t1/notify:latest
+    networks:
+      backend-bridged-network: null
+    ports:
+    - mode: ingress
+      target: 5000
+      published: "15001"
+      protocol: tcp
+    restart: unless-stopped
+    volumes:
+    - type: volume
+      source: notify
+      target: /app
+      volume: {}
+  payments:
+    container_name: payments
+    depends_on:
+      mongodb:
+        condition: service_started
+    environment:
+      COLLECTION_NAME: payment_intents
+      DB_CONN_STRING: mongodb://someuser:changeme@mongodb:27017
+      DB_NAME: payment
+      MONGO_ROOT_PASSWORD: changeme
+      MONGO_ROOT_USER: someuser
+      STRIPE_PUBLISHABLE_KEY: pk_test_51MkoTiGehkGRMk67fwLugmwnA1wRXQlokK2bJiu83NC9P1X4b89uGEMPGlBuUOr4pnoSa6DhjQwEkUUY3H8ZGxYj00RUlCuPb5
+      STRIPE_SECRET_KEY: sk_test_51MkoTiGehkGRMk67gmWUZuFPf1iHB19BSX8EqmVjvzw8zYJADo9WWeOc77BzgoUZ25wgsjTKyRyAKtmROMYFbRhO00SCIvrTYo
+    image: esdg9t1/payments:latest
+    networks:
+      backend-bridged-network: null
+    ports:
+    - mode: ingress
+      target: 5000
+      published: "15002"
+      protocol: tcp
+    restart: unless-stopped
+    volumes:
+    - type: volume
+      source: payments
+      target: /app
+      volume: {}
+  postgres:
+    container_name: postgres
+    environment:
+      POSTGRES_MULTIPLE_DATABASES: users,projects
+      POSTGRES_PASSWORD: changeme
+      POSTGRES_PORT: "5432"
+      POSTGRES_USER: someuser
+    image: postgres:13.3
+    networks:
+      backend-bridged-network: null
+    restart: unless-stopped
+    volumes:
+    - type: bind
+      source: C:\Users\User1\Documents\David\projects\school\carbon-marketplace-backend\deployment\.docker\create_multiple_db.sh
+      target: /docker-entrypoint-initdb.d/create_multiple_db.sh
+      read_only: true
+      bind:
+        create_host_path: true
+    - type: volume
+      source: postgres_data
+      target: /var/lib/postgresql/data
+      volume: {}
+  project_police_app:
+    container_name: project_police_app
+    depends_on:
+      project_police_tmplwrkr:
+        condition: service_started
+    environment:
+      projectms: http://projects:5000
+      rmqhostname: rabbitmq
+      rmqpassword: guest
+      rmqport: "5672"
+      rmqusername: guest
+      temporalservice: 13.250.182.148:7233
+      userms: http://users:5000
+    image: esdg9t1/project_police-app:latest
+    networks:
+      backend-bridged-network: null
+    restart: unless-stopped
+    volumes:
+    - type: volume
+      source: project_police_app
+      target: /app
+      volume: {}
+  project_police_tmplwrkr:
+    container_name: project_police_tmplwrkr
+    depends_on:
+      projects:
+        condition: service_started
+      rabbitmq:
+        condition: service_started
+      users:
+        condition: service_started
+    environment:
+      projectms: http://projects:5000
+      rmqhostname: rabbitmq
+      rmqpassword: guest
+      rmqport: "5672"
+      rmqusername: guest
+      temporalservice: 13.250.182.148:7233
+      userms: http://users:5000
+    image: esdg9t1/project_police-tmplwrkr:latest
+    networks:
+      backend-bridged-network: null
+    restart: unless-stopped
+    volumes:
+    - type: volume
+      source: project_police_tmplwrkr
+      target: /app
+      volume: {}
+  projects:
+    container_name: projects
+    depends_on:
+      postgres:
+        condition: service_started
+      rabbitmq:
+        condition: service_started
+    environment:
+      POSTGRES_DB: projects
+      POSTGRES_HOSTNAME: postgres
+      POSTGRES_PASSWORD: changeme
+      POSTGRES_PORT: "5432"
+      POSTGRES_USER: someuser
+      RABBITMQ_HOSTNAME: rabbitmq
+      RABBITMQ_PASSWORD: guest
+      RABBITMQ_PORT: "5672"
+      RABBITMQ_USERNAME: guest
+    image: esdg9t1/projects:latest
+    networks:
+      backend-bridged-network: null
+    ports:
+    - mode: ingress
+      target: 5000
+      published: "15003"
+      protocol: tcp
+    restart: unless-stopped
+    volumes:
+    - type: volume
+      source: projects
+      target: /app
+      volume: {}
+  rabbitmq:
+    container_name: rabbitmq
+    image: rabbitmq:3-management
+    networks:
+      backend-bridged-network: null
+    ports:
+    - mode: ingress
+      target: 5672
+      published: "5672"
+      protocol: tcp
+    - mode: ingress
+      target: 15672
+      published: "15672"
+      protocol: tcp
+    restart: unless-stopped
+    volumes:
+    - type: volume
+      source: rabbitmq_data
+      target: /var/lib/rabbitmq
+      volume: {}
+  scheduler:
+    container_name: scheduler
+    depends_on:
+      rabbitmq:
+        condition: service_started
+    environment:
+      rmqhostname: rabbitmq
+      rmqpassword: guest
+      rmqport: "5672"
+      rmqusername: guest
+    image: esdg9t1/scheduler:latest
+    networks:
+      backend-bridged-network: null
+    restart: unless-stopped
+    volumes:
+    - type: volume
+      source: scheduler
+      target: /app
+      volume: {}
+  scheduler_supervisor:
+    container_name: scheduler_supervisor
+    depends_on:
+      rabbitmq:
+        condition: service_started
+    environment:
+      rmqhostname: rabbitmq
+      rmqpassword: guest
+      rmqport: "5672"
+      rmqusername: guest
+    image: esdg9t1/scheduler_supervisor:latest
+    networks:
+      backend-bridged-network: null
+    restart: unless-stopped
+    volumes:
+    - type: volume
+      source: scheduler_supervisor
+      target: /app
+      volume: {}
+  search:
+    container_name: search
+    depends_on:
+      meili:
+        condition: service_started
+      postgres:
+        condition: service_started
+      rabbitmq:
+        condition: service_started
+    environment:
+      MEILI: ""
+      rmqhostname: rabbitmq
+      rmqpassword: guest
+      rmqport: "5672"
+      rmqusername: guest
+    image: esdg9t1/search:latest
+    networks:
+      backend-bridged-network: null
+    restart: unless-stopped
+    volumes:
+    - type: volume
+      source: search
+      target: /app
+      volume: {}
+  users:
+    container_name: users
+    depends_on:
+      postgres:
+        condition: service_started
+    environment:
+      POSTGRES_DB: users
+      POSTGRES_HOSTNAME: postgres
+      POSTGRES_PASSWORD: changeme
+      POSTGRES_PORT: "5432"
+      POSTGRES_USER: someuser
+    image: esdg9t1/users:latest
+    networks:
+      backend-bridged-network: null
+    ports:
+    - mode: ingress
+      target: 5000
+      published: "15004"
+      protocol: tcp
+    restart: unless-stopped
+    volumes:
+    - type: volume
+      source: users
+      target: /app
+      volume: {}
+networks:
+  backend-bridged-network:
+    name: carbon-marketplace-backend_backend-bridged-network
+    driver: bridge
+volumes:
+  buy_project_app:
+    name: carbon-marketplace-backend_buy_project_app
+  buy_project_tmplwrkr:
+    name: carbon-marketplace-backend_buy_project_tmplwrkr
+  mongo_data:
+    name: carbon-marketplace-backend_mongo_data
+  notify:
+    name: carbon-marketplace-backend_notify
+  payments:
+    name: carbon-marketplace-backend_payments
+  postgres_data:
+    name: carbon-marketplace-backend_postgres_data
+  project_police_app:
+    name: carbon-marketplace-backend_project_police_app
+  project_police_tmplwrkr:
+    name: carbon-marketplace-backend_project_police_tmplwrkr
+  projects:
+    name: carbon-marketplace-backend_projects
+  rabbitmq_data:
+    name: carbon-marketplace-backend_rabbitmq_data
+  scheduler:
+    name: carbon-marketplace-backend_scheduler
+  scheduler_supervisor:
+    name: carbon-marketplace-backend_scheduler_supervisor
+  search:
+    name: carbon-marketplace-backend_search
+  search_data:
+    name: carbon-marketplace-backend_search_data
+  users:
+    name: carbon-marketplace-backend_users

@@ -1,0 +1,11 @@
+#!/bin/bash
+
+SCRIPT_DIR=$(dirname $0)
+PROJECT_ROOT=$(dirname $SCRIPT_DIR)
+
+echo "generating manifest files..."
+
+docker-compose config >docker-compose-resolved.yaml &&
+    kompose convert -f docker-compose-resolved.yaml -o $PROJECT_ROOT/deployment/manifests/
+
+echo "generated at $PROJECT_ROOT/deployment/manifests"
