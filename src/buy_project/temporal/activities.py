@@ -24,8 +24,9 @@ def format_url(url, pid, mid):
 async def create_payment_intent(data) -> dict:
     data["amount"] = data["amount_of_money"]
     try:
-        result = requests.post(f"{PAYMENT_MS_URL}/payments", data=data)
+        result = requests.post(f"{PAYMENT_MS_URL}/payments", json=data)
         result.raise_for_status()
+        result = result.json()
     except requests.exceptions.HTTPError as err:
         result = {
             "success": False,
@@ -50,8 +51,9 @@ async def reserve_offset(data) -> dict:
         "buyer_id": data["buyer_id"],
     }
     try:
-        result = requests.post(url, data=payload)
+        result = requests.post(url, json=payload)
         result.raise_for_status()
+        result = result.json()
     except requests.exceptions.HTTPError as err:
         result = {
             "success": False,
@@ -70,6 +72,7 @@ async def get_payment_intent(data) -> dict:
     try:
         result = requests.get(url)
         result.raise_for_status()
+        result = result.json()
     except requests.exceptions.HTTPError as err:
         result = {
             "success": False,
@@ -89,8 +92,9 @@ async def commit_offset(data) -> dict:
         data["milestone_id"],
     )
     try:
-        result = requests.post(url, data={"payment_id": data["payment_id"]})
+        result = requests.post(url, json={"payment_id": data["payment_id"]})
         result.raise_for_status()
+        result = result.json()
     except requests.exceptions.HTTPError as err:
         result = {
             "success": False,
@@ -118,8 +122,9 @@ async def add_pending_offset(data) -> dict:
         },
     }
     try:
-        result = requests.post(url, data=payload)
+        result = requests.post(url, json=payload)
         result.raise_for_status()
+        result = result.json()
     except requests.exceptions.HTTPError as err:
         result = {
             "success": False,
@@ -135,8 +140,9 @@ async def add_pending_offset(data) -> dict:
 async def remove_offset(data) -> dict:
     url = format_url(PROJECT_OFFSET_URL, data["project_id"], data["milestone_id"])
     try:
-        result = requests.delete(url, data={"payment_id": data["payment_id"]})
+        result = requests.delete(url, json={"payment_id": data["payment_id"]})
         result.raise_for_status()
+        result = result.json()
     except requests.exceptions.HTTPError as err:
         result = {
             "success": False,
