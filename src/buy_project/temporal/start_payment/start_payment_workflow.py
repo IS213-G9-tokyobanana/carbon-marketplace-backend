@@ -21,7 +21,18 @@ class StartPaymentTemporalWorkflow:
         )
         status_arr.append(payment_intent_result["success"])
 
-        data["payment_id"] = payment_intent_result["data"]
+        client_secret = payment_intent_result.get("data")
+        if not client_secret:
+            return {
+                "success": False,
+                "data": {
+                    "message": "Failed to retrieve client secret",
+                    "resources": payment_intent_result,
+                },
+            }
+
+        data["client_secret"] = client_secret
+        data["payment_id"] = data["client_secret"].split("_secret_")[0]
 
         # Reserve offset
         reserve_offset_result = await workflow.execute_activity(
