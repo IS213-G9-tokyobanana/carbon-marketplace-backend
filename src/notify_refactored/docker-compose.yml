@@ -1,0 +1,13 @@
+version: "3.8"
+
+networks:
+  notify_network:
+    driver: bridge
+
+services:
+  notify:
+    container_name: notify
+    build: .
+    restart: always
+    networks:
+      - notify_network
