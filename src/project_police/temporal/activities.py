@@ -22,6 +22,7 @@ async def get_payment_id(data) -> dict:
     try:
         result = requests.get(f"{PAYMENT_MS_URL}/payment/{milestone_id}")
         result.raise_for_status()
+        result = result.json()
     except requests.exceptions.HTTPError as err:
         result = {
             "success": False,
@@ -39,6 +40,7 @@ async def get_buyer_id(data) -> dict:
     try:
         result = requests.get(f"{PAYMENT_MS_URL}/payment/{payment_id}")
         result.raise_for_status()
+        result = result.json()
     except requests.exceptions.HTTPError as err:
         result = {
             "success": False,
@@ -62,10 +64,7 @@ async def send_to_notifier(data) -> dict:
     connection = pika.BlockingConnection(parameters=parameters)
     channel = connection.channel()
     result = publish_to_notifier(data, channel)
-    return {
-        "success": True,
-        "data": {"message": "Example test message from send_to_notifier"},
-    }
+    return result
 
 
 # Request to Project Microservice to remove reserved offset
@@ -80,6 +79,7 @@ async def remove_reserved_offset(data) -> dict:
     try:
         result = requests.delete(url, json=payload)
         result.raise_for_status()
+        result = result.json()
     except requests.exceptions.HTTPError as err:
         result = {
             "success": False,
@@ -103,6 +103,7 @@ async def patch_milestone(data) -> dict:
     try:
         result = requests.patch(url, json=payload)
         result.raise_for_status()
+        result = result.json()
     except requests.exceptions.HTTPError as err:
         result = {
             "success": False,
@@ -127,6 +128,7 @@ async def send_to_user(data) -> dict:
             f"{USER_MS_URL}/user/{payment_id}/payment/{buyer_id}/send", json=payload
         )
         result.raise_for_status()
+        result = result.json()
     except requests.exceptions.HTTPError as err:
         result = {
             "success": False,

@@ -27,7 +27,7 @@ class PenaliseRewardTemporalWorkflow:
             get_buyer_id, data, start_to_close_timeout=timedelta(seconds=5)
         )
         status_arr.append(result2["success"])
-        data["data"]["buyer_id"] = result2["buyer_id"]["payment_data"]["buyer_id"]
+        data["data"]["buyer_id"] = result2["data"]["payment_data"]["buyer_id"]
 
         # Execute activity to remove reserved offset
         result3 = await workflow.execute_activity(

@@ -21,7 +21,7 @@ class RollbackTemporalWorkflow:
         )
         status_arr.append(result1["success"])
 
-        data["data"]["buyer_id"] = result1["buyer_id"]
+        data["data"]["buyer_id"] = result1["data"]["payment_data"]["buyer_id"]
 
         # Execute activity to remove reserved offset
         result2 = await workflow.execute_activity(
