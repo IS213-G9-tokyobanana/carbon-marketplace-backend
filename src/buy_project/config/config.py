@@ -1,4 +1,5 @@
 import os
+
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -11,5 +12,4 @@ PROJECT_MS_URL = os.getenv("projectms")
 USER_MS_URL = os.getenv("userms")
 TEMPORAL_SERVICE_URL = os.getenv("temporalservice")
 EXCHANGE_NAME = "topic_exchange"
-PROJECT_OFFSET_URL = PROJECT_MS_URL + "/projects/{project_id}/milestones/{milestone_id}/offset"
 PAYMENT_STATUS_ROUTING_KEY = "events.buyprojects.public.payment.{payment_status}"

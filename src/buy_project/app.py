@@ -1,64 +1,82 @@
-from flask import Flask, request, jsonify
+import asyncio
+import logging
+
+from flask import Flask, jsonify, request
 from flask_cors import CORS
-from os import environ
-from temporal.run_workflow import main
-from temporal.start_payment.start_payment_workflow import StartPaymentTemporalWorkflow
 from temporal.payment_failed.payment_failed_workflow import (
     PaymentFailedTemporalWorkflow,
 )
 from temporal.payment_success.payment_success_workflow import (
     PaymentSuccessTemporalWorkflow,
 )
-import asyncio
-import stripe
-import logging
+from temporal.run_workflow import main
+from temporal.start_payment.start_payment_workflow import StartPaymentTemporalWorkflow
 
 app = Flask(__name__)
 CORS(app)
 
 
-@app.route("/webhook", methods=["POST"])
-def webhook():
-    event = None
-    payload = request.get_data()  # retrieves raw body data
-    signature = request.headers["stripe-signature"]
+@app.route("/checkout", methods=["POST"])
+def checkout():
+    """For backend to reserve offset and create payment object
 
+    Expected data:
+    data: {
+        payment_id: string; // stripe checkout session id
+        quantity_tco2e: number;
+        project_id: string;
+        milestone_id: string;
+        owner_id: string;
+        buyer_id: string;
+    }
+    """
+
+    data = request.get_json()
     try:
-        event = stripe.Webhook.construct_event(
-            payload, signature, environ.get("STRIPE_ENDPOINT_SECRET")
-        )
-    except ValueError as err:
-        # Invalid payload
-        raise err
-    except stripe.error.SignatureVerificationError as err:
-        # Invalid signature
-        raise err
-
-    # Handle events
-    if event["type"] == "payment_intent.succeeded":
-        payment_details = event["data"]["object"]
-        result = asyncio.run(
-            main(payment_details, PaymentSuccessTemporalWorkflow, "payment_success")
-        )
-    elif event["type"] == "payment_intent.failed":
-        payment_details = event["data"]["object"]
-        result = asyncio.run(
-            main(payment_details, PaymentFailedTemporalWorkflow, "payment_failed")
-        )
-    else:
-        print(f"Unhandled event type {event}")
-
+        result = asyncio.run(main(StartPaymentTemporalWorkflow, data, "start_payment"))
+    except Exception as e:
+        logging.error(e)
+        return jsonify(success=False, data=dict(message=str(e), resources=data))
     return result
 
 
-@app.route("/checkout", methods=["POST"])
-def checkout():
+@app.route("/payment-success", methods=["POST"])
+def payment_success():
+    """
+    Expected data:
+    data: {
+        payment_id: string; // stripe checkout session id
+        status: "open" | "complete" | "expired"; // stripe checkout session status
+    }
+    """
     data = request.get_json()
     try:
-        result = asyncio.run(main(data, StartPaymentTemporalWorkflow, "start_payment"))
+        result = asyncio.run(
+            main(PaymentSuccessTemporalWorkflow, data, "payment_success")
+        )
     except Exception as e:
         logging.error(e)
-        return jsonify(success=False)
+        return jsonify(success=False, data=dict(message=str(e), resources=data))
+    return result
+
+
+@app.route("/payment-failed", methods=["POST"])
+def payment_failed():
+    """
+    Expected data:
+    data: {
+        payment_id: string; // stripe checkout session id
+        status: "open" | "complete" | "expired"; // stripe checkout session status
+    }
+    """
+    data = request.get_json()
+    try:
+        result = asyncio.run(
+            main(PaymentFailedTemporalWorkflow, data, "payment_failed")
+        )
+    except Exception as e:
+        logging.error(e)
+        return jsonify(success=False, data=dict(message=str(e), resources=data))
     return result
 
 

@@ -4,7 +4,7 @@ from config.config import TEMPORAL_SERVICE_URL
 from temporal.activities import (
     add_pending_offset,
     commit_offset,
-    get_payment_intent,
+    get_payment_object,
     publish_message,
 )
 from temporal.payment_success.payment_success_workflow import (
@@ -24,7 +24,7 @@ async def main():
         task_queue="payment_success",
         workflows=[PaymentSuccessTemporalWorkflow],
         activities=[
-            get_payment_intent,
+            get_payment_object,
             commit_offset,
             add_pending_offset,
             publish_message,

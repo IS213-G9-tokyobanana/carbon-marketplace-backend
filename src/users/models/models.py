@@ -1,43 +1,50 @@
+import uuid
+from datetime import datetime
+
+from classes.enums import OffsetStatus, UserRole
 from config.flask_config import app
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Column, ForeignKey
+from sqlalchemy.dialects.postgresql import ENUM, FLOAT, TEXT, TIMESTAMP, UUID, VARCHAR
 from sqlalchemy.orm import relationship
-import uuid
-from datetime import datetime
-from sqlalchemy.dialects.postgresql import VARCHAR, TEXT, TIMESTAMP, FLOAT, UUID, BOOLEAN
-from classes.enums import OffsetStatus, UserRole
 
 db = SQLAlchemy(app)
 
 time_format = "%Y-%m-%dT%H:%M:%SZ"
 
-class User(db.Model):
-    __tablename__ = 'user'
 
-    id = Column(UUID(as_uuid=True), primary_key=True, nullable=False, default=uuid.uuid4)
+class User(db.Model):
+    __tablename__ = "user"
+
+    id = Column(
+        UUID(as_uuid=True), primary_key=True, nullable=False, default=uuid.uuid4
+    )
     name = Column(TEXT, nullable=False)
     email = Column(TEXT, nullable=False)
-    role = Column(VARCHAR(20), nullable=False, default=UserRole.BUYER.value)
+    role = Column(db.Enum(UserRole), nullable=False, default=UserRole.BUYER.value)
     footprint_in_tCO2e = Column(FLOAT, nullable=False, default=0.00)
     created_at = Column(TIMESTAMP, nullable=False, default=datetime.utcnow)
-    updated_at = Column(TIMESTAMP, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at = Column(
+        TIMESTAMP, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
 
-    offsets = relationship('Offset', back_populates='buyer')
+    offsets = relationship("Offset", back_populates="buyer")
 
     def json(self) -> dict:
         return {
-            "id": str(self.id), 
+            "id": str(self.id),
             "name": self.name,
             "email": self.email,
             "role": self.role,
             "footprint_in_tCO2e": self.footprint_in_tCO2e,
             "created_at": self.created_at.strftime(time_format),
             "updated_at": self.updated_at.strftime(time_format),
-            "offsets": [] if self.offsets is None else [o.json() for o in self.offsets]
-            }
-    
+            "offsets": [] if self.offsets is None else [o.json() for o in self.offsets],
+        }
+
     def __repr__(self) -> str:
-        return f'{self.json()}'
+        return f"{self.json()}"
+
 
 class Offset(db.Model):
     __tablename__ = "offset"
@@ -45,12 +52,16 @@ class Offset(db.Model):
     payment_id = Column(TEXT, primary_key=True)
     milestone_id = Column(TEXT, nullable=False)
     amount = Column(FLOAT, nullable=False)
-    status = Column(VARCHAR(20), nullable=False, default=OffsetStatus.PENDING.value) # "pending" | "confirmed"
+    status = Column(
+        db.Enum(OffsetStatus), nullable=False, default=OffsetStatus.PENDING.value
+    )  # "pending" | "confirmed"
     created_at = Column(TIMESTAMP, nullable=False, default=datetime.utcnow)
-    updated_at = Column(TIMESTAMP, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
-    buyer_id = Column(UUID(as_uuid=True), ForeignKey('user.id'))
+    updated_at = Column(
+        TIMESTAMP, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+    buyer_id = Column(UUID(as_uuid=True), ForeignKey("user.id"))
 
-    buyer = relationship('User', back_populates='offsets')
+    buyer = relationship("User", back_populates="offsets")
 
     def json(self) -> dict:
         return {
@@ -58,11 +69,10 @@ class Offset(db.Model):
             "milestone_id": self.milestone_id,
             "amount": self.amount,
             "status": self.status,
-            "created_at": self.created_at.strftime(time_format), 
-            "updated_at": self.updated_at.strftime(time_format), 
-            "buyer_id": str(self.buyer_id)
+            "created_at": self.created_at.strftime(time_format),
+            "updated_at": self.updated_at.strftime(time_format),
+            "buyer_id": str(self.buyer_id),
         }
 
     def __repr__(self) -> str:
-        return f'{self.json()}'
-
+        return f"{self.json()}"

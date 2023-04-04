@@ -1,199 +1,121 @@
-import { DbTransactionOutput, TransactionInput } from "./types"
-import Stripe from "stripe"
-import mongoDB, { MongoClient } from "mongodb"
+import { DbTransactionOutput, TransactionInput } from "./types";
+import { config } from "dotenv";
+import { MongoClient, Collection } from "mongodb";
+import express from "express";
 
-import * as dotenv from "dotenv"
-dotenv.config()
-import express from "express"
+config();
 
-const app = express()
-app.use((req, res, next) => {
-	if (req.originalUrl === "/webhooks") {
-		next()
-	} else {
-		express.json()(req, res, next)
-	}
-})
-const port = 5000
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-	apiVersion: "2022-11-15",
-	typescript: true,
-})
-const collections: { paymentintents?: mongoDB.Collection } = {}
+const app = express();
+app.use(express.json());
+app.use(function (err, req, res, next) {
+  // error handling middleware
+  console.error(err.stack);
+  res.status(500).send({
+    success: false,
+    data: {
+      message: err.message,
+    },
+  });
+});
+app.use(function (req, res, next) {
+  // logging middleware
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.originalUrl}`);
+  next();
+});
+
+const port = 5000;
+
+const collections: { payments?: Collection } = {};
 
 // function to connect to MongoDB
 async function connectToDatabase() {
-	const client: mongoDB.MongoClient = new MongoClient(
-		process.env.DB_CONN_STRING
-	)
-	await client.connect()
+  const client: MongoClient = new MongoClient(process.env.DB_CONN_STRING);
+  await client.connect();
 
-	const db = client.db(process.env.DB_NAME)
+  const db = client.db(process.env.DB_NAME);
 
-	const collection: mongoDB.Collection = db.collection(
-		process.env.COLLECTION_NAME
-	)
-	collections.paymentintents = collection
-	console.log(
-		`Successfully connected to database: ${db.databaseName} and collection: ${collections.paymentintents}`
-	)
+  const collection: Collection = db.collection(process.env.COLLECTION_NAME);
+  collections.payments = collection;
+  console.log(
+    `Successfully connected to database: ${db.databaseName} and collection: ${collections.payments}`
+  );
 }
 
-connectToDatabase()
-
 app.get("/", (req, res) => {
-	res.send("Hello World!")
-})
-
-app.listen(port, () => {
-	console.log(`Example app listening on port ${port}`)
-})
+  res.send("Payments microservice healthy");
+});
 
 // route to get Payment Intent saved in MongoDB
 app.get("/payments", async (req, res) => {
-	let input
-	if (req.query.payment_id) {
-		input = req.query.payment_id
-		console.log(`Query payment id: ${input} `)
-	} else {
-		input = req.query.milestone_id
-		console.log(`Query milestone id: ${input} `)
-	}
+  let input;
+  let result;
+  if (req.query.payment_id) {
+    input = req.query.payment_id;
+    console.log(`Query payment id: ${input} `);
+  } else {
+    input = req.query.milestone_id;
+    console.log(`Query milestone id: ${input} `);
+  }
 
-	try {
-		let result
+  try {
+    if (req.query.payment_id) {
+      result = await collections.payments.findOne({
+        $or: [{ payment_id: input }],
+      });
+    } else {
+      result = await collections.payments.findOne({
+        $or: [{ milestone_id: input }],
+      });
+    }
 
-		if (req.query.payment_id) {
-			result = await collections.paymentintents.findOne({
-				$or: [{ payment_id: input }],
-			})
-		} else {
-			result = await collections.paymentintents.findOne({
-				$or: [{ milestone_id: input }],
-			})
-		}
-
-		if (result) {
-			res.send({ success: true, data: { payment_data: result } })
-		} else {
-			res.send({
-				success: false,
-				data: { message: "No payment intent with that ID found." },
-			})
-		}
-	} catch (e) {
-		res.status(400).send({
-			success: false,
-			data: { message: e.message },
-		})
-	}
-})
+    if (result) {
+      res.status(200).send({ success: true, data: result });
+    } else {
+      res.status(404).send({
+        success: false,
+        data: { message: "No payment intent with that ID found." },
+      });
+    }
+  } catch (e) {
+    res.status(400).send({
+      success: false,
+      data: { message: e.message },
+    });
+  }
+});
 
 // route to create Payment Intent in Stripe
 app.post("/payments", async (req, res) => {
-	const input: TransactionInput = req.body
-	let paymentIntent: Stripe.PaymentIntent
-	let dbTransaction: DbTransactionOutput
+  const input = req.body;
 
-	const params: Stripe.PaymentIntentCreateParams = {
-		amount: input.amount,
-		currency: input.currency,
-		automatic_payment_methods: { enabled: true }, // for the sake of this project, we just assume automatic payment options
-	}
+  try {
+    const dbTransaction = {
+      payment_id: input.payment_id,
+      quantity_tco2e: input.quantity_tco2e,
+      project_id: input.project_id,
+      milestone_id: input.milestone_id,
+      owner_id: input.owner_id,
+      buyer_id: input.buyer_id,
+      created_at: new Date(),
+      updated_at: new Date(),
+    } as DbTransactionOutput;
 
-	try {
-		paymentIntent = await stripe.paymentIntents.create(params)
-	} catch (e) {
-		res.status(400).send({
-			success: false,
-			data: {
-				message: e.message,
-				resource: {
-					amount: input.amount,
-					currency: input.currency,
-				},
-			},
-		})
-	}
+    collections.payments.insertOne(dbTransaction);
 
-	try {
-		dbTransaction = {
-			payment_id: paymentIntent.id,
-			payment_intent: paymentIntent,
-			quantity_tco2e: input.quantity_tco2e,
-			project_id: input.project_id,
-			milestone_id: input.milestone_id,
-			owner_id: input.owner_id,
-			buyer_id: input.buyer_id,
-			created_at: new Date(),
-			updated_at: new Date(),
-		}
+    res.status(201).send({ success: true, data: dbTransaction });
+  } catch (e) {
+    res.status(400).send({
+      success: false,
+      data: {
+        message: e.message,
+        resource: input,
+      },
+    });
+  }
+});
 
-		collections.paymentintents.insertOne(dbTransaction)
+connectToDatabase();
 
-		res.send({ success: true, data: paymentIntent.client_secret })
-	} catch (e) {
-		res.status(400).send({
-			success: false,
-			data: {
-				message: e.message,
-				resource: dbTransaction,
-			},
-		})
-	}
-})
-
-// route to receive webhooks from Stripe
-app.post(
-	"/webhooks",
-	express.raw({ type: "application/json" }),
-	async (req, res) => {
-		const sig = req.headers["stripe-signature"]
-
-		let event
-
-		try {
-			event = stripe.webhooks.constructEvent(
-				req.body,
-				sig,
-				process.env.STRIPE_ENDPOINT_SECRET
-			)
-		} catch (err) {
-			console.log(err.message)
-			res.status(400).send(`Webhook Error: ${err.message}`)
-			return
-		}
-
-		switch (event.type) {
-			case "charge.succeeded":
-				const charge = event.data.object
-				console.log(charge)
-			case "payment_intent.created":
-				const paymentIntent = event.data.object
-				console.log(paymentIntent)
-			case "payment_intent.succeeded":
-				const paymentIntentStatus = event.data.object
-				console.log(paymentIntentStatus)
-				break
-			case "payment_method.attached":
-				const paymentMethod = event.data.object
-				console.log(paymentMethod)
-				break
-			default:
-				console.log(`Unhandled event type ${event.type}`)
-		}
-
-		res.send({ received: true })
-
-		// if (req.body) {
-		// 	res.send({ success: true, data: req.body })
-		// } else {
-		// 	res.status(400).send({
-		// 		success: false,
-		// 		data: {
-		// 			message: "No message received.",
-		// 		},
-		// 	})
-		// }
-	}
-)
+app.listen(port, () => {
+  console.log(`Payments MS listening on port ${port}`);
+});
