@@ -67,7 +67,7 @@ async def reserve_offset(data) -> dict:
 # Get payment intent from Payment MS
 @activity.defn
 async def get_payment_intent(data) -> dict:
-    payment_id = data
+    payment_id = data['id']
     url = f"{PAYMENT_MS_URL}/payments/{payment_id}"
     try:
         result = requests.get(url)

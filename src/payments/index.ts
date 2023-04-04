@@ -52,11 +52,12 @@ app.listen(port, () => {
 // route to get Payment Intent saved in MongoDB
 app.get("/payments", async (req, res) => {
 	let input
-
 	if (req.query.payment_id) {
 		input = req.query.payment_id
+		console.log(`Query payment id: ${input} `)
 	} else {
 		input = req.query.milestone_id
+		console.log(`Query milestone id: ${input} `)
 	}
 
 	try {
@@ -120,6 +121,7 @@ app.post("/payments", async (req, res) => {
 			payment_id: paymentIntent.id,
 			payment_intent: paymentIntent,
 			quantity_tco2e: input.quantity_tco2e,
+			project_id: input.project_id,
 			milestone_id: input.milestone_id,
 			owner_id: input.owner_id,
 			buyer_id: input.buyer_id,
