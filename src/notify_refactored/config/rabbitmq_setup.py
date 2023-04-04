@@ -63,7 +63,7 @@ BUYER_MESSAGES = { # { queue_name: message }
         "subject": "Milestone has been {milestone_status}",
         "message": """
         Dear {recipient},
-            This is to inform you that the following milestone has been {milestone_status} and project rating {rating_action}.:
+            This is to inform you that the following milestone has been {milestone_status} and project rating {rating_action}:
             Milestone ID: {milestone_id}
             Milestone Name: {milestone_name}
             Milestone Status: {milestone_status}
@@ -80,7 +80,7 @@ SELLER_MESSAGES = {
         "subject": "Project has been verified",
         "message": """
         Dear {recipient},
-            This s to inform you that your project has been verified:
+            This is to inform you that your project has been verified:
             Project ID: {project_id}
             Project name: {project_name}
         """,
