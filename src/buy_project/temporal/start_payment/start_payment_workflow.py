@@ -21,7 +21,7 @@ class StartPaymentTemporalWorkflow:
         )
         status_arr.append(payment_intent_result["success"])
 
-        data["payment_id"] = payment_intent_result["data"]["id"]
+        data["payment_id"] = payment_intent_result["data"]
 
         # Reserve offset
         reserve_offset_result = await workflow.execute_activity(
