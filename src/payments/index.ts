@@ -76,7 +76,7 @@ app.get("/payments", async (req, res) => {
 		if (result) {
 			res.send({ success: true, data: { payment_data: result } })
 		} else {
-			res.send({
+			res.status(404).send({
 				success: false,
 				data: { message: "No payment intent with that ID found." },
 			})
