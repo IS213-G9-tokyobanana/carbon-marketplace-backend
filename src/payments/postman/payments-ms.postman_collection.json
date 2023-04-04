@@ -1,0 +1,290 @@
+{
+	"info": {
+		"_postman_id": "fe5e7185-c750-4c7e-94b1-0f2ef916f229",
+		"name": "payments-ms",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "21122994"
+	},
+	"item": [
+		{
+			"name": "PaymentIntent - create one",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\t\"amount\": 500,\r\n\t\"currency\": \"sgd\",\r\n\t\"quantity_tco2e\": 200,\r\n\t\"milestone_id\": \"b776d994-edc6-403b-a479-31b457b715f3\",\r\n\t\"owner_id\": \"9b3d423e-604f-4dee-b2aa-ab98b6e675a5\",\r\n\t\"buyer_id\": \"dfa45ec7-acd8-4d7f-a677-56a125b3bdf9\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:15002/payments",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "15002",
+					"path": [
+						"payments"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "200 - Success",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"amount\": 500,\r\n\t\"currency\": \"sgd\",\r\n\t\"quantity_tco2e\": 200,\r\n\t\"milestone_id\": \"b776d994-edc6-403b-a479-31b457b715f3\",\r\n\t\"owner_id\": \"9b3d423e-604f-4dee-b2aa-ab98b6e675a5\",\r\n\t\"buyer_id\": \"dfa45ec7-acd8-4d7f-a677-56a125b3bdf9\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:15002/payments",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "15002",
+							"path": [
+								"payments"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Powered-By",
+							"value": "Express"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "Content-Length",
+							"value": "86"
+						},
+						{
+							"key": "ETag",
+							"value": "W/\"56-jjP+zPYnzncTpLMxzkcaqHw2xbs\""
+						},
+						{
+							"key": "Date",
+							"value": "Tue, 04 Apr 2023 14:13:56 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=5"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"success\": true,\n    \"data\": \"pi_3MtAcRGehkGRMk670N2UO0vp_secret_0tKE4LujJSJOXIvq9vcSbp5rK\"\n}"
+				},
+				{
+					"name": "400 - Missing Params",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\r\n\t\"milestone_id\": \"b776d994-edc6-403b-a479-31b457b715f3\",\r\n\t\"owner_id\": \"9b3d423e-604f-4dee-b2aa-ab98b6e675a5\",\r\n\t\"buyer_id\": \"dfa45ec7-acd8-4d7f-a677-56a125b3bdf9\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:15002/payments",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "15002",
+							"path": [
+								"payments"
+							]
+						}
+					},
+					"status": "Bad Request",
+					"code": 400,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Powered-By",
+							"value": "Express"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "Content-Length",
+							"value": "84"
+						},
+						{
+							"key": "ETag",
+							"value": "W/\"54-R2F3oSFikc6cy3pU5lls/He6MSo\""
+						},
+						{
+							"key": "Date",
+							"value": "Tue, 04 Apr 2023 14:17:02 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=5"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"success\": false,\n    \"data\": {\n        \"message\": \"Missing required param: amount.\",\n        \"resource\": {}\n    }\n}"
+				}
+			]
+		},
+		{
+			"name": "PaymentIntent - get one by id",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": [
+				{
+					"name": "200 - Success",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:15002/payments?payment_id=pi_3MtAcRGehkGRMk670N2UO0vp",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "15002",
+							"path": [
+								"payments"
+							],
+							"query": [
+								{
+									"key": "payment_id",
+									"value": "pi_3MtAcRGehkGRMk670N2UO0vp"
+								}
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Powered-By",
+							"value": "Express"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "Content-Length",
+							"value": "1479"
+						},
+						{
+							"key": "ETag",
+							"value": "W/\"5c7-vfozV3mFK+5neSkQx3BaF7dQv0k\""
+						},
+						{
+							"key": "Date",
+							"value": "Tue, 04 Apr 2023 14:19:19 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=5"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"success\": true,\n    \"data\": {\n        \"payment_data\": {\n            \"_id\": \"642c30a4eca38e989af93599\",\n            \"payment_id\": \"pi_3MtAcRGehkGRMk670N2UO0vp\",\n            \"payment_intent\": {\n                \"id\": \"pi_3MtAcRGehkGRMk670N2UO0vp\",\n                \"object\": \"payment_intent\",\n                \"amount\": 500,\n                \"amount_capturable\": 0,\n                \"amount_details\": {\n                    \"tip\": {}\n                },\n                \"amount_received\": 0,\n                \"application\": null,\n                \"application_fee_amount\": null,\n                \"automatic_payment_methods\": {\n                    \"enabled\": true\n                },\n                \"canceled_at\": null,\n                \"cancellation_reason\": null,\n                \"capture_method\": \"automatic\",\n                \"client_secret\": \"pi_3MtAcRGehkGRMk670N2UO0vp_secret_0tKE4LujJSJOXIvq9vcSbp5rK\",\n                \"confirmation_method\": \"automatic\",\n                \"created\": 1680617635,\n                \"currency\": \"sgd\",\n                \"customer\": null,\n                \"description\": null,\n                \"invoice\": null,\n                \"last_payment_error\": null,\n                \"latest_charge\": null,\n                \"livemode\": false,\n                \"metadata\": {},\n                \"next_action\": null,\n                \"on_behalf_of\": null,\n                \"payment_method\": null,\n                \"payment_method_options\": {\n                    \"card\": {\n                        \"installments\": null,\n                        \"mandate_options\": null,\n                        \"network\": null,\n                        \"request_three_d_secure\": \"automatic\"\n                    },\n                    \"paynow\": {}\n                },\n                \"payment_method_types\": [\n                    \"card\",\n                    \"paynow\"\n                ],\n                \"processing\": null,\n                \"receipt_email\": null,\n                \"review\": null,\n                \"setup_future_usage\": null,\n                \"shipping\": null,\n                \"source\": null,\n                \"statement_descriptor\": null,\n                \"statement_descriptor_suffix\": null,\n                \"status\": \"requires_payment_method\",\n                \"transfer_data\": null,\n                \"transfer_group\": null\n            },\n            \"quantity_tco2e\": 200,\n            \"milestone_id\": \"b776d994-edc6-403b-a479-31b457b715f3\",\n            \"owner_id\": \"9b3d423e-604f-4dee-b2aa-ab98b6e675a5\",\n            \"buyer_id\": \"dfa45ec7-acd8-4d7f-a677-56a125b3bdf9\",\n            \"created_at\": \"2023-04-04T14:13:56.265Z\",\n            \"updated_at\": \"2023-04-04T14:13:56.265Z\"\n        }\n    }\n}"
+				},
+				{
+					"name": "400 - Not found",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:15002/payments?payment_id=pi_3MtAcRG",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "15002",
+							"path": [
+								"payments"
+							],
+							"query": [
+								{
+									"key": "payment_id",
+									"value": "pi_3MtAcRG"
+								}
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Powered-By",
+							"value": "Express"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "Content-Length",
+							"value": "76"
+						},
+						{
+							"key": "ETag",
+							"value": "W/\"4c-F2+3uNlV03d18Qlj4AIlzs6r2cw\""
+						},
+						{
+							"key": "Date",
+							"value": "Tue, 04 Apr 2023 14:21:01 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=5"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"success\": false,\n    \"data\": {\n        \"message\": \"No payment intent with that ID found.\"\n    }\n}"
+				}
+			]
+		}
+	]
+}
