@@ -1,194 +1,279 @@
 import json
 import logging
 import requests
-from config import (
-    RABBITMQ_HOSTNAME,
-    RABBITMQ_PORT,
-    EXCHANGE,
-    EXCHANGE_TYPE,
-    MS_BASE_URL,
-    SENDGRID_API_KEY,
-    SENDGRID_FROM_EMAIL,
-    VERIFIERS_EMAILS
+from config.config import ( 
+    EXCHANGE, USERS_BASE_URL, 
+    SENDGRID_API_KEY, SENDGRID_FROM_EMAIL
 )
-from amqp_setup import (
-    connection,
-    channel,
-    QUEUES,
-    message,
-    channel_consume,
-    message_buyer,
-    message_seller, SUBJECT
+from config.rabbitmq_setup import (
+    connection, channel, QUEUES, VERIFIER_MESSAGES, SELLER_MESSAGES, BUYER_MESSAGES
 )
+from classes.MessageType import MessageType
+
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 
-def callback(channel, method, properties, body):
-    try:
-        data = json.loads(body)
-        queue_name = "_".join(method.routing_key.split(".")[-2:])
-        queue_name = "notify_" + queue_name
+VERIFIERS_URL = f'{USERS_BASE_URL}?role=verifier'
 
-        email_subject = QUEUES[queue_name][SUBJECT]
-        # this is the data retrieved from the publisher
-        process_message(data, queue_name, email_subject)
+def consume_message(channel, method, properties, body):
+    print(f'Received from routing key: {method.routing_key}', end='\n\n')
+    # Get subject, get recipients, create message, send email
+    try:
+        payload = json.loads(body)
+        print(f'payload: {payload}', end='\n\n')
+        resource_id = payload['resource_id']
+        type = payload['type']
+        data = payload['data']
+
+        if type == MessageType.PROJECT_CREATE.value: # Sends email to all verifiers
+            print(f'Preparing email for {type}...', end='\n\n')
+            project = data['project']
+            subject = VERIFIER_MESSAGES[MessageType.PROJECT_CREATE.value]['subject']
+
+            response = requests.get(VERIFIERS_URL).json()
+            verifiers = response.get('data', [])
+            print(f'verifiers: {verifiers}', end='\n\n')
+
+            for verifier in verifiers:
+                email = verifier.get('email')
+                
+                message = VERIFIER_MESSAGES[MessageType.PROJECT_CREATE.value]['message']
+                message = message.format(recipient=verifier.get('name'), project_name= project.get('name'), project_id=project.get('id'))
+                print(f'Sending email TO {email} \t MESSAGE: {message}', end='\n\n')
+
+                send_email(to_emails=email, message=message, subject=subject)
+                print(f'Email sent to {email} for type {type}', end='\n\n')
+
+        elif type == MessageType.MILESTONE_ADD.value: # Sends email to all verifiers
+            print(f'Preparing email for {type}...', end='\n\n')
+            project = data['project']
+            milestone = project['milestones'][0]
+            subject = VERIFIER_MESSAGES[type]['subject']
+
+            response = requests.get(VERIFIERS_URL).json()
+            verifiers = response.get('data', [])
+            print(f'verifiers: {verifiers}', end='\n\n')
+
+            for verifier in verifiers:
+                email = verifier.get('email')
+                
+                message = VERIFIER_MESSAGES[type]['message']
+                message = message.format(
+                    recipient=verifier.get('name'), milestone_id=milestone.get('id'), milestone_name=milestone.get('name'),
+                    project_id=project.get('id'), project_name=project.get('name'), due_date=milestone.get('due_date'))
+
+                print(f'Sending email TO {email} \t MESSAGE: {message}', end='\n\n')
+                send_email(to_emails=email, message=message, subject=subject)
+                print(f'Email sent to {email} for type {type}', end='\n\n')
+            
+
+        elif type == MessageType.MILESTONE_UPCOMING.value: # Sends email to all verifiers
+            print(f'Preparing email for {type}...', end='\n\n')
+            project_id = data['project_id']
+            milestone_id = data['milestone_id']
+            subject = VERIFIER_MESSAGES[type]['subject']
+
+            response = requests.get(VERIFIERS_URL).json()
+            verifiers = response.get('data', [])
+            print(f'verifiers: {verifiers}', end='\n\n')
+
+            for verifier in verifiers:
+                email = verifier.get('email')
+                message = VERIFIER_MESSAGES[type]['message']
+                message = message.format(
+                    recipient=verifier.get('name'), milestone_id=milestone_id, project_id=project_id)
+
+                print(f'Sending email TO {email} \t MESSAGE: {message}', end='\n\n')
+                send_email(to_emails=email, message=message, subject=subject)
+                print(f'Email sent to {email} for type {type}', end='\n\n')
+
+        elif type == MessageType.PROJECT_VERIFY.value: # Sends email to seller
+            print(f'Preparing email for {type}...', end='\n\n')
+            project = data['project']
+            subject = SELLER_MESSAGES[type]['subject']
+            owner_id = project['owner_id']
+
+            # notify seller
+            print(f'Sending URL to users MS: {USERS_BASE_URL}/{owner_id}')
+            response = requests.get(f'{USERS_BASE_URL}/{owner_id}').json()
+            seller = response.get('data', [])
+            print(f'seller: {seller}', end='\n\n')
+
+            email = seller.get('email')
+            print(f'seller email: {email}', end='\n\n')
+            
+            message = SELLER_MESSAGES[type]['message']
+            message = message.format(
+                recipient=seller.get('name'), project_id=project.get('id'), project_name=project.get('name'))
+            print(f'Sending email TO {email} \t MESSAGE: {message}', end='\n\n')
+
+            send_email(to_emails=email, message=message, subject=subject)
+            print(f'Email sent to {email} for type {type}', end='\n\n')
+
+        elif type == MessageType.MILESTONE_PENALISE.value or type == MessageType.MILESTONE_REWARD.value: # Sends email to seller and all buyers of the milestone
+            print(f'Preparing email for {type}...', end='\n\n')
+            milestone_id = resource_id
+            project = data['project']
+            milestones = project['milestones']
+            print(f'milestones: {milestones}', end='\n\n')
+            milestone_penalised = list(filter(lambda m: m['id'] == milestone_id, milestones))
+            if len(milestone_penalised) == 0:
+                raise Exception(f'Invalid payload. Milestone penalised of resource_id {resource_id} does not match any milestone_id in project milestones passed in the payload')
+            
+            milestone_penalised = milestone_penalised[0]
+            milestone_name = milestone_penalised.get('name')
+            milestone_status = milestone_penalised.get('status')
+            project_id = project.get('id')
+            project_name = project.get('name')
+            project_rating = project.get('rating')
+            rating_action = 'penalised' if type == MessageType.MILESTONE_PENALISE.value else 'rewarded'
+
+            subject = SELLER_MESSAGES[type]['subject']
+            subject = subject.format(milestone_status=milestone_status)
+            owner_id = project['owner_id']
+
+            # notify seller
+            print(f'Sending URL to users MS: {USERS_BASE_URL}/{owner_id}')
+            response = requests.get(f'{USERS_BASE_URL}/{owner_id}').json()
+            print(f'response after GET to {USERS_BASE_URL}/{owner_id}: {response}', end='\n\n')
+            seller = response.get('data', [])
+            print(f'seller: {seller}', end='\n\n')
+
+            email = seller.get('email')
+            print(f'seller email: {email}', end='\n\n')
+            
+            message = SELLER_MESSAGES[type]['message']
+            message = message.format(
+                recipient=seller.get('name'), milestone_id=milestone_id, milestone_name=milestone_name, milestone_status=milestone_status, rating_action=rating_action,
+                  project_id=project_id, project_name=project_name, rating=project_rating)
+            print(f'Sending email TO {email} \t MESSAGE: {message}', end='\n\n')
+
+            send_email(to_emails=email, message=message, subject=subject)
+            print(f'Email sent to {email} for type {type}', end='\n\n')
+
+            #notify all the buyers of that milestone
+            print(f'Getting all buyers by milestone_id to users MS: {USERS_BASE_URL}?milestone_id={milestone_id}')
+            response = requests.get(f'{USERS_BASE_URL}?milestone_id={milestone_id}').json()
+            print(f'response after GET to {USERS_BASE_URL}?milestone_id={milestone_id}: {response}', end='\n\n')
+            buyers = response.get('data', [])
+            print(f'buyers: {buyers}', end='\n\n')
+
+            for buyer in buyers:
+                email = buyer.get('email')
+                print(f'buyer email: {email}', end='\n\n')
+                
+                message = BUYER_MESSAGES[type]['message']
+                message = message.format(
+                    recipient=buyer.get('name'), milestone_id=milestone_id, milestone_name=milestone_name, milestone_status=milestone_status, rating_action=rating_action,
+                      project_id=project_id, project_name=project_name, rating=project_rating)
+                print(f'Sending email TO {email} \t MESSAGE: {message}', end='\n\n')
+
+                send_email(to_emails=email, message=message, subject=subject)
+                print(f'Email sent to {email} for type {type}', end='\n\n')
+
+
+        elif type == MessageType.PAYMENT_SUCCESS.value: # Sends email to seller and buyer
+            print(f'Preparing email for {type}...', end='\n\n')
+            buyer_id = data['buyer_id']
+            seller_id = data['seller_id']
+            milestone_id = data['milestone_id']
+            subject = BUYER_MESSAGES[type]['subject']
+            
+            # notify buyer
+            print(f'Sending URL to users MS: {USERS_BASE_URL}/{buyer_id}')
+            response = requests.get(f'{USERS_BASE_URL}/{buyer_id}').json()
+            print(f'response after GET to {USERS_BASE_URL}/{buyer_id}: {response}', end='\n\n')
+            buyer = response.get('data', [])
+            print(f'buyer: {buyer}', end='\n\n')
+
+            email = buyer.get('email')
+            
+            message = BUYER_MESSAGES[type]['message']
+            message = message.format(
+                recipient=buyer.get('name'), milestone_id=milestone_id)
+            print(f'Sending email TO {email} \t MESSAGE: {message}', end='\n\n')
+
+            send_email(to_emails=email, message=message, subject=subject)
+
+            # notify seller
+            subject = SELLER_MESSAGES[type]['subject']
+            print(f'Sending URL to users MS: {USERS_BASE_URL}/{seller_id}')
+            response = requests.get(f'{USERS_BASE_URL}/{seller_id}').json()
+            print(f'response after GET to {USERS_BASE_URL}/{seller_id}: {response}', end='\n\n')
+            seller = response.get('data', [])
+            print(f'seller: {seller}', end='\n\n')
+
+            email = seller.get('email')
+            
+            message = BUYER_MESSAGES[type]['message']
+            message = message.format(
+                recipient=seller.get('name'), milestone_id=milestone_id)
+            print(f'Sending email TO {email} \t MESSAGE: {message}', end='\n\n')
+
+            send_email(to_emails=email, message=message, subject=subject)
+            print(f'Email sent to {email} for type {type}', end='\n\n')
+
+        elif type == MessageType.PAYMENT_FAILED.value: # Sends email to buyer
+            print(f'Preparing email for {type}...', end='\n\n')
+            buyer_id = data['buyer_id']
+            milestone_id = data['milestone_id']
+            subject = BUYER_MESSAGES[type]['subject']
+
+            # notify buyer
+            print(f'Sending URL to users MS: {USERS_BASE_URL}/{buyer_id}')
+            response = requests.get(f'{USERS_BASE_URL}/{buyer_id}').json()
+            print(f'response after GET to {USERS_BASE_URL}/{buyer_id}: {response}', end='\n\n')
+            buyer = response.get('data', [])
+            print(f'buyer: {buyer}', end='\n\n')
+
+            email = buyer.get('email')
+            
+            message = BUYER_MESSAGES[type]['message']
+            message = message.format(
+                recipient=buyer.get('name'), milestone_id=milestone_id)
+            print(f'Sending email TO {email} \t MESSAGE: {message}', end='\n\n')
+
+            send_email(to_emails=email, message=message, subject=subject)
+            print(f'Email sent to {email} for type {type}', end='\n\n')
+
         channel.basic_ack(delivery_tag=method.delivery_tag)
+
     except Exception as err:
         logging.exception("Error processing message: %s", err)
+        channel.basic_ack(delivery_tag=method.delivery_tag) # remove the unacknowledged message from the queue
 
-def process_message(data, queue_name, SUBJECT):
-    if queue_name == "notify_payment_success":
-        buyer_id = data.get("data").get("buyer_id", {})
-        seller_id = data.get("data").get("seller_id", {})
-
-        retrieved_email_buyer, retrieved_role_buyer = retrieve_user_email(buyer_id)
-        result_message = format_message(data, queue_name, retrieved_role_buyer)
-        send_email_to_user(retrieved_email_buyer, result_message, SUBJECT)
-
-        retrieved_email_seller, retrieved_role_seller = retrieve_user_email(seller_id)
-        result_message = format_message(data, queue_name, retrieved_role_seller)
-        send_email_to_user(retrieved_email_seller, result_message, SUBJECT)
-
-    elif queue_name == "notify_payment_failed":
-        buyer_id = data.get("data").get("buyer_id", {})
-        retrieved_email_buyer, retrieved_role_buyer = retrieve_user_email(buyer_id)
-        result_message = format_message(data, queue_name, retrieved_role_buyer)
-        send_email_to_user(retrieved_email_buyer, result_message, SUBJECT)
-
-    elif queue_name == "notify_milestone_add" or queue_name == "notify_project_create" or queue_name == "notify_milestone_upcoming":
-        verifiers_emails = get_all_verifiers()
-        for email in verifiers_emails:
-            result_message = format_message(data, queue_name, retrieved_role="verifier")
-            send_email_to_user(email, result_message, SUBJECT)
-            
-    elif queue_name == "notify_project_verify":
-        owner_id = data.get("data").get("project", {}).get("owner_id", {})
-        print('owner_id: ', owner_id, end='\n\n')
-        retrieved_email, retrieved_role = retrieve_user_email(owner_id)
-        result_message = format_message(data, queue_name, retrieved_role)
-        send_email_to_user(retrieved_email, result_message, SUBJECT)
-    
-    else:
-        owner_id = data.get("data").get("project", {}).get("owner_id", {})
-        print('owner_id: ', owner_id, end='\n\n')
-        retrieved_email, retrieved_role = retrieve_user_email(owner_id)
-        result_message = format_message(data, queue_name, retrieved_role)
-        send_email_to_user(retrieved_email, result_message, SUBJECT)
- 
-def get_all_verifiers():
-    response = requests.get(VERIFIERS_EMAILS)
-    data_object = response.json()
-    verifiers_emails = []
-    payload = data_object.get("data", {})
-    for item in payload:
-        verifiers_emails.append(item["email"])
-    return verifiers_emails
-
-# communicate with the user microservice to retrieve users information
-def retrieve_user_email(id):
-    try:
-        get_user_url = "".join([MS_BASE_URL, id])
-        print(get_user_url)
-        response = requests.get(get_user_url)
-        response.raise_for_status()
-        #handles 404,403 and 500 error
-    except requests.exceptions.HTTPError as e:
-        status_code = e.response.status_code
-        print("this is the status_code retrieved from HTTP Error:", status_code)
-        if status_code == 404:
-            print("User not found")
-    data_object = response.json()
-    user_email = data_object.get("data", {}).get("email")
-    retrieved_role = data_object.get("data").get("role", {})
-    return (user_email, retrieved_role)
-
-def format_message(data, queue_name, retrieved_role):
-    format_resource_id = None
-    format_milestone_id = None
-    format_buyer_id = None
-    format_seller_id = None
-    if queue_name == "notify_ratings_reward" or queue_name == "notify_ratings_penalise":
-        format_resource_id = data.get('data', {}).get("project",{}).get("id", {})
-        format_milestone_id = data.get("resource_id", {})
-    elif queue_name == "notify_milestone_upcoming":
-        format_resource_id = data.get("data",{}).get("project_id", {})
-        format_milestone_id = data.get("resource_id", {})
-    elif queue_name == "notify_payment_success":
-        format_buyer_id = data.get("data",{}).get("buyer_id", {})
-        format_seller_id = data.get("data",{}).get("seller_id",{})
-    elif queue_name == "notify_payment_failed":
-        format_buyer_id = data.get("data",{}).get("buyer_id", {})
-    elif queue_name == "notify_milestone_add":
-        format_resource_id = data.get("data",{}).get("project").get("id", {})
-        format_milestone_id = data.get("resource_id", {})
-    elif queue_name == "notify_project_create" or queue_name == "notify_project_verify":
-        format_resource_id = data.get('data', {}).get("project",{}).get("id", {})
-    else:
-        format_resource_id = data.get("data",{}).get("project",{}).get("id", {})
-        format_milestone_id = data.get("resource_id", {})
-    
-    if queue_name in QUEUES:
-        queue_data = QUEUES[queue_name]
-        message_retrieved = queue_data.get(message)
-
-    if message_retrieved is not None:
-        if format_milestone_id is not None:
-            new_message_retrieved = message_retrieved.format(
-            project_id=format_resource_id,
-            milestone_id=format_milestone_id
-        )
-        else:
-            new_message_retrieved = message_retrieved.format(
-            project_id=format_resource_id
-        )
-        if new_message_retrieved is not None:
-            return new_message_retrieved
-    elif retrieved_role == "buyer":
-        message_retrieved = queue_data.get(message_buyer)
-        if message_retrieved is not None:
-            return message_retrieved.format(buyer_id=format_buyer_id)
-    elif retrieved_role == "seller":
-        message_retrieved = queue_data.get(message_seller)
-        if message_retrieved is not None:
-            return message_retrieved.format(seller_id=format_seller_id)
         
-def send_email_to_user(user_email, message, subject_retrieved):
-    from_email = SENDGRID_FROM_EMAIL
-    to_emails = user_email
-    subject = subject_retrieved
-    plain_text_content = str(message)
-    message = Mail(from_email, to_emails, subject, plain_text_content)
-    print("from email", from_email)
-    print("to email", to_emails)
+def send_email(to_emails, message, subject):
+    message = Mail(from_email=SENDGRID_FROM_EMAIL, to_emails=to_emails, subject=subject, plain_text_content=message)
+    print(f'trying to send email from {SENDGRID_FROM_EMAIL} to {to_emails}', end='\n\n')
     try:
         sg = SendGridAPIClient(SENDGRID_API_KEY)
-        print("api key retrieved", SENDGRID_API_KEY)
         response = sg.send(message)
-        print(response.status_code)
-        print("Email has been successfully sent")
+        print(f'response.status_code: {response.status_code}')
+        print("Email sent", end='\n\n')
+
     except requests.exceptions.HTTPError as e:
         if e.response.status_code == 401:
             print(
                 "Invalid API key. Authentication failed. Please check your credentials"
             )
-        else:
-            print("An error occurred:", e)
+    except Exception as e:
+        logging.exception(f'Uncaught exception {e}')
         
 
 if __name__ == "__main__":
+    print(' [*] Waiting for messages. To exit press CTRL+C')
     try:
         for queue_name, binding_key in QUEUES.items():
-            channel_consume(
-                connection=connection,
-                channel=channel,
-                host=RABBITMQ_HOSTNAME,
-                port=RABBITMQ_PORT,
-                exchangename=EXCHANGE,
-                exchangetype=EXCHANGE_TYPE,
-                queue=queue_name,
-                on_message_callback=callback,
-            )
+            print(f"Monitoring binding queue {queue_name} on exchange {EXCHANGE} with binding key {binding_key}")
+            channel.basic_consume(queue=queue_name, on_message_callback=consume_message, auto_ack=False)
         channel.start_consuming()
     except KeyboardInterrupt:
+        print(' [*] Exiting...')
+
+    except Exception as e:
+        print("Uncaught exception:", e)
+
+    finally:
         channel.stop_consuming()
         connection.close()

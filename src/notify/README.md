@@ -23,34 +23,19 @@ git clone
 cp .env.example .env
 ```
 
-3. Change `RABBITMQ_HOSTNAME=changeme` and `RABBITMQ_PORT=changeme` in the `.env` file to the ip address and port number provisioned for the rabbitmq server. 
-
-```bash
-RABBITMQ_HOSTNAME=changeme
-RABBITMQ_PORT=changeme
 ```
+3. Add in the `SENDGRID_API_KEY` and `SENDGRID_FROM_EMAIL` in the `.env` file
 
-4. Change `RABBITMQ_USERNAME=changeme` and `RABBITMQ_PASSWORD=changeme` to the `guest`
+4. Start up the users microservice with `docker compose up` in the `users` folder. Create 1 buyer, 1 seller and 1 verifier with valid emails to see the email sent to the respective emails.
 
-```bash
-RABBITMQ_USERNAME=changeme
-RABBITMQ_PASSWORD=changeme
-```
-5. Add in the `SENDGRID_API_KEY` in the `.env` file
-
-6. Set up the users microservice and ensure that you are able to create users with `buyer`, `seller` and `verifier` roles. Ensure that the email of the users you are testing for is configured with enterprisesolutiondevg9t1@gmail.com in the body params.
-
-7. Open the `tests` folder and update the `owner_id` of the json files according to the user that you are notifying based on the queue that you are listening on with the `id` of the respective user role retrieved from the get multiple users request from postman.
-
-8. Run python3 `publisher.py` to publish the messages 
-
-9. Run docker compose to receive the messages
-
-10. Enter the 
-
+5. `docker compose up` 
 ```bash 
 docker build -t notify .
 ```
+
+### Testing
+Refer to `Notify MS` in Notion for the payload to be sent to which queue and the expected result.
+
 
 ### Local Development
 

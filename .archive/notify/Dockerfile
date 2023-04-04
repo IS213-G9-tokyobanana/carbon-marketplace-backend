@@ -15,6 +15,4 @@ COPY . ./
 RUN poetry config virtualenvs.create false \
   && poetry install --no-interaction --no-ansi
 
-EXPOSE 5001
-
 CMD [ "python", "./notify.py" ]
