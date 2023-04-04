@@ -1,3 +1,4 @@
+from datetime import timedelta
 from temporalio.client import Client
 from config.config import TEMPORAL_SERVICE_URL
 import time
@@ -13,6 +14,7 @@ async def main(data, workflow, queue):
         data,
         id=f"{queue}-{int(time.time())}",
         task_queue=queue,
+        execution_timeout=timedelta(seconds=100),
     )
 
     if workflow_result["success"] == True:

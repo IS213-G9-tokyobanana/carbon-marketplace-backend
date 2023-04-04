@@ -11,7 +11,7 @@ from config.config import (
     RMQUSERNAME,
     RMQPASSWORD,
     EXCHANGE_NAME,
-    PAYMENT_STATUS_ROUTING_KEY
+    PAYMENT_STATUS_ROUTING_KEY,
 )
 
 
@@ -22,13 +22,11 @@ def format_url(url, pid, mid):
 # Request to Payment MS to create a new payment intent
 @activity.defn
 async def create_payment_intent(data) -> dict:
-    amount = data["amount_of_money"]
-    currency = data["currency"]
+    data["amount"] = data["amount_of_money"]
     try:
-        result = requests.post(
-            f"{PAYMENT_MS_URL}/payments", data={"amount": amount, "currency": currency}
-        )
+        result = requests.post(f"{PAYMENT_MS_URL}/payments", json=data)
         result.raise_for_status()
+        result = result.json()
     except requests.exceptions.HTTPError as err:
         result = {
             "success": False,
@@ -44,17 +42,18 @@ async def create_payment_intent(data) -> dict:
 async def reserve_offset(data) -> dict:
     url = format_url(
         PROJECT_OFFSET_URL,
-        data["data"]["project_id"],
-        data["data"]["milestone_id"],
+        data["project_id"],
+        data["milestone_id"],
     )
     payload = {
         "payment_id": data["payment_id"],
-        "amount": data["amount_of_money"],
+        "amount": data["quantity_tco2e"],
         "buyer_id": data["buyer_id"],
     }
     try:
-        result = requests.post(url, data=payload)
+        result = requests.post(url, json=payload)
         result.raise_for_status()
+        result = result.json()
     except requests.exceptions.HTTPError as err:
         result = {
             "success": False,
@@ -73,6 +72,7 @@ async def get_payment_intent(data) -> dict:
     try:
         result = requests.get(url)
         result.raise_for_status()
+        result = result.json()
     except requests.exceptions.HTTPError as err:
         result = {
             "success": False,
@@ -92,8 +92,9 @@ async def commit_offset(data) -> dict:
         data["milestone_id"],
     )
     try:
-        result = requests.post(url, data={"payment_id": data["payment_id"]})
+        result = requests.post(url, json={"payment_id": data["payment_id"]})
         result.raise_for_status()
+        result = result.json()
     except requests.exceptions.HTTPError as err:
         result = {
             "success": False,
@@ -121,8 +122,9 @@ async def add_pending_offset(data) -> dict:
         },
     }
     try:
-        result = requests.post(url, data=payload)
+        result = requests.post(url, json=payload)
         result.raise_for_status()
+        result = result.json()
     except requests.exceptions.HTTPError as err:
         result = {
             "success": False,
@@ -138,8 +140,9 @@ async def add_pending_offset(data) -> dict:
 async def remove_offset(data) -> dict:
     url = format_url(PROJECT_OFFSET_URL, data["project_id"], data["milestone_id"])
     try:
-        result = requests.delete(url, data={"payment_id": data["payment_id"]})
+        result = requests.delete(url, json={"payment_id": data["payment_id"]})
         result.raise_for_status()
+        result = result.json()
     except requests.exceptions.HTTPError as err:
         result = {
             "success": False,
@@ -173,7 +176,7 @@ async def publish_message(data) -> dict:
             "payment_status": data["payment_status"],
             "buyer_id": data["buyer_id"],
         }
-    key = PAYMENT_STATUS_ROUTING_KEY.format(payment_status = data["payment_status"])
+    key = PAYMENT_STATUS_ROUTING_KEY.format(payment_status=data["payment_status"])
     channel.basic_publish(
         exchange=EXCHANGE_NAME,
         routing_key=key,
