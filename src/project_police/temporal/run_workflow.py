@@ -1,11 +1,11 @@
-from temporalio.client import Client
+import time
 
 # Import the workflow
 from config.config import TEMPORAL_SERVICE_URL
-import time
+from temporalio.client import Client
 
 
-async def main(data, workflow, queue):
+async def main(workflow, data, queue):
     # Create client connected to server at the given address
     client = await Client.connect(TEMPORAL_SERVICE_URL)
 

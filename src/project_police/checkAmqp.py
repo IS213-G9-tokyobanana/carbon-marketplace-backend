@@ -1,21 +1,22 @@
-import json
-import pika
-import logging
 import asyncio
+import json
+import logging
+
+import pika
+import police
 from config.config import (
     EXCHANGE_NAME,
-    TASK_EXECUTE_BINDING_KEY,
+    POLICE_SCHEDULER_MANAGER_ROUTING_KEY,
     QUEUE_NAME,
     RMQHOSTNAME,
+    RMQPASSWORD,
     RMQPORT,
     RMQUSERNAME,
-    RMQPASSWORD,
-    POLICE_SCHEDULER_MANAGER_ROUTING_KEY,
+    TASK_EXECUTE_BINDING_KEY,
 )
-import police
-from temporal.run_workflow import main
 from temporal.penalise_reward_workflow import PenaliseRewardTemporalWorkflow
 from temporal.rollback_workflow import RollbackTemporalWorkflow
+from temporal.run_workflow import main
 
 # Global variable
 channel = None
@@ -83,9 +84,29 @@ def check_message(data: dict):
         if data["type"] == "milestone_upcoming":
             result = police.publish_to_notifier(data, channel)
         elif data["type"] == "milestone_penalise" or data["type"] == "milestone_reward":
-            result = asyncio.run(main(data, PenaliseRewardTemporalWorkflow, "penalise-reward-task-queue"))
+            milestone_status = (
+                "met" if data["type"] == "milestone_reward" else "rejected"
+            )
+            print(
+                "starting workflow with data: ",
+                {**data["data"], "status": milestone_status},
+            )
+            result = asyncio.run(
+                main(
+                    PenaliseRewardTemporalWorkflow,
+                    {**data["data"], "status": milestone_status},
+                    "penalise-reward-task-queue",
+                )
+            )
         elif data["type"] == "payment_overdue":
-            result = asyncio.run(main(data, RollbackTemporalWorkflow, "rollback-task-queue"))
+            print("starting workflow with data: ", data["data"])
+            result = asyncio.run(
+                main(
+                    RollbackTemporalWorkflow,
+                    data["data"],
+                    "rollback-task-queue",
+                )
+            )
         else:
             result = {
                 "success": False,
@@ -94,17 +115,17 @@ def check_message(data: dict):
                 },
             }
         print("Result:", result)
-        publish_status(result)
+        publish_status(result=result, input_data=data)
     except Exception as err:
         logging.exception("Error processing message: %s", err)
 
 
-def publish_status(result: dict):
+def publish_status(result: dict, input_data: dict):
     # Publish result to supoervisor ms
     channel.basic_publish(
         exchange=EXCHANGE_NAME,
         routing_key=POLICE_SCHEDULER_MANAGER_ROUTING_KEY,
-        body=json.dumps(result),
+        body=json.dumps(dict(result=result, input_data=input_data)),
         properties=pika.BasicProperties(delivery_mode=2),
     )
 

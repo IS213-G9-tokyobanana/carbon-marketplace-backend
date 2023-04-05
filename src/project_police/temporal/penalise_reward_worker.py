@@ -1,15 +1,14 @@
-from temporalio.client import Client
-from temporalio.worker import Worker
+from config.config import TEMPORAL_SERVICE_URL
 
 # Import the activity and workflow from our other files
 from temporal.activities import (
-    get_payment_id,
-    get_buyer_id,
-    patch_milestone,
-    send_to_user,
+    get_payment_object_by_milestone_id,
+    update_project_milestone_status,
+    update_user_offset,
 )
 from temporal.penalise_reward_workflow import PenaliseRewardTemporalWorkflow
-from config.config import TEMPORAL_SERVICE_URL
+from temporalio.client import Client
+from temporalio.worker import Worker
 
 
 async def main():
@@ -22,10 +21,9 @@ async def main():
         task_queue="penalise-reward-task-queue",
         workflows=[PenaliseRewardTemporalWorkflow],
         activities=[
-            get_payment_id,
-            get_buyer_id,
-            patch_milestone,
-            send_to_user,
+            get_payment_object_by_milestone_id,
+            update_project_milestone_status,
+            update_user_offset,
         ],
     )
 

@@ -42,17 +42,15 @@ def consume_message(
 
 
 def check_status(data: dict):
-    if data["success"] == True:
+    if data["data"]["result"]["success"]:
         print("Task completed successfully!")
     else:
-        payload = data["data"]["resource"]
-        payload = json.dumps(payload)
         publish_message(
             connection=connection,
             channel=channel,
             exchangename=EXCHANGE_NAME,
             routing_key=SCHEDULER_SUPERVISOR_SCHEDULER_ROUTING_KEY,
-            message=payload,
+            message=json.dumps(data["data"]["input_data"]),
         )
 
 

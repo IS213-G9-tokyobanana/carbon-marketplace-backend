@@ -63,9 +63,9 @@ app.get("/payments", async (req, res) => {
         $or: [{ payment_id: input }],
       });
     } else {
-      result = await collections.payments.findOne({
-        $or: [{ milestone_id: input }],
-      });
+      result = await collections.payments
+        .find({ milestone_id: input })
+        .toArray();
     }
 
     if (result) {

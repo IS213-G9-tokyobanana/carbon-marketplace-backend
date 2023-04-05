@@ -1,6 +1,13 @@
 import pika
-from config.config import RABBITMQ_HOSTNAME, RABBITMQ_PORT, RABBITMQ_USERNAME, RABBITMQ_PASSWORD, EXCHANGE, EXCHANGE_TYPE
 from classes.MessageType import MessageType
+from config.config import (
+    EXCHANGE,
+    EXCHANGE_TYPE,
+    RABBITMQ_HOSTNAME,
+    RABBITMQ_PASSWORD,
+    RABBITMQ_PORT,
+    RABBITMQ_USERNAME,
+)
 
 #<RESOURCE>_<ACTION>_QUEUE = "notify_<RESOURCE>.<ACTION>" # variable = queue_name
 PROJECT_CREATE_QUEUE = "notify_project_create"
@@ -19,7 +26,7 @@ QUEUES = { # { queue_name: binding_key }
     PROJECT_VERIFY_QUEUE: "events.projects.*.project.verify",
     MILESTONE_ADD_QUEUE: "events.projects.*.milestones.add",
     PAYMENT_SUCCESS_QUEUE: "events.buyprojects.*.payment.success",
-    PAYMENT_FAILED_QUEUE: "events.buyprojects.*.payment.failed",
+    PAYMENT_FAILED_QUEUE: "events.*.*.payment.failed",
     MILESTONE_UPCOMING_QUEUE: "events.projectpolice.*.milestone.upcoming",
 
 }
