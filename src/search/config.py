@@ -1,4 +1,5 @@
 import os
+
 from dotenv import load_dotenv
 
 env = "production"
@@ -9,6 +10,8 @@ BINDING_KEYS = {
     "search.project.verify":"events.projects.*.project.verify",
     "search.offsets.reserve":"events.projects.*.offsets.reserve",
     "search.offsets.rollback":"events.projects.*.offsets.rollback",
+    "search.rating.penalise":"events.projects.*.rating.penalise",
+    "search.rating.reward":"events.projects.*.rating.reward",
 }
 
 
