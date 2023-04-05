@@ -21,14 +21,14 @@ volumes:
   postgres_data:
   search_data:
   temporal_data:
+  prometheus_data:
+  grafana_data:
 
 services:
   buy_project_app:
     container_name: buy_project_app
     image: esdg9t1/buy_project-app:latest
     restart: unless-stopped
-    ports:
-      - 15000:${APP_PORT}
     volumes:
       - buy_project_app:/app
     networks:
@@ -73,8 +73,6 @@ services:
     container_name: notify
     image: esdg9t1/notify:latest
     restart: unless-stopped
-    ports:
-      - 15001:${APP_PORT}
     volumes:
       - notify:/app
     networks:
@@ -97,8 +95,6 @@ services:
     container_name: payments
     image: esdg9t1/payments:latest
     restart: unless-stopped
-    ports:
-      - 15002:${APP_PORT}
     volumes:
       - payments:/app
     networks:
@@ -132,12 +128,16 @@ services:
       rmqusername: ${RABBITMQ_USERNAME}
       rmqpassword: ${RABBITMQ_PASSWORD}
       projectms: ${PROJECTS_BASE_URL}
+      paymentms: ${PAYMENTS_BASE_URL}
       userms: ${USERS_BASE_URL}
       temporalservice: ${TEMPORAL_SERVER_BASE_URL}
 
   project_police_tmplwrkr:
     container_name: project_police_tmplwrkr
     image: esdg9t1/project_police-tmplwrkr:latest
+    # build:
+    #   context: ./src/project_police
+    #   dockerfile: temporal_worker.Dockerfile
     restart: unless-stopped
     volumes:
       - project_police_tmplwrkr:/app
@@ -154,6 +154,7 @@ services:
       rmqusername: ${RABBITMQ_USERNAME}
       rmqpassword: ${RABBITMQ_PASSWORD}
       projectms: ${PROJECTS_BASE_URL}
+      paymentms: ${PAYMENTS_BASE_URL}
       userms: ${USERS_BASE_URL}
       temporalservice: ${TEMPORAL_SERVER_BASE_URL}
 
@@ -161,8 +162,6 @@ services:
     container_name: projects
     image: esdg9t1/projects:latest
     restart: unless-stopped
-    ports:
-      - 15003:${APP_PORT}
     volumes:
       - projects:/app
     networks:
@@ -237,8 +236,6 @@ services:
     container_name: users
     image: esdg9t1/users:latest
     restart: unless-stopped
-    ports:
-      - 15004:${APP_PORT}
     volumes:
       - users:/app
     networks:
@@ -261,6 +258,8 @@ services:
       - 15672:15672
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
+      - ./deployment/rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
+      - ./deployment/rabbitmq/definitions.json:/etc/rabbitmq/definitions.json:ro
     networks:
       - backend-bridged-network
 
@@ -288,7 +287,7 @@ services:
     volumes:
       - mongo_data:/data/db
     ports:
-      - 37017:27017
+      - 27018:27017
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
@@ -311,8 +310,147 @@ services:
     restart: unless-stopped
     ports:
       - 7233:7233
-      - 8080:8080
     volumes:
       - temporal_data:/temporal
     networks:
       - backend-bridged-network
+
+  kong:
+    image: kong:3.2.2-alpine
+    hostname: kong
+    container_name: kong
+    environment:
+      KONG_DATABASE: "off"
+      KONG_DECLARATIVE_CONFIG: /kong/declarative/kong.yaml
+      KONG_PROXY_ACCESS_LOG: /dev/stdout
+      KONG_ADMIN_ACCESS_LOG: /dev/stdout
+      KONG_PROXY_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_LISTEN: 0.0.0.0:8001, 0.0.0.0:8444 ssl
+    networks:
+      - backend-bridged-network
+    ports:
+      - 8000:8000
+      - 8443:8443
+      - 127.0.0.1:8001:8001
+      - 127.0.0.1:8444:8444
+    command: "kong start --vv"
+    healthcheck:
+      test: ["CMD", "kong", "health"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+    restart: on-failure:5
+    volumes:
+      - ./deployment/kong/config:/kong/declarative
+
+  konga:
+    image: pantsel/konga:latest
+    container_name: konga
+    environment:
+      - NODE_ENV=production
+      - TOKEN_SECRET=my_token_secret
+    ports:
+      - 1337:1337
+    networks:
+      - backend-bridged-network
+
+  prometheus:
+    container_name: prometheus
+    image: prom/prometheus:v2.36.2
+    volumes:
+      - ./deployment/monitoring/prometheus/:/etc/prometheus/
+      - prometheus_data:/prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.console.libraries=/usr/share/prometheus/console_libraries"
+      - "--web.console.templates=/usr/share/prometheus/consoles"
+    ports:
+      - 9090:9090
+    links:
+      - cadvisor:cadvisor
+      - alertmanager:alertmanager
+      # - pushgateway:pushgateway
+    depends_on:
+      - cadvisor
+      # - pushgateway
+    networks:
+      - backend-bridged-network
+    restart: always
+    # deploy:
+    #   placement:
+    #     constraints:
+    #       - node.hostname == ${HOSTNAME}
+
+  node-exporter:
+    container_name: node-exporter
+    image: quay.io/prometheus/node-exporter:latest
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+      - /:/host:ro,rslave
+    command:
+      - "--path.rootfs=/host"
+      - "--path.procfs=/host/proc"
+      - "--path.sysfs=/host/sys"
+      - --collector.filesystem.ignored-mount-points
+      - "^/(sys|proc|dev|host|etc|rootfs/var/lib/docker/containers|rootfs/var/lib/docker/overlay2|rootfs/run/docker/netns|rootfs/var/lib/docker/aufs)($$|/)"
+    ports:
+      - 9100:9100
+    networks:
+      - backend-bridged-network
+    restart: always
+    deploy:
+      mode: global
+
+  alertmanager:
+    container_name: alertmanager
+    image: prom/alertmanager
+    ports:
+      - 9093:9093
+    volumes:
+      - ./deployment/monitoring/alertmanager/:/etc/alertmanager/
+    networks:
+      - backend-bridged-network
+    restart: always
+    command:
+      - "--config.file=/etc/alertmanager/config.yml"
+      - "--storage.path=/alertmanager"
+    # deploy:
+    #   placement:
+    #     constraints:
+    #       - node.hostname == ${HOSTNAME}
+  cadvisor:
+    container_name: cadvisor
+    image: gcr.io/cadvisor/cadvisor
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    ports:
+      - 8081:8080
+    networks:
+      - backend-bridged-network
+    restart: always
+    deploy:
+      mode: global
+
+  grafana:
+    container_name: grafana
+    image: grafana/grafana
+    user: "472"
+    depends_on:
+      - prometheus
+    ports:
+      - 3001:3000
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./deployment/monitoring/grafana/provisioning/:/etc/grafana/provisioning/
+    env_file:
+      - ./deployment/monitoring/grafana/config.monitoring
+    networks:
+      - backend-bridged-network
+    restart: always
