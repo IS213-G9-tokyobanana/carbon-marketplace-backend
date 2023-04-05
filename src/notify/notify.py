@@ -1,15 +1,22 @@
 import json
 import logging
+
 import requests
-from config.config import ( 
-    EXCHANGE, USERS_BASE_URL, 
-    SENDGRID_API_KEY, SENDGRID_FROM_EMAIL
+from classes.MessageType import MessageType
+from config.config import (
+    EXCHANGE,
+    SENDGRID_API_KEY,
+    SENDGRID_FROM_EMAIL,
+    USERS_BASE_URL,
 )
 from config.rabbitmq_setup import (
-    connection, channel, QUEUES, VERIFIER_MESSAGES, SELLER_MESSAGES, BUYER_MESSAGES
+    BUYER_MESSAGES,
+    QUEUES,
+    SELLER_MESSAGES,
+    VERIFIER_MESSAGES,
+    channel,
+    connection,
 )
-from classes.MessageType import MessageType
-
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 
@@ -175,7 +182,7 @@ def consume_message(channel, method, properties, body):
         elif type == MessageType.PAYMENT_SUCCESS.value: # Sends email to seller and buyer
             print(f'Preparing email for {type}...', end='\n\n')
             buyer_id = data['buyer_id']
-            seller_id = data['seller_id']
+            owner_id = data['owner_id']
             milestone_id = data['milestone_id']
             subject = BUYER_MESSAGES[type]['subject']
             
@@ -197,9 +204,9 @@ def consume_message(channel, method, properties, body):
 
             # notify seller
             subject = SELLER_MESSAGES[type]['subject']
-            print(f'Sending URL to users MS: {USERS_BASE_URL}/{seller_id}')
-            response = requests.get(f'{USERS_BASE_URL}/{seller_id}').json()
-            print(f'response after GET to {USERS_BASE_URL}/{seller_id}: {response}', end='\n\n')
+            print(f'Sending URL to users MS: {USERS_BASE_URL}/{owner_id}')
+            response = requests.get(f'{USERS_BASE_URL}/{owner_id}').json()
+            print(f'response after GET to {USERS_BASE_URL}/{owner_id}: {response}', end='\n\n')
             seller = response.get('data', [])
             print(f'seller: {seller}', end='\n\n')
 

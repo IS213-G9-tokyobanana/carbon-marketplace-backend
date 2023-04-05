@@ -1,6 +1,7 @@
 from datetime import timedelta
 
 from temporalio import workflow
+from temporalio.common import RetryPolicy
 
 # Import activity, passing it through the sandbox without reloading the module
 with workflow.unsafe.imports_passed_through():
@@ -23,6 +24,9 @@ class PaymentFailedTemporalWorkflow:
         payment_object_response = await workflow.execute_activity(
             get_payment_object,
             data["payment_id"],
+            retry_policy=RetryPolicy(
+                maximum_attempts=3,
+            ),
             start_to_close_timeout=timedelta(seconds=5),
         )
         results.append(payment_object_response)
@@ -31,17 +35,28 @@ class PaymentFailedTemporalWorkflow:
         remove_offset_result = await workflow.execute_activity(
             remove_offset,
             payment_object_response["data"],
+            retry_policy=RetryPolicy(
+                maximum_attempts=3,
+            ),
             start_to_close_timeout=timedelta(seconds=5),
         )
-        results.append(remove_offset_result["success"])
+        results.append(remove_offset_result)
 
         # Publish message
         publish_message_result = await workflow.execute_activity(
             publish_message,
-            {**payment_object_response, **data},
+            dict(
+                data={**data, **payment_object_response["data"]},
+                resource_id=data["payment_id"],
+                success=all([r.get("success", False) for r in results]),
+                payment_succeeded=False,
+            ),
+            retry_policy=RetryPolicy(
+                maximum_attempts=3,
+            ),
             start_to_close_timeout=timedelta(seconds=5),
         )
-        results.append(publish_message_result["success"])
+        results.append(publish_message_result)
 
         if all([result.get("success", False) for result in results]):
             return {

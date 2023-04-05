@@ -14,7 +14,7 @@ async def main():
     # Run the worker
     worker = Worker(
         client,
-        task_queue="start_payment",
+        task_queue="start_payment_test",
         workflows=[StartPaymentTemporalWorkflow],
         activities=[create_payment, reserve_offset],
     )
