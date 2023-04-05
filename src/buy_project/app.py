@@ -33,9 +33,7 @@ def checkout():
 
     data = request.get_json()
     try:
-        result = asyncio.run(
-            main(StartPaymentTemporalWorkflow, data, "start_payment_test")
-        )
+        result = asyncio.run(main(StartPaymentTemporalWorkflow, data, "start_payment"))
     except Exception as e:
         logging.error(e)
         return jsonify(success=False, data=dict(message=str(e), resources=data))
