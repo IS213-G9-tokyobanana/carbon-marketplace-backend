@@ -1,0 +1,47 @@
+# a very minimal declarative config file
+_format_version: "2.1"
+_transform: true
+
+services:
+  - name: buy_project_app
+    url: http://buy_project_app:5000
+    routes:
+      - name: buy_project_app-routes
+        paths:
+          - /api/v1/buy
+        strip_path: true
+  - name: payments
+    url: http://payments:5000/payments
+    routes:
+      - name: payments-routes
+        paths:
+          - /api/v1/payments
+        strip_path: true
+  - name: projects
+    url: http://projects:5000/projects
+    routes:
+      - name: projects-routes
+        paths:
+          - /api/v1/projects
+        strip_path: true
+  - name: users
+    url: http://users:5000/users
+    routes:
+      - name: users-routes
+        paths:
+          - /api/v1/users
+        strip_path: true
+  - name: meili
+    url: http://meili:7700
+    routes:
+      - name: meili-routes
+        paths:
+          - /api/v1/meili
+        strip_path: true
+  - name: temporalio_ui
+    url: http://temporal_server:8080
+    routes:
+      - name: temporalio_ui-routes
+        paths:
+          - /temporal
+        strip_path: true
