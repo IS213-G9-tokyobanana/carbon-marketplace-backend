@@ -86,7 +86,12 @@ def callback(channel, method, properties, body):
         client = meilisearch.Client(MEILIBASEURL)
         data = json.loads(body)
         print(data)
-        if data["type"] == "project_verify" or data["type"] == "offsets_rollback":
+        if data["type"] in (
+            "project_verify",
+            "offsets_rollback",
+            "milestone_reward",
+            "milestone_penalise",
+        ):
             client.index("projects").add_documents(
                 [data["data"]["project"]], primary_key="id"
             )
