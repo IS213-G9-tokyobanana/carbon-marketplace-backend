@@ -87,9 +87,9 @@ services:
       RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
       EXCHANGE: topic_exchange
       EXCHANGE_TYPE: topic
-      MS_BASE_URL: ${USERS_BASE_URL}/users
-      VERIFIERS_EMAILS: ${USERS_BASE_URL}/users?role=verifier
+      USERS_BASE_URL: ${USERS_BASE_URL}
       SENDGRID_API_KEY: ${SENDGRID_API_KEY}
+      SENDGRID_FROM_EMAIL: ${SENDGRID_FROM_EMAIL}
 
   payments:
     container_name: payments
@@ -229,7 +229,6 @@ services:
       rmqusername: ${RABBITMQ_USERNAME}
       rmqpassword: ${RABBITMQ_PASSWORD}
       MEILI: ${MEILI_BASE_URL}
-
 
   users:
     container_name: users
