@@ -1,3 +1,5 @@
+import json
+
 import pika
 import requests
 from config.config import (
@@ -31,12 +33,14 @@ async def reserve_offset(payment_object) -> dict:
     payment_id = payment_object["payment_id"]
     quantity_tco2e = payment_object["quantity_tco2e"]
     url = f"{PROJECT_MS_URL}/projects/{project_id}/milestones/{milestone_id}/offset"
-    payload = {
-        "payment_id": payment_id,
-        "amount": quantity_tco2e,
-        "buyer_id": buyer_id,
-    }
-    r = requests.post(url, json=payload)
+    r = requests.post(
+        url,
+        json=dict(
+            payment_id=payment_id,
+            buyer_id=buyer_id,
+            amount=quantity_tco2e,
+        ),
+    )
     r.raise_for_status()
     return r.json()
 
@@ -54,10 +58,9 @@ async def get_payment_object(payment_id) -> dict:
 # Patch request to Project MS to commit offset
 @activity.defn
 async def commit_offset(payment_object) -> dict:
-    project_id = payment_object["project_id"]
-    milestone_id = payment_object["milestone_id"]
-    url = f"{PROJECT_MS_URL}/projects/{project_id}/milestones/{milestone_id}/offset"
-    r = requests.post(url, json={"payment_id": project_id})
+    payment_id = payment_object["payment_id"]
+    url = f"{PROJECT_MS_URL}/projects/milestones/offset"
+    r = requests.patch(url, json={"payment_id": payment_id})
     r.raise_for_status()
     return r.json()
 
@@ -85,10 +88,8 @@ async def add_pending_offset(payment_object) -> dict:
 # Delete request to Projects MS to remove offset
 @activity.defn
 async def remove_offset(payment_object) -> dict:
-    project_id = payment_object["project_id"]
-    milestone_id = payment_object["milestone_id"]
     payment_id = payment_object["payment_id"]
-    url = f"{PROJECT_MS_URL}/projects/{project_id}/milestones/{milestone_id}/offset"
+    url = f"{PROJECT_MS_URL}/projects/milestones/offset"
     r = requests.delete(url, json={"payment_id": payment_id})
     r.raise_for_status()
     return r.json()
@@ -106,12 +107,13 @@ async def publish_message(data) -> dict:
     )
     connection = pika.BlockingConnection(parameters=parameters)
     channel = connection.channel()
-    payment_status = "success" if data["status"] == "complete" else "failed"
+    payment_status = "success" if data["payment_succeeded"] else "failed"
     key = PAYMENT_STATUS_ROUTING_KEY.format(payment_status=payment_status)
+    data["type"] = f"payment.{payment_status}"
     channel.basic_publish(
         exchange=EXCHANGE_NAME,
         routing_key=key,
-        body=data,
+        body=json.dumps(data),
         properties=pika.BasicProperties(delivery_mode=2),
     )
     return {

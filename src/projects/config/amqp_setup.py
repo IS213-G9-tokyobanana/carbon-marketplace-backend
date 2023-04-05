@@ -81,14 +81,13 @@ channel.exchange_declare(
 
 
 def publish_message(
-    connection,
-    channel,
     exchangename,
     routing_key,
     message,
 ):
     """This function in this module publishes a message (persistent) to the exchange with a routing key."""
-    channel = check_setup(connection, channel)
+    global connection, channel
+    connection, channel = check_setup(connection, channel)
     channel.basic_publish(
         exchange=exchangename,
         routing_key=routing_key,
@@ -116,7 +115,7 @@ def check_setup(connection, channel):
     if not is_connection_open(connection) or channel.is_closed:
         connection = create_connection()
         channel = connection.channel()
-    return channel
+    return connection, channel
 
 
 def is_connection_open(connection: pika.BlockingConnection):

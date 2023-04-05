@@ -33,15 +33,17 @@ def checkout():
 
     data = request.get_json()
     try:
-        result = asyncio.run(main(StartPaymentTemporalWorkflow, data, "start_payment"))
+        result = asyncio.run(
+            main(StartPaymentTemporalWorkflow, data, "start_payment_test")
+        )
     except Exception as e:
         logging.error(e)
         return jsonify(success=False, data=dict(message=str(e), resources=data))
     return result
 
 
-@app.route("/payment-success", methods=["POST"])
-def payment_success():
+@app.route("/webhook", methods=["POST"])
+def handle_payment_status():
     """
     Expected data:
     data: {
@@ -50,30 +52,28 @@ def payment_success():
     }
     """
     data = request.get_json()
-    try:
-        result = asyncio.run(
-            main(PaymentSuccessTemporalWorkflow, data, "payment_success")
+    if not (data.get("status") and data.get("payment_id")):
+        return jsonify(
+            success=False,
+            data=dict(message="Missing parameters in data, needs (payment_id, status)"),
         )
-    except Exception as e:
-        logging.error(e)
-        return jsonify(success=False, data=dict(message=str(e), resources=data))
-    return result
-
-
-@app.route("/payment-failed", methods=["POST"])
-def payment_failed():
-    """
-    Expected data:
-    data: {
-        payment_id: string; // stripe checkout session id
-        status: "open" | "complete" | "expired"; // stripe checkout session status
-    }
-    """
-    data = request.get_json()
-    try:
-        result = asyncio.run(
-            main(PaymentFailedTemporalWorkflow, data, "payment_failed")
+    if data["status"] not in ["open", "complete", "expired"]:
+        return jsonify(
+            success=False,
+            data=dict(
+                message="Invalid status in data, needs one of (open, complete, expired)"
+            ),
         )
+
+    if data["status"] == "complete":
+        workflow = PaymentSuccessTemporalWorkflow
+        task_queue = f"payment_success"
+    else:
+        workflow = PaymentFailedTemporalWorkflow
+        task_queue = f"payment_failed"
+
+    try:
+        result = asyncio.run(main(workflow, data, task_queue))
     except Exception as e:
         logging.error(e)
         return jsonify(success=False, data=dict(message=str(e), resources=data))
