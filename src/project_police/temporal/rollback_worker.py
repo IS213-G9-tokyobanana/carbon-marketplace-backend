@@ -1,14 +1,14 @@
-from temporalio.client import Client
-from temporalio.worker import Worker
+from config.config import TEMPORAL_SERVICE_URL
 
 # Import the activity and workflow from our other files
 from temporal.activities import (
-    remove_reserved_offset,
-    get_buyer_id,
-    send_to_notifier,
+    get_payment_object_by_milestone_id,
+    notify_buyer_payment_failed,
+    remove_reserved_offset_by_payment_id,
 )
 from temporal.rollback_workflow import RollbackTemporalWorkflow
-from config.config import TEMPORAL_SERVICE_URL
+from temporalio.client import Client
+from temporalio.worker import Worker
 
 
 async def main():
@@ -21,9 +21,9 @@ async def main():
         task_queue="rollback-task-queue",
         workflows=[RollbackTemporalWorkflow],
         activities=[
-            remove_reserved_offset,
-            get_buyer_id,
-            send_to_notifier,
+            get_payment_object_by_milestone_id,
+            notify_buyer_payment_failed,
+            remove_reserved_offset_by_payment_id,
         ],
     )
 

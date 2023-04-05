@@ -1,52 +1,73 @@
 from datetime import timedelta
+
 from temporalio import workflow
+from temporalio.common import RetryPolicy
 
 # Import activity, passing it through the sandbox without reloading the module
 with workflow.unsafe.imports_passed_through():
     from temporal.activities import (
-        remove_reserved_offset,
-        get_buyer_id,
-        send_to_notifier,
+        get_payment_object_by_milestone_id,
+        notify_buyer_payment_failed,
+        remove_reserved_offset_by_payment_id,
     )
 
 
 @workflow.defn
 class RollbackTemporalWorkflow:
+    def __repr__(self) -> str:
+        return "PenaliseRewardTemporalWorkflow"
+
     @workflow.run
     async def rollback(self, data: dict) -> dict:
-        status_arr = []
+        """
+        Expected data:
+        data: {
+            project_id: string;
+            milestone_id: string;
+            payment_id: string;
+        }
+        """
+        results = []
         # Execute activity to retrieve buyer id from a particular payment intent
-        result1 = await workflow.execute_activity(
-            get_buyer_id, data, start_to_close_timeout=timedelta(seconds=5)
-        )
-        status_arr.append(result1["success"])
-
-        data["data"]["buyer_id"] = result1["buyer_id"]
-
-        # Execute activity to remove reserved offset
-        result2 = await workflow.execute_activity(
-            remove_reserved_offset,
-            data,
+        payment_object_response = await workflow.execute_activity(
+            get_payment_object_by_milestone_id,
+            data["milestone_id"],
+            retry_policy=RetryPolicy(
+                maximum_attempts=3,
+            ),
             start_to_close_timeout=timedelta(seconds=5),
         )
-        status_arr.append(result2["success"])
+        results.append(payment_object_response)
+
+        # Execute activity to remove reserved offset
+        remove_reserved_offset_response = await workflow.execute_activity(
+            remove_reserved_offset_by_payment_id,
+            data["payment_id"],
+            retry_policy=RetryPolicy(
+                maximum_attempts=3,
+            ),
+            start_to_close_timeout=timedelta(seconds=5),
+        )
+        results.append(remove_reserved_offset_response)
 
         # Execute activity to send message to Notifier
-        result3 = await workflow.execute_activity(
-            send_to_notifier, data, start_to_close_timeout=timedelta(seconds=5)
+        publish_to_notifier_response = await workflow.execute_activity(
+            notify_buyer_payment_failed,
+            {**payment_object_response["data"], **data},
+            start_to_close_timeout=timedelta(seconds=5),
         )
-        status_arr.append(result3["success"])
+        results.append(publish_to_notifier_response)
 
-        if all(status_arr):
+        if all(results):
             return {
                 "success": True,
                 "data": {
                     "message": "Workflow executed successfully",
-                    "resources": data,
+                    "results": results,
                 },
             }
         else:
             return {
                 "success": False,
-                "data": {"message": "Workflow execution failed", "resources": data},
+                "data": {"message": "Workflow execution failed", "results": results},
             }

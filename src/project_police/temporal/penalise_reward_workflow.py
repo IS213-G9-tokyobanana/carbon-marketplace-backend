@@ -1,58 +1,77 @@
+import asyncio
 from datetime import timedelta
+from typing import List
+
 from temporalio import workflow
+from temporalio.common import RetryPolicy
 
 # Import activity, passing it through the sandbox without reloading the module
 with workflow.unsafe.imports_passed_through():
     from temporal.activities import (
-        get_payment_id,
-        get_buyer_id,
-        send_to_user,
-        patch_milestone,
+        get_payment_object_by_milestone_id,
+        update_project_milestone_status,
+        update_user_offset,
     )
 
 
 @workflow.defn
 class PenaliseRewardTemporalWorkflow:
+    def __repr__(self) -> str:
+        return "PenaliseRewardTemporalWorkflow"
+
     @workflow.run
     async def refund(self, data: dict) -> dict:
-        status_arr = []
-        result1 = await workflow.execute_activity(
-            get_payment_id, data, start_to_close_timeout=timedelta(seconds=5)
-        )
-        status_arr.append(result1["success"])
-        data["data"]["payment_id"] = result1["data"]["payment_id"]
-
-        # Execute activity to retrieve buyer id
-        result2 = await workflow.execute_activity(
-            get_buyer_id, data, start_to_close_timeout=timedelta(seconds=5)
-        )
-        status_arr.append(result2["success"])
-        data["data"]["buyer_id"] = result2["data"]["buyer_id"]
-
-        # Execute activity to remove reserved offset
-        result3 = await workflow.execute_activity(
-            patch_milestone,
-            data,
+        """
+        Expected data:
+        data: {
+            project_id: string;
+            milestone_id: string;
+            payment_id: string;
+            status: string
+        }
+        """
+        results = []
+        # returns a list of payment objects that paid for the milestone
+        payment_object_response = await workflow.execute_activity(
+            get_payment_object_by_milestone_id,
+            data["milestone_id"],
+            retry_policy=RetryPolicy(
+                maximum_attempts=3,
+            ),
             start_to_close_timeout=timedelta(seconds=5),
         )
-        status_arr.append(result3["success"])
+        results.append(payment_object_response)
 
-        # Execute activity to send message to Notifier
-        result4 = await workflow.execute_activity(
-            send_to_user, data, start_to_close_timeout=timedelta(seconds=5)
+        update_user_offset_response = await workflow.execute_activity(
+            update_user_offset,
+            data,
+            retry_policy=RetryPolicy(
+                maximum_attempts=3,
+            ),
+            start_to_close_timeout=timedelta(seconds=5),
         )
-        status_arr.append(result4["success"])
+        results.append(update_user_offset_response)
 
-        if all(status_arr):
+        update_project_milestone_status_response = await workflow.execute_activity(
+            update_project_milestone_status,
+            data,
+            retry_policy=RetryPolicy(
+                maximum_attempts=3,
+            ),
+            start_to_close_timeout=timedelta(seconds=5),
+        )
+        results.append(update_project_milestone_status_response)
+
+        if all([r.get("success", False) for r in results]):
             return {
                 "success": True,
                 "data": {
                     "message": "Workflow executed successfully",
-                    "resources": data,
+                    "results": results,
                 },
             }
         else:
             return {
                 "success": False,
-                "data": {"message": "Workflow execution failed", "resources": data},
+                "data": {"message": "Workflow execution failed", "results": results},
             }

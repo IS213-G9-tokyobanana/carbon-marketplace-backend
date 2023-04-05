@@ -1,12 +1,5 @@
 import pika
-
-from config.config import (
-    EXCHANGE_NAME,
-    RMQHOSTNAME,
-    RMQPORT,
-    RMQUSERNAME,
-    RMQPASSWORD,
-)
+from config.config import EXCHANGE_NAME, RMQHOSTNAME, RMQPASSWORD, RMQPORT, RMQUSERNAME
 
 
 def publish_message(
