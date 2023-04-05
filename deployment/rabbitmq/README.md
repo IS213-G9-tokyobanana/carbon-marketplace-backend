@@ -32,6 +32,57 @@ If you have previously ran commands to bring up container, you will need to rebu
 docker compose down && docker compose up --build
 ```
 
+#### Auto creation of exchange on startup
+
+Refer to https://stackoverflow.com/a/71035760/20545838.
+
+Config and definition files are found at {PROJECT_ROOT}/src/rabbitmq.
+
+Example definitions.json:
+
+```json
+{
+  "queues": [
+    {
+      "name": "externally_configured_queue",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-queue-type": "classic"
+      }
+    }
+  ],
+  "exchanges": [
+    {
+      "name": "externally_configured_exchange",
+      "vhost": "/",
+      "type": "direct",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {}
+    }
+  ],
+  "bindings": [
+    {
+      "source": "externally_configured_exchange",
+      "vhost": "/",
+      "destination": "externally_configured_queue",
+      "destination_type": "queue",
+      "routing_key": "externally_configured_queue",
+      "arguments": {}
+    }
+  ]
+}
+```
+
+Example rabbitmq.conf:
+
+```conf
+management.load_definitions = /etc/rabbitmq/definitions.json
+```
+
 ### Test
 
 To test, go to http://localhost:15672/#/exchanges. You should observe a newly declared exchange called topic_exchange.
