@@ -20,6 +20,7 @@ volumes:
   mongo_data:
   postgres_data:
   search_data:
+  temporal_data:
 
 services:
   buy_project_app:
@@ -57,6 +58,7 @@ services:
       - users
       - projects
       - payments
+      - temporal_server
     environment:
       rmqhostname: ${RABBITMQ_HOSTNAME}
       rmqport: ${RABBITMQ_PORT}
@@ -145,6 +147,7 @@ services:
       - rabbitmq
       - users
       - projects
+      - temporal_server
     environment:
       rmqhostname: ${RABBITMQ_HOSTNAME}
       rmqport: ${RABBITMQ_PORT}
@@ -299,5 +302,17 @@ services:
       - 17700:7700
     volumes:
       - search_data:/data.ms
+    networks:
+      - backend-bridged-network
+
+  temporal_server:
+    image: esdg9t1/temporal_server:latest
+    container_name: temporal_server
+    restart: unless-stopped
+    ports:
+      - 7233:7233
+      - 8080:8080
+    volumes:
+      - temporal_data:/temporal
     networks:
       - backend-bridged-network
