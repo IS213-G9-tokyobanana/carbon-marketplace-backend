@@ -231,6 +231,7 @@ services:
       rmqusername: ${RABBITMQ_USERNAME}
       rmqpassword: ${RABBITMQ_PASSWORD}
       MEILI: ${MEILI_BASE_URL}
+      MEILI_MASTER_KEY: ${MEILI_MASTER_KEY}
 
   users:
     container_name: users
@@ -303,6 +304,8 @@ services:
       - search_data:/data.ms
     networks:
       - backend-bridged-network
+    environment:
+      MEILI_MASTER_KEY: ${MEILI_MASTER_KEY}
 
   temporal_server:
     image: esdg9t1/temporal_server:latest
