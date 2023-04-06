@@ -4,6 +4,7 @@ import meilisearch
 import pika
 from config import (
     BINDING_KEYS,
+    MASTER_KEY,
     MEILIBASEURL,
     RMQHOSTNAME,
     RMQPASSWORD,
@@ -83,7 +84,7 @@ def callback(channel, method, properties, body):
     # print(" [x] Received %r" % body)
     # after receiving a message, call the scheduler
     try:
-        client = meilisearch.Client(MEILIBASEURL)
+        client = meilisearch.Client(MEILIBASEURL, MASTER_KEY)
         data = json.loads(body)
         print(data)
         if data["type"] in (

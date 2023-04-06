@@ -256,7 +256,9 @@ def update_project_milestone_status(id, mid):
 
     milestone.status = body["status"]
     db.session.commit()
-
+    project = (
+        db.session.execute(db.select(Project).where(Project.id == id)).scalars().first()
+    )
     # increase project rating + publish to project_verified queue
     if body["status"] == MilestoneStatus.MET.value:
         project.rating += 10
