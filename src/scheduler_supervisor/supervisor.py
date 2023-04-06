@@ -12,6 +12,7 @@ from config.config import (
 
 def callback(channel, method, properties, body):
     data = json.loads(body)
+    print(f'SUPERVISOR Received json message: {data}')
     check_status(data)
     channel.basic_ack(delivery_tag=method.delivery_tag)
 
@@ -42,15 +43,19 @@ def consume_message(
 
 
 def check_status(data: dict):
-    if data["data"]["result"]["success"]:
+    # if data["data"]["result"]["success"]:
+    if data['result']['success']:
         print("Task completed successfully!")
     else:
+        print("Task failed!")
+        print(f"Publishing data['input_data'] {data['input_data']} to {SCHEDULER_SUPERVISOR_SCHEDULER_ROUTING_KEY} ...")
+
         publish_message(
             connection=connection,
             channel=channel,
             exchangename=EXCHANGE_NAME,
             routing_key=SCHEDULER_SUPERVISOR_SCHEDULER_ROUTING_KEY,
-            message=json.dumps(data["data"]["input_data"]),
+            message=json.dumps(data["input_data"]),
         )
 
 
