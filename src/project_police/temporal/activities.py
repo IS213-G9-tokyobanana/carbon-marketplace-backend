@@ -42,7 +42,7 @@ async def update_project_milestone_status(data) -> dict:
     project_id = data["project_id"]
     milestone_id = data["milestone_id"]
     milestone_status = data["status"]
-    url = f"{PROJECT_MS_URL}/projects/{project_id}/milestones/{milestone_id}"
+    url = f"{PROJECT_MS_URL}/projects/{project_id}/milestones/{milestone_id}/status"
     r = requests.patch(url, json=dict(status=milestone_status))
     r.raise_for_status()
     return r.json()

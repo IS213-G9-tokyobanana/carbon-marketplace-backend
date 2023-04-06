@@ -80,6 +80,19 @@ def callback(channel, method, properties, body):
 
 # Function is called when message is received, and message type is checked
 def check_message(data: dict):
+    """
+    data = {
+        "type": "milestone_penalise",
+        "resource_id": "915132d0-3b1d-4ca5-a09a-7b048fcac205",
+        "data": {
+            "project_id": "19b65a6f-bbad-4d88-8744-a9cbe7e69a58",
+            "milestone_id": "915132d0-3b1d-4ca5-a09a-7b048fcac205",
+            "payment_id": "1234",
+            "status": "rejected"
+        }
+    } 
+    """
+    
     try:
         if data["type"] == "milestone_upcoming":
             result = police.publish_to_notifier(data, channel)
@@ -115,6 +128,20 @@ def check_message(data: dict):
                 },
             }
         print("Result:", result)
+        """ example result
+        {
+            "success": True,
+            "data": {
+                "message": "Workflow executed successfully",
+                "resource": {
+                    "project_id": "19b65a6f-bbad-4d88-8744-a9cbe7e69a58",
+                    "milestone_id": "915132d0-3b1d-4ca5-a09a-7b048fcac205",
+                    "payment_id": "1234",
+                    "status": "rejected"
+                }
+            }
+        }
+        """
         publish_status(result=result, input_data=data)
     except Exception as err:
         logging.exception("Error processing message: %s", err)
@@ -128,6 +155,32 @@ def publish_status(result: dict, input_data: dict):
         body=json.dumps(dict(result=result, input_data=input_data)),
         properties=pika.BasicProperties(delivery_mode=2),
     )
+    """
+    {
+        "result": {
+            "success": True,
+            "data": {
+                "message": "Workflow executed successfully",
+                "resource": {
+                    "project_id": "19b65a6f-bbad-4d88-8744-a9cbe7e69a58",
+                    "milestone_id": "915132d0-3b1d-4ca5-a09a-7b048fcac205",
+                    "payment_id": "1234",
+                    "status": "rejected"
+                }
+            }
+        },
+        "input_data": {
+            "type": "milestone_penalise",
+            "resource_id": "915132d0-3b1d-4ca5-a09a-7b048fcac205",
+            "data": {
+                "project_id": "19b65a6f-bbad-4d88-8744-a9cbe7e69a58",
+                "milestone_id": "915132d0-3b1d-4ca5-a09a-7b048fcac205",
+                "payment_id": "1234",
+                "status": "rejected"
+            }
+        } 
+    }
+    """
 
 
 if __name__ == "__main__":
