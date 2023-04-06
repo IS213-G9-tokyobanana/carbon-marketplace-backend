@@ -235,8 +235,9 @@ def update_project_milestone_status(id, mid):
         3a. decrease project rating
         3b. publish to `ratings_penalise` queue
     """
-    project_query = db.session.execute(db.select(Project).where(Project.id == id))
-    project = project_query.scalars().first()
+    project = (
+        db.session.execute(db.select(Project).where(Project.id == id)).scalars().first()
+    )
     if project is None:
         abort(404, description=f"Project {str(id)} not found.")
 
@@ -255,11 +256,13 @@ def update_project_milestone_status(id, mid):
 
     milestone.status = body["status"]
     db.session.commit()
-
+    project = (
+        db.session.execute(db.select(Project).where(Project.id == id)).scalars().first()
+    )
     # increase project rating + publish to project_verified queue
     if body["status"] == MilestoneStatus.MET.value:
         project.rating += 10
-        amqp_data = {"project": project_query.scalars().first().json()}
+        amqp_data = {"project": project.json()}
         payload = Payload(
             resource_id=str(milestone.id),
             type=AmqpPayloadType.MILESTONE_REWARD.value,
@@ -275,7 +278,7 @@ def update_project_milestone_status(id, mid):
     # decrease project rating + publish to project_penalised queue
     elif body["status"] == MilestoneStatus.REJECTED.value:
         project.rating -= 10
-        amqp_data = {"project": project_query.scalars().first().json()}
+        amqp_data = {"project": project.json()}
         payload = Payload(
             resource_id=str(milestone.id),
             type=AmqpPayloadType.MILESTONE_PENALISE.value,
