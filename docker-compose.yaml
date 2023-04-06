@@ -303,6 +303,8 @@ services:
       - search_data:/data.ms
     networks:
       - backend-bridged-network
+    environment:
+      MEILI_MASTER_KEY: ${MEILI_MASTER_KEY}
 
   temporal_server:
     image: esdg9t1/temporal_server:latest
