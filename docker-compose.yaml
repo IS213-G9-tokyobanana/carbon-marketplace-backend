@@ -231,6 +231,7 @@ services:
       rmqusername: ${RABBITMQ_USERNAME}
       rmqpassword: ${RABBITMQ_PASSWORD}
       MEILI: ${MEILI_BASE_URL}
+      MEILI_MASTER_KEY: ${MEILI_MASTER_KEY}
 
   users:
     container_name: users
