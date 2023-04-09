@@ -31,22 +31,21 @@
       <a href="#about-the-project">About The Project</a>
       <ul>
         <li><a href="#built-with">Built With</a></li>
+        <li><a href="#libraries">Libraries</a></li>
+        <li><a href="#method-communication">Method of Communication</a></li>
+        <li><a href="#deployment">Deployment</a></li>
       </ul>
     </li>
     <li>
       <a href="#initial-setup">Initial Setup</a>
       <ul>
         <li><a href="#prerequisites">Prerequisites</a></li>
-        <li><a href="#local-development">Local Development</a></li>
+        <li><a href="#usage">Usage</a></li>
       </ul>
     </li>
     <li>
-      <a href="#usage">Usage</a>
-      <ul>
-        <li><a href="#api-documentation">API Documentation</a></li>
-      </ul>
+      <a href="#api-acknowledgements">API Acknowledgments</a>
     </li>
-    <li><a href="#acknowledgments">Acknowledgments</a></li>
   </ol>
 </details>
 
@@ -56,31 +55,47 @@
 
 <!-- [![Product Name Screen Shot][product-screenshot]](https://example.com) -->
 
-Our app is a platform for companies any entity to (1) obtain funding for new green projects and (2) further monetise existing green projects that have already began consistently removing CO2 from environment.
+Our app is a platform that enables individuals and organisations to contribute to reduce greenhouse gases in the atomosphere through voluntary carbon offsetting. It allows any entity to (1) obtain funding for new green projects and (2) further monetise existing green projects that have already began consistently removing CO2 from environment.
 
-The focus is primarily on the voluntary market where anyone can fund new projects or support existing projects by buying carbon credits sold by these companies.
-
-We are not focusing on compliance market to facilitate the trading of carbon credits b/w companies who have hit their carbon credit cap set by govt and want to buy carbon credits from other companies with surplus carbon credits (companies whose carbon credits are below the cap set by govt).
+The focus is primarily on the voluntary market where anyone can fund new projects or support existing projects by buying carbon credits sold by these companies on our platform. 
+Our focus is not on the compliance market, which involves the trading of carbon credits between companies that have hit their carbon credit cap set by government and wish to buy carbon credits from other companies with surplus carbon credits (i.e., companies whose carbon credits are below the cap set by the government).
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ### Built With
 
-- [Docker](https://www.docker.com/) (Container Runtime)
-- [Temporal](https://temporal.io/) (Workflow Engine)
 - [Flask](https://flask.palletsprojects.com/en/2.0.x/) (Python Web Framework)
 - [Express.js](https://expressjs.com/) (Node.js Web Framework)
 - [PostgreSQL](https://www.postgresql.org/) (SQL Database)
 - [MongoDB](https://www.mongodb.com/) (NoSQL Database)
+- [Docker](https://www.docker.com/) (Container Runtime)
 - [RabbitMQ](https://www.rabbitmq.com/) (Message Broker)
 - [MeiliSearch](https://www.meilisearch.com/) (Search Engine)
-- [Terrafom](https://www.terraform.io/) (Infrastructure as Code)
-- [Prometheus](https://prometheus.io/) (Monitoring)
-- [Grafana](https://grafana.com/) (Monitoring)
+- [Kong](https://konghq.com/) (API Gateway)
 - [Istio](https://istio.io/) (API Gateway / Service Mesh)
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+### Libraries 
 
+- [Pika](https://pika.readthedocs.io/en/stable/) (Python Implementation of AMQP 0-9-1 Protocol)
+- [Crontab](https://crontab.guru/) (Job Scheduler)
+
+
+### Methods of Communication 
+- [gRPC](https://grpc.io/docs/languages/python/quickstart/) (Remote Procedure Call Framework)
+- [Temporal](https://temporal.io/) (Workflow Engine)
+
+
+### Monitoring 
+- [Prometheus](https://prometheus.io/) (Monitoring System)
+- [Grafana](https://grafana.com/) (Observability Platform)
+
+### Deployment
+- [Github Actions](https://docs.github.com/en/actions/) (CI/CD platform for pipelines)
+- [Terraform](https://www.terraform.io/) (Infrastructure as Code)
+- [Kubernetes](https://kubernetes.io/) (Container Orchestration Engine)
+
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 <!-- GETTING STARTED -->
 
 ## Initial Setup
@@ -94,9 +109,9 @@ To get a local copy of all the microservices up and running follow these steps.
 - [Deployment only] [Terraform](https://www.terraform.io/downloads.html)
 - [Deployment only] [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html)
 
-### Local development
+### Usage
 
-1. Clone the repo
+1. Clone the repository
    ```bash
    git clone https://github.com/IS213-G9-tokyobanana/carbon-marketplace-backend.git
    ```
@@ -154,24 +169,11 @@ To get a local copy of all the microservices up and running follow these steps.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-<!-- USAGE EXAMPLES -->
 
-## Usage
+## API Acknowledgments
 
-Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources.
+- [Stripe API](https://stripe.com/docs/api) (Stripe API)
+- [Twilio SendGrid API](https://www.twilio.com/en-us/sendgrid/email-api) (Twilio SendGrid API)
 
-_For more examples, please refer to the [Documentation](https://example.com)_
-
-### API Documentations
-
-API documentation can be found [here](https://example.com).
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-## Acknowledgments
-
-- []()
-- []()
-- []()
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
